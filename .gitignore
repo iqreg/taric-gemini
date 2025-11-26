@@ -1,4 +1,4 @@
-# Python venv
+# virtuelle Umgebungen
 .venv/
 .venv_taric/
 
@@ -6,15 +6,18 @@
 __pycache__/
 *.pyc
 
-# Lokale Datenbanken
-*.db
+# macOS
+.DS_Store
 
-# API Keys / Secrets
+# API-Key / Secrets
 API_GEMINI.txt
 
-# Bilder (lokale Evaluationsdaten)
+# lokale Datenbanken
+*.db
+
+# lokale Bilddaten
 bilder/
 bilder_uploads/
 
-# VS Code Settings (optional)
+# VS Code Workspace (optional)
 .vscode/
