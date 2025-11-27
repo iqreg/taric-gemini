@@ -1,9 +1,12 @@
 import os
-import glob
 import json
 import sqlite3
-import time
 import mimetypes
+import time
+
+from fastapi import FastAPI, File, UploadFile
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 
 import google.generativeai as genai
 
@@ -12,8 +15,8 @@ import google.generativeai as genai
 # Konfiguration
 # -----------------------
 
-IMAGE_DIR = "bilder"            # Ordner mit deinen Produktfotos
-DB_PATH = "taric_dataset.db"    # SQLite-Datenbank
+IMAGE_DIR = "bilder_uploads"
+DB_PATH = "taric_live.db"
 
 SYSTEM_PROMPT = """
 Du bist ein erfahrener EU-Zoll- und TARIC-Experte.
@@ -56,32 +59,28 @@ Regeln:
 USER_TEXT = "Bestimme für dieses Produktfoto den TARIC-Code und gib nur das JSON aus."
 
 
-# -----------------------
-# Hilfsfunktionen
-# -----------------------
-
 def configure_gemini():
-    """Initialisiere das Gemini-Modell mit API-Key aus GEMINI_API_KEY."""
     api_key = os.environ.get("GEMINI_API_KEY")
     if not api_key:
         raise RuntimeError("Bitte Umgebungsvariable GEMINI_API_KEY setzen.")
     genai.configure(api_key=api_key)
 
-    # WICHTIG: -latest verwenden, sonst 404-Fehler
+    # Modell aus deiner list_models-Ausgabe
     model = genai.GenerativeModel(
-        model_name="gemini-1.5-flash-latest",
+        model_name="gemini-flash-latest",
         system_instruction=SYSTEM_PROMPT,
     )
     return model
 
 
-def create_db(conn: sqlite3.Connection) -> None:
-    """Legt die Tabelle für die TARIC-Labels an (falls noch nicht vorhanden)."""
+def ensure_db():
+    conn = sqlite3.connect(DB_PATH)
     cur = conn.cursor()
     cur.execute(
         """
-        CREATE TABLE IF NOT EXISTS taric_labels (
+        CREATE TABLE IF NOT EXISTS taric_live (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
+            created_at TEXT,
             filename TEXT,
             taric_code TEXT,
             cn_code TEXT,
@@ -94,28 +93,27 @@ def create_db(conn: sqlite3.Connection) -> None:
         """
     )
     conn.commit()
+    conn.close()
 
 
-def guess_mime_type(path: str) -> str:
-    """Bestimme den MIME-Typ anhand der Dateiendung, fallback image/jpeg."""
-    mime, _ = mimetypes.guess_type(path)
+def guess_mime_type(filename: str, content_type: str | None) -> str:
+    if content_type:
+        return content_type
+    mime, _ = mimetypes.guess_type(filename)
     if mime is None:
         return "image/jpeg"
     return mime
 
 
-def classify_image_with_gemini(model, image_path: str) -> dict:
-    """Schicke Bild + Prompt an Gemini und parse die JSON-Antwort."""
-    mime_type = guess_mime_type(image_path)
-    with open(image_path, "rb") as f:
-        img_bytes = f.read()
+def classify_image_bytes(model, data: bytes, filename: str, content_type: str | None) -> dict:
+    mime_type = guess_mime_type(filename, content_type)
 
     response = model.generate_content(
         [
             USER_TEXT,
             {
                 "mime_type": mime_type,
-                "data": img_bytes,
+                "data": data,
             },
         ],
         generation_config={
@@ -123,77 +121,82 @@ def classify_image_with_gemini(model, image_path: str) -> dict:
         },
     )
 
-    # response.text sollte ein JSON-String sein
     return json.loads(response.text)
 
 
-def classify_and_store(conn: sqlite3.Connection, model, image_path: str) -> None:
-    """Klassifiziere 1 Bild und schreibe Ergebnis in SQLite."""
-    data = classify_image_with_gemini(model, image_path)
-    content_json = json.dumps(data, ensure_ascii=False)
-
+def store_result(filename: str, result: dict) -> None:
+    conn = sqlite3.connect(DB_PATH)
     cur = conn.cursor()
     cur.execute(
         """
-        INSERT INTO taric_labels
-        (filename, taric_code, cn_code, hs_chapter,
+        INSERT INTO taric_live
+        (created_at, filename, taric_code, cn_code, hs_chapter,
          confidence, short_reason, alternatives_json, raw_response_json)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        VALUES (datetime('now'), ?, ?, ?, ?, ?, ?, ?, ?)
         """,
         (
-            os.path.basename(image_path),
-            data.get("taric_code"),
-            data.get("cn_code"),
-            data.get("hs_chapter"),
-            float(data.get("confidence", 0.0)),
-            data.get("short_reason"),
-            json.dumps(data.get("possible_alternatives", []), ensure_ascii=False),
-            content_json,
+            filename,
+            result.get("taric_code"),
+            result.get("cn_code"),
+            result.get("hs_chapter"),
+            float(result.get("confidence", 0.0)),
+            result.get("short_reason"),
+            json.dumps(result.get("possible_alternatives", []), ensure_ascii=False),
+            json.dumps(result, ensure_ascii=False),
         ),
     )
     conn.commit()
-
-
-# -----------------------
-# Hauptprogramm
-# -----------------------
-
-def main():
-    # Modell initialisieren
-    model = configure_gemini()
-
-    # DB öffnen/erzeugen
-    conn = sqlite3.connect(DB_PATH)
-    create_db(conn)
-
-    # Alle unterstützten Bild-Dateien einsammeln
-    image_paths = sorted(
-        glob.glob(os.path.join(IMAGE_DIR, "*.jpg"))
-        + glob.glob(os.path.join(IMAGE_DIR, "*.jpeg"))
-        + glob.glob(os.path.join(IMAGE_DIR, "*.png"))
-    )
-
-    print(f"Insgesamt gefundene Bilder: {len(image_paths)}")
-
-    if not image_paths:
-        print("Keine Bilder im Ordner 'bilder' gefunden.")
-        conn.close()
-        return
-
-    # Zum Testen ggf. begrenzen:
-    # image_paths = image_paths[:5]
-
-    for i, path in enumerate(image_paths, start=1):
-        print(f"[{i}/{len(image_paths)}] Verarbeite {path} ...")
-        try:
-            classify_and_store(conn, model, path)
-        except Exception as e:
-            print(f"Fehler bei {path}: {e}")
-        time.sleep(0.4)  # kleine Pause gegen Rate-Limits
-
     conn.close()
-    print("Fertig. Datenbank liegt unter:", DB_PATH)
 
 
-if __name__ == "__main__":
-    main()
+# -----------------------
+# FastAPI App
+# -----------------------
+
+app = FastAPI()
+model = configure_gemini()
+ensure_db()
+
+# CORS für lokale Web-App erlauben (Entwicklung)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],      # für Produktion enger machen
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
+@app.post("/classify")
+async def classify(file: UploadFile = File(...)):
+    try:
+        data = await file.read()
+
+        # optional: Upload lokal speichern
+        os.makedirs(IMAGE_DIR, exist_ok=True)
+        safe_name = f"{int(time.time())}_{file.filename}"
+        save_path = os.path.join(IMAGE_DIR, safe_name)
+        with open(save_path, "wb") as f:
+            f.write(data)
+
+        result = classify_image_bytes(
+            model=model,
+            data=data,
+            filename=file.filename,
+            content_type=file.content_type,
+        )
+
+        store_result(safe_name, result)
+
+        return JSONResponse(content=result)
+
+    except Exception as e:
+        return JSONResponse(
+            status_code=500,
+            content={"error": str(e)},
+        )
+
+
+@app.get("/health")
+async def health():
+    return {"status": "ok"}
