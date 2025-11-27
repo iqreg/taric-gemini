@@ -1,32 +1,99 @@
 ---
+# Projektstatus TARIC-Gemini
 
-# README.md
+## Übersicht
 
-# TARIC Gemini – KI-gestützte Klassifikation von Warenbildern
+Das Projekt dient der automatisierten Bilderkennung und TARIC-Klassifizierung über ein eigenes Backend (Python/FastAPI + Uvicorn) und ein simples Frontend (lokaler HTTP-Server). Der aktuelle Stand umfasst eine funktionierende Bildübertragung an das Backend, eine stabile Kommunikation mit dem Klassifizierungsmodell sowie funktionierende Netzwerkzugriffe über die lokale IP.
 
-Dieses Projekt ermöglicht die automatische Ermittlung des passenden **TARIC-Codes** anhand eines **Produktfotos**.
-Es kombiniert eine minimalistische **Web-App** zur Bildaufnahme (Browser/Kamera) mit einem **FastAPI-Backend**, das Bilder an **Google Gemini** sendet und die Ergebnisse strukturiert speichert.
+## Komponenten
 
----
+### Backend
 
-## 🚀 Funktionen
+* Framework: FastAPI
+* Startbefehl:
 
-* Foto aufnehmen oder hochladen
-* Bild wird per API an Gemini gesendet
-* TARIC-Klassifikation in strukturiertem JSON:
+  ```bash
+  uvicorn backend:app --reload --host 0.0.0.0 --port 8000
+  ```
+* Funktionen:
 
-  * `taric_code` (10-stellig)
-  * `cn_code`
-  * `hs_chapter`
-  * `confidence`
-  * `short_reason`
-  * `possible_alternatives[]`
-* Vollautomatische Speicherung:
+  * Entgegennahme von Bildern (POST /classify)
+  * Speichern der Bilddateien
+  * Weiterleitung an Klassifizierungsfunktion
 
-  * Bild wird im Ordner **`bilder/`** abgelegt
-  * Klassifikation wird in **`taric_live.db`** (SQLite) gespeichert
-* REST-API mit **FastAPI**
-* Einfache lokale Web-App (`index.html`) für mobile Nutzung
+### Frontend
+
+* Lokaler Webserver mittels Python:
+
+  ```bash
+  python3 -m http.server 8080 --bind 0.0.0.0
+  ```
+* Index-Datei wird korrekt von anderen Geräten im Netzwerk geladen
+
+## Netzwerk & Firewall
+
+* Lokale Mac-IP: Beispiel `192.168.7.124`
+* Adressschema für Frontend-Aufruf:
+
+  ```
+  http://192.168.7.124:8080/index.html
+  ```
+* Firewall-Thema gelöst: Ports korrekt freigegeben
+* Wichtig: Bei Änderungen der Firewall-Einträge werden Regeln teilweise automatisch gelöscht → erneute Prüfung notwendig
+
+## Aktueller Stand Backend
+
+* Bildempfang funktioniert:
+
+  * Logging zeigt volle Bildbytes
+  * Dateien werden unter `bilder_uploads/` gespeichert
+* Klassifizierungsmodell liefert JSON mit:
+
+  * taric_code
+  * cn_code
+  * hs_chapter
+  * confidence
+  * short_reason
+  * possible_alternatives
+
+## Beispiel-Response
+
+```json
+{
+  "taric_code": "8517620000",
+  "cn_code": "85176200",
+  "hs_chapter": "85",
+  "confidence": 0.9,
+  "short_reason": "Dockingstation mit Netzwerkschnittstellen.",
+  "possible_alternatives": [ ... ]
+}
+```
+
+## Branch & GitHub
+
+* Ziel: Aktuelle lokale Version (Backend + Frontend + Infrastruktur) in neuen Branch pushen
+* Standard-Vorgehen:
+
+  ```bash
+  git add .
+  git commit -m "Projektstatus aktualisiert, Backend/Frontend stabil"
+  git push -u origin <branch-name>
+  ```
+
+## Projektordner-Struktur
+
+```
+project-root/
+│ backend.py
+│ index.html
+│ bilder_uploads/
+│ .venv_taric/
+│ kill_http_servers.sh
+│ requirements.txt
+└─ README.md
+```
+
+
 
 ---
 
