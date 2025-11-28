@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <title>TARIC Evaluation – Zollprüfung</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg: #020617;
+      --bg-panel: #0f172a;
+      --border: #1f2937;
+      --accent: #2563eb;
+      --accent-soft: rgba(37,99,235,0.12);
+      --accent-strong: rgba(37,99,235,0.4);
+      --text: #e5e7eb;
+      --text-muted: #9ca3af;
+      --error: #ef4444;
+      --success: #22c55e;
+      --radius: 14px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+        "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #020617, #000 80%);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 16px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .page {
+      width: 100%;
+      max-width: 1080px;
+      background: linear-gradient(145deg, #020617 0%, #020617 55%, #020617 100%);
+      border-radius: 24px;
+      border: 1px solid rgba(148,163,184,0.35);
+      box-shadow: 0 18px 45px rgba(15,23,42,0.75);
+      padding: 16px 16px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    header {
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 1.4rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    h1 span.icon {
+      font-size: 1.2rem;
+    }
+
+    header p {
+      margin: 0;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    .header-right {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+
+    .nav-link {
+      text-decoration: none;
+      padding: 6px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.4);
+      color: #e5e7eb;
+      font-size: 0.8rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      background: radial-gradient(circle at top, #1e293b, #020617);
+      transition: transform 0.1s ease, box-shadow 0.1s ease,
+        background 0.1s ease, border-color 0.1s ease;
+    }
+
+    .nav-link span.icon {
+      font-size: 0.9rem;
+    }
+
+    .nav-link:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 25px rgba(15,23,42,0.7);
+      border-color: rgba(191,219,254,0.6);
+      background: radial-gradient(circle at top, #1d4ed8, #020617);
+    }
+
+    .nav-link.active {
+      border-color: rgba(129,140,248,0.9);
+      background: radial-gradient(circle at top, #1d4ed8, #020617);
+    }
+
+    select {
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: #020617;
+      border: 1px solid rgba(148,163,184,0.6);
+      color: var(--text);
+      font-size: 0.8rem;
+    }
+
+    main {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+      gap: 16px;
+    }
+
+    @media (max-width: 900px) {
+      main {
+        display: flex;
+        flex-direction: column;
+      }
+    }
+
+    .panel {
+      background: radial-gradient(circle at top left, #020617, #000 95%);
+      border-radius: var(--radius);
+      border: 1px solid rgba(31,41,55,0.9);
+      padding: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.55);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .panel h2 {
+      margin: 0 0 6px 0;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .panel h2 span.icon {
+      font-size: 1rem;
+    }
+
+    .thumb-box {
+      border-radius: 12px;
+      border: 1px solid rgba(31,41,55,0.9);
+      padding: 8px;
+      background: #020617;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .thumb-box img {
+      max-width: 100%;
+      border-radius: 10px;
+      display: block;
+    }
+
+    .meta {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .meta strong {
+      color: #e5e7eb;
+    }
+
+    .codes {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      font-size: 0.8rem;
+    }
+
+    .code-pill {
+      border-radius: 999px;
+      padding: 3px 8px;
+      border: 1px solid rgba(148,163,184,0.7);
+      background: rgba(15,23,42,0.85);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .code-pill strong {
+      color: #e5e7eb;
+    }
+
+    .confidence {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 4px;
+    }
+
+    .confidence span.label {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .confidence-bar {
+      flex: 1;
+      height: 6px;
+      border-radius: 999px;
+      background: rgba(31,41,55,0.85);
+      overflow: hidden;
+    }
+
+    .confidence-bar-inner {
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #f97316, #facc15, #22c55e);
+      width: 0%;
+      transition: width 0.2s ease;
+    }
+
+    .confidence-pill {
+      font-size: 0.7rem;
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.7);
+      background: rgba(15,23,42,0.9);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .short-reason {
+      font-size: 0.85rem;
+    }
+
+    .short-reason strong {
+      color: #e5e7eb;
+    }
+
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-bottom: 8px;
+    }
+
+    label {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    input[type="number"],
+    input[type="text"],
+    textarea {
+      width: 100%;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.7);
+      padding: 5px 8px;
+      background: #020617;
+      color: var(--text);
+      font-size: 0.85rem;
+    }
+
+    textarea {
+      border-radius: 10px;
+      min-height: 80px;
+      resize: vertical;
+    }
+
+    .chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 4px;
+      margin-bottom: 2px;
+    }
+
+    .chip {
+      min-width: 32px;
+      padding: 5px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.6);
+      background: radial-gradient(circle at top, #020617, #020617 90%);
+      color: #e5e7eb;
+      font-size: 0.82rem;
+      text-align: center;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      transition: transform 0.1s ease, box-shadow 0.1s ease,
+        background 0.1s ease, border-color 0.1s ease;
+      box-shadow: 0 6px 14px rgba(15,23,42,0.6);
+    }
+
+    .chip span.icon {
+      font-size: 0.9rem;
+    }
+
+    .chip:hover {
+      transform: translateY(-1px);
+      border-color: rgba(191,219,254,0.8);
+      box-shadow: 0 10px 22px rgba(15,23,42,0.8);
+    }
+
+    .chip.selected {
+      background: radial-gradient(circle at top, #1d4ed8, #020617);
+      border-color: rgba(129,140,248,0.9);
+      box-shadow: 0 10px 28px rgba(37,99,235,0.6);
+    }
+
+    .chip.secondary {
+      opacity: 0.8;
+      border-style: dashed;
+    }
+
+    .hint-inline {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+    }
+
+    .btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    .btn {
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.6);
+      padding: 7px 14px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      background: radial-gradient(circle at top, #1e3a8a, #111827);
+      color: #e5e7eb;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      transition: transform 0.12s ease, box-shadow 0.12s ease,
+        background 0.12s ease, border-color 0.12s ease;
+      box-shadow: 0 10px 25px rgba(37,99,235,0.35);
+    }
+
+    .btn span.icon {
+      font-size: 0.9rem;
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: default;
+      box-shadow: none;
+    }
+
+    .btn:hover:not(:disabled) {
+      transform: translateY(-1px);
+      border-color: rgba(191,219,254,0.9);
+      background: radial-gradient(circle at top, #1d4ed8, #020617);
+    }
+
+    .status {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .status strong {
+      color: #e5e7eb;
+    }
+
+    .status.ok {
+      color: var(--success);
+    }
+
+    .status.error {
+      color: var(--error);
+    }
+
+    .index-info {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .no-data {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .legend {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .legend span.swatch {
+      width: 30px;
+      height: 6px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #f97316, #facc15, #22c55e);
+      border: 1px solid rgba(148,163,184,0.7);
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <div class="header-bar">
+        <div>
+          <h1><span class="icon">⚖️</span>TARIC Evaluation – Zollprüfung</h1>
+          <p>
+            Bewertung der automatischen TARIC-Klassifikation (0–10 Stellen korrekt)
+            und optionale Supervisor-Korrektur.
+          </p>
+        </div>
+        <div class="header-right">
+          <select id="filterSelect">
+            <option value="unreviewed" selected>Nur unbewertete</option>
+            <option value="reviewed">Nur bewertete</option>
+            <option value="all">Alle</option>
+          </select>
+          <a href="index.html" class="nav-link">
+            <span class="icon">📷</span><span>Klassifikation</span>
+          </a>
+          <a href="evaluation.html" class="nav-link active">
+            <span class="icon">🧪</span><span>Evaluation</span>
+          </a>
+          <a href="auswertung.html" class="nav-link">
+            <span class="icon">📊</span><span>DB-Auswertung</span>
+          </a>
+        </div>
+      </div>
+      <div class="legend">
+        <span>Confidence-Farbskala:</span>
+        <span class="swatch"></span>
+        <span>links = niedrig, rechts = hoch</span>
+      </div>
+    </header>
+
+    <main>
+      <!-- Linke Seite: Bild + Basisdaten -->
+      <section class="panel">
+        <h2><span class="icon">🖼️</span>Bild &amp; Modell-Ergebnis</h2>
+        <div id="imageCard" class="thumb-box">
+          <div class="no-data">
+            Noch keine Daten geladen. Filter wählen oder Seite lädt automatisch beim Start.
+          </div>
+        </div>
+      </section>
+
+      <!-- Rechte Seite: Bewertung -->
+      <section class="panel">
+        <h2><span class="icon">✍️</span>Bewertung</h2>
+
+        <div class="index-info" id="indexInfo">
+          Datensatz 0 / 0
+        </div>
+
+        <div class="field-group" id="correctDigitsGroup">
+          <label for="correctDigitsInput">
+            Korrekte Stellen (0–10, Zollprofi)
+          </label>
+          <div class="chip-row" id="correctDigitsChips"></div>
+          <span class="hint-inline">
+            Per Tippen schnell wählen – Eingabefeld unten kann bei Bedarf überschrieben werden.
+          </span>
+          <input id="correctDigitsInput" type="number" min="0" max="10" step="1" />
+        </div>
+
+        <div class="field-group" id="reviewerGroup">
+          <label for="reviewerInput">Reviewer (Name/Kürzel)</label>
+          <input id="reviewerInput" type="text" placeholder="z. B. AB123" />
+        </div>
+
+        <div class="field-group" id="commentGroup">
+          <label for="commentInput">Kommentar</label>
+          <textarea id="commentInput" placeholder="Optionaler Kommentar zur Einstufung"></textarea>
+        </div>
+
+        <div class="field-group" id="supervisorGroup">
+          <label for="supervisorInput">
+            Supervisor-Bewertung (0–10, optional)
+          </label>
+          <div class="chip-row" id="supervisorChips"></div>
+          <span class="hint-inline">
+            Supervisor kann hier schnell korrigieren/übersteuern.
+          </span>
+          <input id="supervisorInput" type="number" min="0" max="10" step="1" />
+        </div>
+
+        <div class="btn-row">
+          <button id="saveBtn" class="btn">
+            <span class="icon">💾</span><span>Speichern</span>
+          </button>
+          <button id="saveNextBtn" class="btn">
+            <span class="icon">⏭️</span><span>Speichern &amp; nächster</span>
+          </button>
+          <button id="prevBtn" class="btn">
+            <span class="icon">⬅️</span><span>Zurück</span>
+          </button>
+          <button id="nextBtn" class="btn">
+            <span class="icon">➡️</span><span>Weiter</span>
+          </button>
+        </div>
+
+        <div class="status" id="statusLine">
+          <strong>Status:</strong> noch keine Daten geladen.
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const BACKEND_PORT = "8000";
+    const API_HOST = window.location.hostname || "localhost";
+    const API_BASE = `${window.location.protocol}//${API_HOST}:${BACKEND_PORT}`;
+
+    const filterSelect = document.getElementById("filterSelect");
+    const imageCard = document.getElementById("imageCard");
+    const indexInfo = document.getElementById("indexInfo");
+    const correctDigitsInput = document.getElementById("correctDigitsInput");
+    const reviewerInput = document.getElementById("reviewerInput");
+    const commentInput = document.getElementById("commentInput");
+    const supervisorInput = document.getElementById("supervisorInput");
+    const saveBtn = document.getElementById("saveBtn");
+    const saveNextBtn = document.getElementById("saveNextBtn");
+    const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const statusLine = document.getElementById("statusLine");
+
+    const correctDigitsChipsContainer = document.getElementById("correctDigitsChips");
+    const supervisorChipsContainer = document.getElementById("supervisorChips");
+
+    const correctDigitsGroup = document.getElementById("correctDigitsGroup");
+    const reviewerGroup = document.getElementById("reviewerGroup");
+    const commentGroup = document.getElementById("commentGroup");
+    const supervisorGroup = document.getElementById("supervisorGroup");
+
+    let items = [];
+    let currentIndex = 0;
+
+    function setStatus(text, mode = "normal") {
+      statusLine.classList.remove("ok", "error");
+      if (mode === "ok") statusLine.classList.add("ok");
+      if (mode === "error") statusLine.classList.add("error");
+      statusLine.innerHTML = `<strong>Status:</strong> ${text}`;
+    }
+
+    function createNumberChips(container, min, max, secondaryBelow = 2) {
+      container.innerHTML = "";
+      for (let i = min; i <= max; i++) {
+        const chip = document.createElement("button");
+        chip.type = "button";
+        chip.className = "chip";
+        if (i < secondaryBelow) {
+          chip.classList.add("secondary");
+        }
+        chip.dataset.value = String(i);
+        chip.innerHTML = `<span class="icon">🔢</span><span>${i}</span>`;
+        container.appendChild(chip);
+      }
+    }
+
+    // Chips initial (0–10)
+    createNumberChips(correctDigitsChipsContainer, 0, 10, 2);
+    createNumberChips(supervisorChipsContainer, 0, 10, 2);
+
+    function selectChip(container, value) {
+      const chips = container.querySelectorAll(".chip");
+      chips.forEach((chip) => {
+        chip.classList.toggle("selected", chip.dataset.value === String(value));
+      });
+    }
+
+    function syncCorrectDigitsFromInput() {
+      const val = correctDigitsInput.value;
+      if (val === "") {
+        selectChip(correctDigitsChipsContainer, null);
+        return;
+      }
+      const num = Number(val);
+      if (!isNaN(num)) {
+        selectChip(correctDigitsChipsContainer, num);
+      }
+    }
+
+    function syncSupervisorFromInput() {
+      const val = supervisorInput.value;
+      if (val === "") {
+        selectChip(supervisorChipsContainer, null);
+        return;
+      }
+      const num = Number(val);
+      if (!isNaN(num)) {
+        selectChip(supervisorChipsContainer, num);
+      }
+    }
+
+    correctDigitsChipsContainer.addEventListener("click", (e) => {
+      const target = e.target.closest(".chip");
+      if (!target) return;
+      const value = target.dataset.value;
+      correctDigitsInput.value = value;
+      selectChip(correctDigitsChipsContainer, value);
+    });
+
+    supervisorChipsContainer.addEventListener("click", (e) => {
+      const target = e.target.closest(".chip");
+      if (!target) return;
+      const value = target.dataset.value;
+      supervisorInput.value = value;
+      selectChip(supervisorChipsContainer, value);
+    });
+
+    correctDigitsInput.addEventListener("input", syncCorrectDigitsFromInput);
+    supervisorInput.addEventListener("input", syncSupervisorFromInput);
+
+    function getFilterParams() {
+      const mode = filterSelect.value;
+      const params = new URLSearchParams();
+      params.set("limit", "200");
+      if (mode === "unreviewed") {
+        params.set("only_unreviewed", "true");
+      } else if (mode === "reviewed") {
+        params.set("only_reviewed", "true");
+      }
+      return params.toString();
+    }
+
+    function updateFormVisibility() {
+      const mode = filterSelect.value;
+      if (mode === "reviewed") {
+        // Nur Supervisor-Bewertung anzeigen
+        correctDigitsGroup.style.display = "none";
+        reviewerGroup.style.display = "none";
+        commentGroup.style.display = "none";
+        supervisorGroup.style.display = "block";
+      } else {
+        // Alle Bewertungen sichtbar
+        correctDigitsGroup.style.display = "block";
+        reviewerGroup.style.display = "block";
+        commentGroup.style.display = "block";
+        supervisorGroup.style.display = "block";
+      }
+    }
+
+    async function loadData() {
+      updateFormVisibility();
+      setStatus("Lade Daten aus Backend …");
+      imageCard.innerHTML = `<div class="no-data">Lade Daten …</div>`;
+      items = [];
+      currentIndex = 0;
+
+      const query = getFilterParams();
+      const url = `${API_BASE}/api/evaluation/items?${query}`;
+
+      try {
+        const res = await fetch(url);
+        if (!res.ok) {
+          const text = await res.text();
+          console.error("Fehler /api/evaluation/items:", text);
+          setStatus(`Fehler beim Laden: HTTP ${res.status}`, "error");
+          imageCard.innerHTML = `<div class="no-data">Fehler beim Laden der Daten.</div>`;
+          return;
+        }
+
+        const data = await res.json();
+        if (!Array.isArray(data) || data.length === 0) {
+          setStatus("Keine Datensätze für diesen Filter.", "ok");
+          indexInfo.textContent = "Datensatz 0 / 0";
+          imageCard.innerHTML = `<div class="no-data">Keine Datensätze vorhanden.</div>`;
+          clearForm();
+          return;
+        }
+
+        items = data;
+        currentIndex = 0;
+        setStatus(`Daten geladen (${items.length} Datensätze).`, "ok");
+        renderCurrent();
+      } catch (err) {
+        console.error(err);
+        setStatus("Backend nicht erreichbar.", "error");
+        imageCard.innerHTML = `<div class="no-data">Backend nicht erreichbar.</div>`;
+      }
+    }
+
+    function clearForm() {
+      correctDigitsInput.value = "";
+      reviewerInput.value = "";
+      commentInput.value = "";
+      supervisorInput.value = "";
+      selectChip(correctDigitsChipsContainer, null);
+      selectChip(supervisorChipsContainer, null);
+    }
+
+    function renderCurrent() {
+      if (!items.length) {
+        indexInfo.textContent = "Datensatz 0 / 0";
+        imageCard.innerHTML = `<div class="no-data">Keine Datensätze.</div>`;
+        clearForm();
+        return;
+      }
+
+      if (currentIndex < 0) currentIndex = 0;
+      if (currentIndex >= items.length) currentIndex = items.length - 1;
+
+      const item = items[currentIndex];
+      indexInfo.textContent = `Datensatz ${currentIndex + 1} / ${items.length}`;
+
+      const imgSrc = `bilder_uploads/${item.filename}`;
+
+      const confRaw = typeof item.confidence === "number"
+        ? item.confidence
+        : Number(item.confidence || 0);
+      const conf = isNaN(confRaw) ? 0 : confRaw;
+      const confPct = Math.round(conf * 100);
+
+      imageCard.innerHTML = `
+        <img src="${imgSrc}" alt="${item.filename}" />
+        <div class="meta">
+          <div><strong>taric_live.id:</strong> ${item.taric_live_id ?? item.id ?? "–"}</div>
+          <div><strong>Datei:</strong> ${item.filename || ""}</div>
+          <div><strong>Erfasst:</strong> ${item.created_at || ""}</div>
+        </div>
+        <div class="codes">
+          <span class="code-pill"><strong>TARIC</strong> ${item.taric_code || "–"}</span>
+          ${item.cn_code ? `<span class="code-pill"><strong>CN</strong> ${item.cn_code}</span>` : ""}
+          ${item.hs_chapter ? `<span class="code-pill"><strong>HS</strong> ${item.hs_chapter}</span>` : ""}
+        </div>
+        <div class="confidence">
+          <span class="label">Confidence:</span>
+          <div class="confidence-bar">
+            <div class="confidence-bar-inner" style="width:${confPct}%;"></div>
+          </div>
+          <span class="confidence-pill">${confPct}%</span>
+        </div>
+        <div class="short-reason">
+          <strong>Begründung:</strong><br />
+          ${item.short_reason || "<span style='color:#9ca3af'>keine Begründung</span>"}
+        </div>
+      `;
+
+      correctDigitsInput.value = item.correct_digits ?? "";
+      reviewerInput.value = item.reviewer ?? "";
+      commentInput.value = item.comment ?? "";
+      supervisorInput.value = item.superviser_bewertung ?? "";
+
+      syncCorrectDigitsFromInput();
+      syncSupervisorFromInput();
+    }
+
+    async function saveCurrent(moveNext) {
+      if (!items.length) return;
+      const item = items[currentIndex];
+
+      const payload = {
+        taric_live_id: item.taric_live_id ?? item.id,
+        correct_digits: Number(correctDigitsInput.value || 0),
+        reviewer: reviewerInput.value || null,
+        comment: commentInput.value || null,
+        superviser_bewertung:
+          supervisorInput.value === "" ? null : Number(supervisorInput.value),
+      };
+
+      setStatus("Speichere Bewertung …");
+      saveBtn.disabled = true;
+      saveNextBtn.disabled = true;
+
+      try {
+        const res = await fetch(`${API_BASE}/api/evaluation/save`, {
+          method: "POST",
+          headers: {"Content-Type": "application/json"},
+          body: JSON.stringify(payload),
+        });
+
+        if (!res.ok) {
+          const text = await res.text();
+          console.error("Fehler /api/evaluation/save:", text);
+          setStatus(`Fehler beim Speichern: HTTP ${res.status}`, "error");
+          return;
+        }
+
+        const data = await res.json();
+        const evalId = data.evaluation_id;
+
+        item.correct_digits = payload.correct_digits;
+        item.reviewer = payload.reviewer;
+        item.comment = payload.comment;
+        item.superviser_bewertung = payload.superviser_bewertung;
+        item.evaluation_id = evalId;
+
+        if (moveNext) {
+          if (currentIndex < items.length - 1) {
+            setStatus("Danke für deine Bewertung. Nächster Datensatz wird geladen …", "ok");
+            currentIndex++;
+            renderCurrent();
+          } else {
+            setStatus("Danke für deine Bewertung. Ende der Liste erreicht.", "ok");
+          }
+        } else {
+          setStatus("Danke für deine Bewertung. Bewertung gespeichert.", "ok");
+        }
+      } catch (err) {
+        console.error(err);
+        setStatus("Fehler beim Speichern (Netzwerk).", "error");
+      } finally {
+        saveBtn.disabled = false;
+        saveNextBtn.disabled = false;
+      }
+    }
+
+    filterSelect.addEventListener("change", () => {
+      loadData();
+    });
+
+    prevBtn.addEventListener("click", () => {
+      if (!items.length) return;
+      if (currentIndex > 0) {
+        currentIndex--;
+        renderCurrent();
+      }
+    });
+
+    nextBtn.addEventListener("click", () => {
+      if (!items.length) return;
+      if (currentIndex < items.length - 1) {
+        currentIndex++;
+        renderCurrent();
+      }
+    });
+
+    saveBtn.addEventListener("click", () => saveCurrent(false));
+    saveNextBtn.addEventListener("click", () => saveCurrent(true));
+
+    // Standard: Filter "nur unbewertete" ist gesetzt (per HTML selected) -> direkt laden
+    updateFormVisibility();
+    loadData();
+  </script>
+</body>
+</html>

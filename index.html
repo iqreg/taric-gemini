@@ -6,19 +6,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     :root {
-      --bg: #0f172a;
-      --bg-panel: #111827;
+      --bg: #020617;
+      --bg-panel: #0b1220;
       --bg-panel-alt: #020617;
       --border: #1f2937;
       --accent: #2563eb;
-      --accent-soft: rgba(37,99,235,0.12);
-      --accent-strong: rgba(37,99,235,0.4);
+      --accent-soft: rgba(37,99,235,0.15);
+      --accent-strong: rgba(37,99,235,0.5);
       --text: #e5e7eb;
       --text-muted: #9ca3af;
       --error: #ef4444;
       --success: #22c55e;
+      --warning: #facc15;
       --radius: 14px;
-      --shadow: 0 18px 45px rgba(15,23,42,0.75);
+      --shadow: 0 20px 45px rgba(15,23,42,0.9);
     }
 
     * {
@@ -26,991 +27,965 @@
     }
 
     body {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       margin: 0;
-      padding: 1.2rem;
-      background: radial-gradient(circle at top, #1f2937 0, #020617 52%, #000 100%);
+      min-height: 100vh;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+      background: radial-gradient(circle at top, #1e293b 0, #020617 55%);
       color: var(--text);
+      display: flex;
+      justify-content: center;
+      padding: 16px 12px 32px;
     }
 
     .app {
-      max-width: 1100px;
-      margin: 0 auto;
+      width: 100%;
+      max-width: 520px;
+      background: linear-gradient(145deg, #020617 0, #020617 40%, #020617 100%);
+      border-radius: 24px;
+      border: 1px solid #1f2937;
+      box-shadow: var(--shadow);
+      padding: 14px 14px 20px;
+      overflow: hidden;
     }
 
     header {
-      margin-bottom: 1.2rem;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 4px 4px 10px;
+      border-bottom: 1px solid rgba(148,163,184,0.24);
+      margin-bottom: 12px;
+    }
+
+    .title-block {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
     }
 
     h1 {
-      font-size: 1.5rem;
-      margin: 0 0 0.25rem 0;
+      font-size: 20px;
+      line-height: 1.2;
+      margin: 0;
+      letter-spacing: 0.02em;
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: 6px;
     }
 
-    h1 span.badge {
-      font-size: 0.7rem;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      padding: 0.15rem 0.6rem;
-      border-radius: 999px;
-      background: var(--accent-soft);
-      border: 1px solid var(--accent-strong);
-      color: #bfdbfe;
+    h1 .icon {
+      font-size: 18px;
     }
 
-    header p {
+    .subtitle {
       margin: 0;
-      font-size: 0.9rem;
+      font-size: 13px;
       color: var(--text-muted);
+    }
+
+    .header-right {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 6px;
+    }
+
+    .pill {
+      padding: 6px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.4);
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: radial-gradient(circle at top, #0f172a 0, #020617 90%);
+    }
+
+    .pill span {
+      font-weight: 600;
+    }
+
+    .pill-badge {
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      background: rgba(56,189,248,0.18);
+      border: 1px solid rgba(56,189,248,0.7);
+      color: #e0f2fe;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .nav-link {
+      text-decoration: none;
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.4);
+      font-size: 11px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: radial-gradient(circle at top, #020617, #020617 95%);
+      color: #e5e7eb;
+      transition: background 0.12s ease, border-color 0.12s ease, transform 0.08s ease;
+    }
+
+    .nav-link span.icon {
+      font-size: 13px;
+    }
+
+    .nav-link.active {
+      background: radial-gradient(circle at top, #1d4ed8, #020617);
+      border-color: rgba(129,140,248,0.9);
+    }
+
+    .nav-link:hover {
+      transform: translateY(-1px);
+      border-color: rgba(191,219,254,0.7);
     }
 
     main {
-      display: grid;
-      gap: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
     }
 
-    @media (min-width: 900px) {
-      main {
-        grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
-        align-items: flex-start;
-      }
-    }
-
-    .panel {
+    .card {
+      background: radial-gradient(circle at top left, #111827 0, #020617 80%);
       border-radius: var(--radius);
       border: 1px solid var(--border);
-      background: linear-gradient(145deg, var(--bg-panel), var(--bg-panel-alt));
-      box-shadow: var(--shadow);
-      padding: 1rem 1.1rem;
+      padding: 12px 12px 14px;
+      position: relative;
+      overflow: hidden;
     }
 
-    .panel h2 {
-      font-size: 1rem;
-      margin: 0 0 0.7rem 0;
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at top left,
+          rgba(56,189,248,0.12) 0,
+          transparent 60%);
+      opacity: 0.7;
+      pointer-events: none;
+    }
+
+    .card-inner {
+      position: relative;
+      z-index: 1;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 10px;
+    }
+
+    .card-title {
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: #e5e7eb;
       display: flex;
       align-items: center;
-      gap: 0.4rem;
+      gap: 6px;
     }
 
-    .panel h2 small {
-      font-size: 0.75rem;
+    .card-title span.icon {
+      font-size: 14px;
+    }
+
+    .card-step {
+      font-size: 11px;
       text-transform: uppercase;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.18em;
       color: var(--text-muted);
     }
 
-    label {
-      font-size: 0.85rem;
-      font-weight: 500;
+    .hint {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin: 4px 0 10px;
+      line-height: 1.5;
+    }
+
+    .file-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
     }
 
     input[type="file"] {
-      margin-top: 0.35rem;
-      font-size: 0.85rem;
-      color: var(--text-muted);
+      font-size: 13px;
+      color: var(--text);
     }
 
-    .preview-wrapper {
-      margin-top: 0.7rem;
-      border-radius: 12px;
-      border: 1px dashed #374151;
-      background: radial-gradient(circle at top left, rgba(37,99,235,0.15), transparent 60%);
-      padding: 0.6rem;
+    .filename {
+      font-size: 12px;
+      color: var(--text-muted);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .preview-frame {
+      border-radius: 18px;
+      border: 1px dashed rgba(148,163,184,0.5);
+      padding: 6px;
+      background: radial-gradient(circle at top,
+          rgba(148,163,184,0.18) 0,
+          #020617 55%);
       display: flex;
       justify-content: center;
       align-items: center;
-      min-height: 160px;
+      margin-bottom: 12px;
+      min-height: 220px;
     }
 
-    #preview {
+    .preview-frame img {
       max-width: 100%;
-      max-height: 260px;
-      border-radius: 10px;
-      display: none;
-      object-fit: contain;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.55);
+      border-radius: 14px;
+      display: block;
     }
 
-    .preview-placeholder {
-      text-align: center;
-      font-size: 0.85rem;
-      color: var(--text-muted);
-    }
-
-    .actions {
-      margin-top: 0.8rem;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.6rem;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .btn {
-      padding: 0.55rem 1.2rem;
+    .btn-primary {
+      width: 100%;
+      padding: 10px 14px;
       border-radius: 999px;
-      border: 1px solid rgba(148,163,184,0.6);
-      background: radial-gradient(circle at top, #1d4ed8, #1d2438);
-      color: #e5e7eb;
-      cursor: pointer;
-      font-size: 0.9rem;
-      font-weight: 500;
-      display: inline-flex;
+      border: none;
+      font-size: 15px;
+      font-weight: 600;
+      color: #eff6ff;
+      background: radial-gradient(circle at top,
+          #38bdf8 0,
+          #2563eb 40%,
+          #1d4ed8 100%);
+      box-shadow: 0 16px 30px rgba(37,99,235,0.75);
+      display: flex;
       align-items: center;
-      gap: 0.4rem;
-      transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease, border-color 0.12s ease;
-      box-shadow: 0 12px 32px rgba(37,99,235,0.4);
+      justify-content: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: transform 0.08s ease, box-shadow 0.08s ease, opacity 0.08s;
     }
 
-    .btn span.icon {
-      font-size: 1em;
+    .btn-primary:active {
+      transform: translateY(1px);
+      box-shadow: 0 10px 18px rgba(37,99,235,0.7);
     }
 
-    .btn:hover:not(:disabled) {
-      transform: translateY(-1px);
-      box-shadow: 0 16px 40px rgba(37,99,235,0.55);
-      border-color: rgba(191,219,254,0.9);
-    }
-
-    .btn:active:not(:disabled) {
-      transform: translateY(0);
-      box-shadow: 0 8px 25px rgba(15,23,42,0.8);
-    }
-
-    .btn:disabled {
-      opacity: 0.55;
+    .btn-primary[disabled] {
+      opacity: 0.6;
       cursor: default;
       box-shadow: none;
-      background: #111827;
-      border-color: #1f2937;
     }
 
-    .status-line {
-      font-size: 0.83rem;
-      color: var(--text-muted);
+    .btn-primary span.emoji {
+      font-size: 17px;
+    }
+
+    .status-row {
       display: flex;
       align-items: center;
-      gap: 0.35rem;
+      gap: 8px;
+      margin-top: 10px;
     }
 
-    .status-pill {
+    .status-badge {
       display: inline-flex;
       align-items: center;
-      gap: 0.35rem;
-      font-size: 0.75rem;
-      padding: 0.15rem 0.55rem;
+      gap: 6px;
+      padding: 4px 10px;
       border-radius: 999px;
-      border: 1px solid #1f2937;
-      background: rgba(15,23,42,0.7);
+      font-size: 12px;
+      background: rgba(34,197,94,0.1);
+      border: 1px solid rgba(34,197,94,0.9);
+      color: #bbf7d0;
     }
 
-    .status-pill.success {
-      border-color: rgba(34,197,94,0.55);
+    .status-badge.error {
+      background: rgba(239,68,68,0.12);
+      border-color: rgba(239,68,68,0.9);
+      color: #fecaca;
+    }
+
+    .status-text {
+      font-size: 11px;
+      color: var(--text-muted);
+      flex: 1;
+    }
+
+    .result-title {
+      font-size: 15px;
+      margin: 0 0 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .result-title .icon {
+      font-size: 16px;
+    }
+
+    .result-main {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .code-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .code-pill-label {
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    .code-pill {
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.5);
+      background: radial-gradient(circle at top, #020617 0, #020617 85%);
+      font-size: 15px;
+      letter-spacing: 0.16em;
+      text-align: center;
+      flex: 1;
+    }
+
+    .confidence-wrap {
+      text-align: right;
+      min-width: 140px;
+    }
+
+    .confidence-label {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+    }
+
+    .confidence-value {
+      font-size: 14px;
+      font-weight: 600;
+      margin-top: 2px;
+    }
+
+    .confidence-badge {
+      font-size: 11px;
+      margin-top: 2px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.5);
+      background: rgba(15,23,42,0.9);
+    }
+
+    .confidence-badge.low {
+      border-color: rgba(248,113,113,0.9);
+      background: rgba(248,113,113,0.15);
+      color: #fecaca;
+    }
+
+    .confidence-badge.medium {
+      border-color: rgba(250,204,21,0.9);
+      background: rgba(250,204,21,0.15);
+      color: #fef9c3;
+    }
+
+    .confidence-badge.high {
+      border-color: rgba(34,197,94,0.9);
       background: rgba(22,163,74,0.15);
       color: #bbf7d0;
     }
 
-    .status-pill.error {
-      border-color: rgba(239,68,68,0.55);
-      background: rgba(239,68,68,0.12);
-      color: #fecaca;
-    }
-
-    .spinner {
-      width: 14px;
-      height: 14px;
-      border-radius: 999px;
-      border: 2px solid rgba(148,163,184,0.4);
-      border-top-color: #93c5fd;
-      animation: spin 0.6s linear infinite;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-
-    .status-text {
-      margin-top: 0.25rem;
-      white-space: pre-line;
-    }
-
-    /* Ergebnis-Panel */
-
-    .result-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      gap: 0.4rem;
-      margin-bottom: 0.5rem;
-    }
-
-    .taric-main {
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-      font-size: 1.25rem;
-      letter-spacing: 0.15em;
-      padding: 0.35rem 0.65rem;
-      border-radius: 999px;
-      background: rgba(15,23,42,0.9);
-      border: 1px solid rgba(148,163,184,0.6);
-      display: inline-flex;
-      align-items: center;
-      gap: 0.4rem;
-    }
-
-    .taric-main-label {
-      font-size: 0.7rem;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      color: var(--text-muted);
-    }
-
-    .confidence {
-      margin-top: 0.35rem;
-      font-size: 0.8rem;
-      color: var(--text-muted);
-    }
-
     .confidence-bar {
-      margin-top: 0.25rem;
+      margin-top: 4px;
       width: 100%;
       height: 7px;
       border-radius: 999px;
       background: rgba(15,23,42,0.9);
       overflow: hidden;
-      border: 1px solid rgba(31,41,55,0.9);
+      border: 1px solid rgba(30,64,175,0.9);
     }
 
-    .confidence-bar-inner {
+    .confidence-bar-fill {
       height: 100%;
-      border-radius: inherit;
-      background: linear-gradient(90deg, #22c55e, #eab308);
       width: 0%;
+      background: linear-gradient(90deg,
+          #f97316 0,
+          #facc15 35%,
+          #22c55e 100%);
       transition: width 0.25s ease-out;
     }
 
-    .codes-grid {
+    .tags-row {
       display: flex;
+      gap: 6px;
       flex-wrap: wrap;
-      gap: 0.5rem;
-      margin-top: 0.5rem;
-      font-size: 0.8rem;
+      margin-bottom: 8px;
     }
 
-    .code-pill {
-      padding: 0.25rem 0.5rem;
+    .tag {
+      font-size: 11px;
+      padding: 4px 9px;
       border-radius: 999px;
-      border: 1px solid #1f2937;
-      background: rgba(15,23,42,0.85);
-      color: var(--text-muted);
-    }
-
-    .code-pill strong {
+      border: 1px solid rgba(148,163,184,0.6);
+      background: rgba(15,23,42,0.9);
       color: #e5e7eb;
-      margin-right: 0.2rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
     }
 
-    .short-reason {
-      margin-top: 0.6rem;
-      font-size: 0.85rem;
+    .tag span.icon {
+      font-size: 12px;
+    }
+
+    .section-label {
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .reason {
+      font-size: 13px;
+      line-height: 1.55;
       color: var(--text-muted);
-      line-height: 1.4;
-    }
-
-    .short-reason strong {
-      color: #e5e7eb;
-    }
-
-    .alternatives {
-      margin-top: 0.8rem;
-      font-size: 0.8rem;
-    }
-
-    .alternatives h3 {
-      margin: 0 0 0.3rem 0;
-      font-size: 0.85rem;
-      color: #d1d5db;
+      margin-bottom: 8px;
     }
 
     .alt-list {
-      list-style: none;
-      padding: 0;
       margin: 0;
-      display: flex;
-      flex-direction: column;
-      gap: 0.25rem;
-    }
-
-    .alt-item {
-      padding: 0.35rem 0.5rem;
-      border-radius: 10px;
-      background: rgba(15,23,42,0.7);
-      border: 1px solid rgba(31,41,55,0.85);
-    }
-
-    .alt-item-code {
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-      font-size: 0.85rem;
-      letter-spacing: 0.14em;
-      color: #bfdbfe;
-    }
-
-    .alt-item-reason {
-      margin-top: 0.2rem;
-      font-size: 0.78rem;
+      padding-left: 18px;
+      font-size: 13px;
       color: var(--text-muted);
     }
 
-    .no-result {
-      font-size: 0.8rem;
+    .alt-list li + li {
+      margin-top: 4px;
+    }
+
+    .feedback-block {
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px dashed rgba(55,65,81,0.9);
+    }
+
+    .feedback-title {
+      font-size: 14px;
+      font-weight: 600;
+      margin: 0 0 4px;
+    }
+
+    .feedback-sub {
+      font-size: 12px;
       color: var(--text-muted);
+      margin: 0 0 8px;
     }
 
-    /* Feedback */
-
-    .feedback-section {
-      margin-top: 0.9rem;
-      padding-top: 0.8rem;
-      border-top: 1px dashed #1f2937;
-    }
-
-    .feedback-options {
+    .feedback-buttons {
       display: flex;
-      gap: 0.5rem;
-      margin-top: 0.35rem;
+      gap: 8px;
+      flex-wrap: wrap;
     }
 
-    .feedback-button {
-      padding: 0.3rem 0.75rem;
-      border-radius: 999px;
-      border: 1px solid #374151;
-      background: #020617;
-      color: #e5e7eb;
-      font-size: 0.8rem;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.3rem;
-      transition: background 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
-    }
-
-    .feedback-button span.icon {
-      font-size: 1em;
-    }
-
-    .feedback-button.active.yes {
-      background: rgba(34,197,94,0.15);
-      border-color: rgba(34,197,94,0.7);
-      color: #bbf7d0;
-      transform: translateY(-1px);
-    }
-
-    .feedback-button.active.no {
-      background: rgba(239,68,68,0.16);
-      border-color: rgba(239,68,68,0.7);
-      color: #fecaca;
-      transform: translateY(-1px);
-    }
-
-    .feedback-extra {
-      margin-top: 0.6rem;
-      display: none;
-      flex-direction: column;
-      gap: 0.4rem;
-      font-size: 0.8rem;
-    }
-
-    .feedback-extra.visible {
-      display: flex;
-    }
-
-    .feedback-extra input,
-    .feedback-extra textarea {
-      width: 100%;
-      border-radius: 8px;
-      border: 1px solid #374151;
-      padding: 0.3rem 0.4rem;
-      background: rgba(15,23,42,0.8);
-      color: #e5e7eb;
-      font-size: 0.8rem;
-      resize: vertical;
-      min-height: 60px;
-    }
-
-    .feedback-save {
-      align-self: flex-start;
-      padding: 0.3rem 0.9rem;
+    .btn-feedback {
+      flex: 1;
+      min-width: 120px;
       border-radius: 999px;
       border: 1px solid rgba(148,163,184,0.6);
-      background: radial-gradient(circle at top, #16a34a, #14532d);
-      color: #ecfdf5;
-      font-size: 0.8rem;
-      cursor: pointer;
-      display: inline-flex;
+      padding: 7px 10px;
+      font-size: 13px;
+      background: rgba(15,23,42,0.95);
+      color: #e5e7eb;
+      display: flex;
       align-items: center;
-      gap: 0.35rem;
-      transition: transform 0.12s ease, box-shadow 0.12s ease;
-      box-shadow: 0 10px 30px rgba(22,163,74,0.45);
-    }
-
-    .feedback-save:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 14px 35px rgba(22,163,74,0.65);
-    }
-
-    .feedback-save:active {
-      transform: translateY(0);
-      box-shadow: 0 6px 20px rgba(15,23,42,0.8);
-    }
-
-    .feedback-hint {
-      font-size: 0.75rem;
-      color: var(--text-muted);
-    }
-
-    .feedback-status {
-      margin-top: 0.25rem;
-      font-size: 0.8rem;
-      color: var(--text-muted);
-    }
-
-    /* Raw JSON */
-
-    .raw-section {
-      margin-top: 0.7rem;
-      font-size: 0.78rem;
-    }
-
-    .toggle-raw {
-      border: none;
-      background: transparent;
-      color: #93c5fd;
+      justify-content: center;
+      gap: 6px;
       cursor: pointer;
-      padding: 0;
-      font-size: 0.78rem;
-      text-decoration: underline;
+      transition: background 0.12s ease, transform 0.06s ease;
     }
 
-    #resultRaw {
-      margin-top: 0.4rem;
-      white-space: pre;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-      font-size: 0.78rem;
-      max-height: 220px;
-      overflow: auto;
-      background: rgba(15,23,42,0.9);
-      border-radius: 10px;
-      padding: 0.45rem 0.6rem;
-      border: 1px solid #1f2937;
-      display: none;
+    .btn-feedback:active {
+      transform: translateY(1px);
     }
-    /* hier style für die Auswertung Icon im Header */
 
-    /* Zoll-Icon im Header ?? */
-    /* kleine Helfer */
+    .btn-feedback.positive {
+      border-color: rgba(34,197,94,0.8);
+    }
 
-    .hint {
-      font-size: 0.75rem;
+    .btn-feedback.negative {
+      border-color: rgba(239,68,68,0.8);
+    }
+
+    .btn-feedback.saved {
+      background: rgba(34,197,94,0.15);
+    }
+
+    .technical-hint {
+      margin-top: 6px;
+      font-size: 11px;
       color: var(--text-muted);
-      margin-top: 0.35rem;
+      line-height: 1.5;
+    }
+
+    .technical-hint code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+        "Liberation Mono", "Courier New", monospace;
+      font-size: 11px;
+      background: rgba(15,23,42,0.95);
+      padding: 2px 5px;
+      border-radius: 5px;
+      border: 1px solid rgba(55,65,81,0.9);
+    }
+
+    .meta-result {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    @media (max-width: 480px) {
+      body {
+        padding: 8px 6px 24px;
+      }
+
+      .app {
+        border-radius: 18px;
+        padding: 10px 10px 16px;
+      }
+
+      header {
+        padding: 4px 2px 8px;
+        flex-direction: column;
+      }
+
+      .header-right {
+        align-items: flex-start;
+      }
+
+      h1 {
+        font-size: 18px;
+      }
+
+      .preview-frame {
+        min-height: 200px;
+      }
+
+      .code-row {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .confidence-wrap {
+        width: 100%;
+        text-align: left;
+      }
+
+      .confidence-bar {
+        max-width: 220px;
+      }
+
+      .feedback-buttons {
+        flex-direction: row;
+      }
     }
   </style>
 </head>
 <body>
   <div class="app">
     <header>
-      <h1>
-        TARIC Klassifikation per Foto
-        <span class="badge">Gemini 2.5</span>
-      </h1>
-      <p>
-        Foto hochladen → Modell ermittelt den wahrscheinlichsten TARIC-Code inkl. Begründung.
-      </p>
+      <div class="title-block">
+        <h1><span class="icon">📷</span>TARIC Klassifikation per Foto</h1>
+        <p class="subtitle">
+          Foto hochladen → Modell ermittelt den wahrscheinlichsten TARIC-Code inkl. Begründung.
+        </p>
+      </div>
+      <div class="header-right">
+        <div class="pill">
+          <span>Gemini&nbsp;2.5</span>
+          <span class="pill-badge">CV&nbsp;+ TARIC</span>
+        </div>
+        <div class="nav-links">
+          <a href="index.html" class="nav-link active">
+            <span class="icon">📷</span><span>Klassifikation</span>
+          </a>
+          <a href="evaluation.html" class="nav-link">
+            <span class="icon">🧪</span><span>Evaluation</span>
+          </a>
+        </div>
+      </div>
     </header>
 
     <main>
-      <!-- Linke Spalte: Upload / Status -->
-      <section class="panel">
-        <h2>
-          Bild-Upload
-          <small>Schritt 1</small>
-        </h2>
-
-        <label for="fileInput">Foto aufnehmen oder aus Galerie auswählen</label><br />
-        <input
-          id="fileInput"
-          type="file"
-          accept="image/*"
-          capture="environment"
-        />
-
-        <div class="preview-wrapper">
-          <img id="preview" alt="Bildvorschau" />
-          <div id="previewPlaceholder" class="preview-placeholder">
-            Noch kein Bild ausgewählt.<br />
-            Nutze oben „Foto aufnehmen / wählen“.
+      <!-- Bild-Upload -->
+      <section class="card">
+        <div class="card-inner">
+          <div class="card-header">
+            <div class="card-title">
+              <span class="icon">🖼️</span>
+              <span>Bild-Upload</span>
+            </div>
+            <div class="card-step">Schritt 1</div>
           </div>
-        </div>
 
-        <div class="actions">
-          <button id="sendBtn" class="btn" disabled>
-            <span class="icon">🚀</span>
+          <p class="hint">
+            Foto aufnehmen oder ein Bild aus der Galerie wählen. Das Bild wird nur an dein lokales Backend gesendet, keine Cloud-Speicherung.
+          </p>
+
+          <div class="file-row">
+            <input type="file" id="file-input" accept="image/*" />
+            <div class="filename" id="file-name">Keine Datei ausgewählt</div>
+          </div>
+
+          <div class="preview-frame">
+            <img id="preview-image" alt="Bildvorschau" style="display:none;" />
+          </div>
+
+          <button class="btn-primary" id="classify-btn" disabled>
+            <span class="emoji">🚀</span>
             <span>Bild klassifizieren</span>
           </button>
-          <div class="status-line">
-            <div id="statusPill" class="status-pill">
-              <span id="statusPillIcon">⏸</span>
-              <span id="statusPillText">Warte auf Bild</span>
+
+          <div class="status-row" id="status-row" style="display:none;">
+            <div class="status-badge" id="status-badge">
+              <span>✔</span>
+              <span id="status-label">Ergebnis bereit</span>
             </div>
+            <div class="status-text" id="status-text"></div>
           </div>
-        </div>
-        
-        <div class="status-text" id="status"></div>
-        <div class="hint">
-          Hinweis: Backend muss auf Port 8000 laufen, diese Seite auf 8080
-          (z. B. <code>python3 -m http.server 8080 --bind 0.0.0.0</code>).
+
+          <p class="technical-hint">
+            Hinweis: Backend muss auf Port <code>8000</code> laufen, diese Seite auf
+            <code>8080</code> (z. B. <code>python3 -m http.server 8080 --bind 0.0.0.0</code>).
+          </p>
         </div>
       </section>
 
-      <!-- Rechte Spalte: Ergebnis / Feedback -->
-      <section class="panel">
-        <h2>
-          Klassifikation & Feedback
-          <small>Schritt 2</small>
-        </h2>
-
-        <div id="resultContainer">
-          <div class="no-result">
-            Noch kein Ergebnis. Sende ein Bild, um den TARIC-Code zu ermitteln.
+      <!-- Klassifikation & Feedback -->
+      <section class="card">
+        <div class="card-inner">
+          <div class="card-header">
+            <div class="card-title">
+              <span class="icon">📊</span>
+              <span>Klassifikation &amp; Feedback</span>
+            </div>
+            <div class="card-step">Schritt 2</div>
           </div>
-        </div>
 
-        <div class="feedback-section" id="feedbackSection" style="display:none;">
-          <div style="display:flex; justify-content:space-between; align-items:center; gap:0.5rem;">
+          <h2 class="result-title">
+            <span class="icon">🎯</span>
+            <span>Ergebnis</span>
+          </h2>
+
+          <div class="result-main">
+            <div class="code-row">
+              <div style="flex: 1;">
+                <div class="code-pill-label">TARIC</div>
+                <div class="code-pill" id="taric-code">──────────</div>
+              </div>
+              <div class="confidence-wrap">
+                <div class="confidence-label">Confidence</div>
+                <div class="confidence-value" id="confidence-value">–</div>
+                <div class="confidence-badge" id="confidence-badge">
+                  <span class="icon">🟦</span>
+                  <span id="confidence-label">keine Bewertung</span>
+                </div>
+                <div class="confidence-bar">
+                  <div class="confidence-bar-fill" id="confidence-bar"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="tags-row">
+              <div class="tag">
+                <span class="icon">🇪🇺</span>
+                <strong>CN-Code</strong>
+                <span id="cn-code" style="margin-left:6px;">────────</span>
+              </div>
+              <div class="tag">
+                <span class="icon">📑</span>
+                <strong>HS-Kapitel</strong>
+                <span id="hs-chapter" style="margin-left:6px;">──</span>
+              </div>
+            </div>
+
             <div>
-              <strong>Passt der vorgeschlagene TARIC-Code?</strong><br />
-              <span class="feedback-hint">
-                Dein Feedback hilft, die Auswertung zu verbessern (wird lokal gespeichert).
-              </span>
+              <div class="section-label">Begründung:</div>
+              <p class="reason" id="reason-text">
+                Noch keine Auswertung durchgeführt.
+              </p>
+            </div>
+
+            <div>
+              <div class="section-label">Alternative Codes (falls vorhanden):</div>
+              <ul class="alt-list" id="alt-list">
+                <li>Keine Alternativcodes angegeben.</li>
+              </ul>
+            </div>
+
+            <div class="meta-result" id="meta-result">
+              ID: – · Datei: – 
             </div>
           </div>
 
-          <div class="feedback-options">
-            <button id="fbYes" class="feedback-button yes">
-              <span class="icon">👍</span>
-              <span>Ja, passt</span>
-            </button>
-            <button id="fbNo" class="feedback-button no">
-              <span class="icon">👎</span>
-              <span>Nein, ist falsch</span>
-            </button>
-          </div>
-
-          <div class="feedback-extra" id="feedbackExtra">
-            <div>
-              <label for="fbCorrectTaric">Korrekte TARIC-Nummer (falls bekannt)</label>
-              <input id="fbCorrectTaric" type="text" placeholder="z. B. 9018908500" />
+          <div class="feedback-block">
+            <p class="feedback-title">Passt der vorgeschlagene TARIC-Code?</p>
+            <p class="feedback-sub">
+              Dein Feedback hilft, die Auswertung zu verbessern (wird lokal im Browser gespeichert).
+            </p>
+            <div class="feedback-buttons">
+              <button class="btn-feedback positive" id="btn-ok">
+                <span>👍</span><span>Ja, passt</span>
+              </button>
+              <button class="btn-feedback negative" id="btn-no">
+                <span>👎</span><span>Nein, ist falsch</span>
+              </button>
             </div>
-            <div>
-              <label for="fbComment">Kurzkommentar (z. B. Art der Ware, Fehlerbeschreibung)</label>
-              <textarea id="fbComment" placeholder="Warum ist der Vorschlag falsch? Was wäre korrekt?"></textarea>
-            </div>
-            <button id="fbSave" class="feedback-save">
-              <span class="icon">💾</span>
-              <span>Feedback lokal speichern</span>
-            </button>
-            <div id="fbStatus" class="feedback-status"></div>
           </div>
-        </div>
-
-        <div class="raw-section">
-          <button type="button" class="toggle-raw" id="toggleRawBtn">
-            Rohes JSON anzeigen
-          </button>
-          <div id="resultRaw"></div>
         </div>
       </section>
     </main>
   </div>
 
   <script>
-    // ============================================================
-    // Backend-URL dynamisch bestimmen (Mac + Handy)
-    // ============================================================
-    const BACKEND_PORT = "8000";
-    const API_HOST = window.location.hostname || "localhost";
-    const API_BASE = `http://${API_HOST}:${BACKEND_PORT}`;
-    const API_URL = `${API_BASE}/classify`;
+    const fileInput = document.getElementById("file-input");
+    const fileNameEl = document.getElementById("file-name");
+    const previewImg = document.getElementById("preview-image");
+    const classifyBtn = document.getElementById("classify-btn");
 
-    console.log("Verwende Backend-URL:", API_URL);
+    const statusRow = document.getElementById("status-row");
+    const statusBadge = document.getElementById("status-badge");
+    const statusLabel = document.getElementById("status-label");
+    const statusText = document.getElementById("status-text");
 
-    // ------------------------------------------------------------
-    // DOM-Elemente
-    // ------------------------------------------------------------
-    const fileInput = document.getElementById("fileInput");
-    const preview = document.getElementById("preview");
-    const previewPlaceholder = document.getElementById("previewPlaceholder");
-    const sendBtn = document.getElementById("sendBtn");
-    const statusEl = document.getElementById("status");
-    const statusPill = document.getElementById("statusPill");
-    const statusPillIcon = document.getElementById("statusPillIcon");
-    const statusPillText = document.getElementById("statusPillText");
+    const taricEl = document.getElementById("taric-code");
+    const cnEl = document.getElementById("cn-code");
+    const hsEl = document.getElementById("hs-chapter");
+    const confValEl = document.getElementById("confidence-value");
+    const confBarEl = document.getElementById("confidence-bar");
+    const confBadgeEl = document.getElementById("confidence-badge");
+    const confLabelEl = document.getElementById("confidence-label");
+    const reasonEl = document.getElementById("reason-text");
+    const altListEl = document.getElementById("alt-list");
+    const metaResultEl = document.getElementById("meta-result");
 
-    const resultContainer = document.getElementById("resultContainer");
-    const resultRaw = document.getElementById("resultRaw");
-    const toggleRawBtn = document.getElementById("toggleRawBtn");
+    const btnOk = document.getElementById("btn-ok");
+    const btnNo = document.getElementById("btn-no");
 
-    const feedbackSection = document.getElementById("feedbackSection");
-    const fbYes = document.getElementById("fbYes");
-    const fbNo = document.getElementById("fbNo");
-    const feedbackExtra = document.getElementById("feedbackExtra");
-    const fbCorrectTaric = document.getElementById("fbCorrectTaric");
-    const fbComment = document.getElementById("fbComment");
-    const fbSave = document.getElementById("fbSave");
-    const fbStatus = document.getElementById("fbStatus");
-
-    let selectedFile = null;
     let lastResult = null;
-    let rawVisible = false;
-    let feedbackState = null; // 'yes' | 'no' | null
 
-    function setStatusPill(mode, text) {
-      statusPill.classList.remove("success", "error");
-      if (mode === "idle") {
-        statusPillIcon.textContent = "⏸";
-      } else if (mode === "loading") {
-        statusPillIcon.innerHTML = "";
-        const spinner = document.createElement("div");
-        spinner.className = "spinner";
-        statusPillIcon.appendChild(spinner);
-      } else if (mode === "success") {
-        statusPill.classList.add("success");
-        statusPillIcon.textContent = "✅";
-      } else if (mode === "error") {
-        statusPill.classList.add("error");
-        statusPillIcon.textContent = "⚠️";
-      }
-      statusPillText.textContent = text;
+    function backendUrl() {
+      const host = window.location.hostname || "localhost";
+      const protocol = window.location.protocol || "http:";
+      return `${protocol}//${host}:8000/classify`;
     }
 
-    function clearFeedbackUI() {
-      feedbackSection.style.display = "none";
-      fbYes.classList.remove("active", "yes");
-      fbNo.classList.remove("active", "no");
-      feedbackExtra.classList.remove("visible");
-      fbCorrectTaric.value = "";
-      fbComment.value = "";
-      fbStatus.textContent = "";
-      feedbackState = null;
-    }
-
-    function renderResult(data) {
-      lastResult = data;
-      resultContainer.innerHTML = "";
-
-      if (!data || !data.taric_code) {
-        const div = document.createElement("div");
-        div.className = "no-result";
-        div.textContent = "Keine TARIC-Daten erhalten. Prüfe Backend-Logs.";
-        resultContainer.appendChild(div);
-        clearFeedbackUI();
-        return;
-      }
-
-      const taricCode = data.taric_code || "";
-      const cnCode = data.cn_code || "";
-      const hsChapter = data.hs_chapter || "";
-      const confidence = typeof data.confidence === "number" ? data.confidence : parseFloat(data.confidence || "0");
-      const shortReason = data.short_reason || "";
-      const alternatives = Array.isArray(data.possible_alternatives) ? data.possible_alternatives : [];
-
-      const wrapper = document.createElement("div");
-
-      // Header mit TARIC und Confidence
-      const header = document.createElement("div");
-      header.className = "result-header";
-
-      const taricBlock = document.createElement("div");
-      taricBlock.className = "taric-main";
-
-      const labelSpan = document.createElement("span");
-      labelSpan.className = "taric-main-label";
-      labelSpan.textContent = "TARIC";
-
-      const codeSpan = document.createElement("span");
-      codeSpan.textContent = taricCode;
-
-      taricBlock.appendChild(labelSpan);
-      taricBlock.appendChild(codeSpan);
-      header.appendChild(taricBlock);
-
-      const confDiv = document.createElement("div");
-      confDiv.className = "confidence";
-      const confPct = Math.round(Math.max(0, Math.min(1, confidence)) * 100);
-      confDiv.textContent = `Confidence: ${isNaN(confPct) ? "-" : confPct + "%"}`;
-
-      const bar = document.createElement("div");
-      bar.className = "confidence-bar";
-      const barInner = document.createElement("div");
-      barInner.className = "confidence-bar-inner";
-      barInner.style.width = `${isNaN(confPct) ? 0 : confPct}%`;
-      bar.appendChild(barInner);
-
-      const confWrap = document.createElement("div");
-      confWrap.appendChild(confDiv);
-      confWrap.appendChild(bar);
-
-      header.appendChild(confWrap);
-
-      wrapper.appendChild(header);
-
-      // Codes (CN, HS)
-      const codesGrid = document.createElement("div");
-      codesGrid.className = "codes-grid";
-
-      if (cnCode) {
-        const pill = document.createElement("div");
-        pill.className = "code-pill";
-        pill.innerHTML = `<strong>CN-Code</strong> ${cnCode}`;
-        codesGrid.appendChild(pill);
-      }
-
-      if (hsChapter) {
-        const pill2 = document.createElement("div");
-        pill2.className = "code-pill";
-        pill2.innerHTML = `<strong>HS-Kapitel</strong> ${hsChapter}`;
-        codesGrid.appendChild(pill2);
-      }
-
-      wrapper.appendChild(codesGrid);
-
-      // Begründung
-      if (shortReason) {
-        const sr = document.createElement("div");
-        sr.className = "short-reason";
-        sr.innerHTML = `<strong>Begründung:</strong><br>${shortReason}`;
-        wrapper.appendChild(sr);
-      }
-
-      // Alternativen
-      const altDiv = document.createElement("div");
-      altDiv.className = "alternatives";
-
-      if (alternatives.length > 0) {
-        const h3 = document.createElement("h3");
-        h3.textContent = "Mögliche Alternativen";
-        altDiv.appendChild(h3);
-
-        const ul = document.createElement("ul");
-        ul.className = "alt-list";
-
-        for (const alt of alternatives) {
-          const li = document.createElement("li");
-          li.className = "alt-item";
-
-          const code = document.createElement("div");
-          code.className = "alt-item-code";
-          code.textContent = alt.taric_code || "–";
-
-          const reason = document.createElement("div");
-          reason.className = "alt-item-reason";
-          reason.textContent = alt.short_reason || "";
-
-          li.appendChild(code);
-          li.appendChild(reason);
-          ul.appendChild(li);
-        }
-
-        altDiv.appendChild(ul);
-      } else {
-        const none = document.createElement("div");
-        none.className = "no-result";
-        none.textContent = "Keine Alternativcodes angegeben.";
-        altDiv.appendChild(none);
-      }
-
-      wrapper.appendChild(altDiv);
-
-      resultContainer.appendChild(wrapper);
-
-      // Raw JSON aktualisieren
-      resultRaw.textContent = JSON.stringify(data, null, 2);
-
-      // Feedbackbereich aktivieren
-      feedbackSection.style.display = "block";
-      clearFeedbackUI(); // setzt intern alles zurück, aber Section bleibt sichtbar
-      feedbackSection.style.display = "block"; // wieder sichtbar machen
-    }
-
-    // Datei-Auswahl
     fileInput.addEventListener("change", () => {
-      const file = fileInput.files[0];
-
+      const file = fileInput.files && fileInput.files[0];
       if (!file) {
-        selectedFile = null;
-        preview.src = "";
-        preview.style.display = "none";
-        previewPlaceholder.style.display = "block";
-        sendBtn.disabled = true;
-        statusEl.textContent = "Bitte ein Bild auswählen.";
-        setStatusPill("idle", "Warte auf Bild");
+        fileNameEl.textContent = "Keine Datei ausgewählt";
+        previewImg.style.display = "none";
+        classifyBtn.disabled = true;
         return;
       }
 
-      selectedFile = file;
-      sendBtn.disabled = false;
-      statusEl.textContent = "Bild gewählt. Du kannst jetzt klassifizieren.";
-      setStatusPill("idle", "Bereit zum Senden");
-
+      fileNameEl.textContent = file.name;
       const reader = new FileReader();
       reader.onload = (e) => {
-        preview.src = e.target.result;
-        preview.style.display = "block";
-        previewPlaceholder.style.display = "none";
+        previewImg.src = e.target.result;
+        previewImg.style.display = "block";
       };
       reader.readAsDataURL(file);
+      classifyBtn.disabled = false;
     });
 
-    // Bild senden
-    sendBtn.addEventListener("click", async () => {
-      if (!selectedFile) {
-        statusEl.textContent = "Kein Bild ausgewählt.";
-        setStatusPill("error", "Kein Bild");
+    function setStatus(type, message, hint) {
+      if (!message && !hint) {
+        statusRow.style.display = "none";
         return;
       }
+      statusRow.style.display = "flex";
+      const isError = type === "error";
+      statusBadge.classList.toggle("error", isError);
+      statusLabel.textContent = isError ? "Fehler" : "Status";
+      statusText.textContent = hint || message || "";
+    }
 
-      statusEl.textContent = "Sende Bild an Backend und warte auf Antwort…";
-      setStatusPill("loading", "Klassifikation läuft…");
-      sendBtn.disabled = true;
-      rawVisible = false;
-      resultRaw.style.display = "none";
-      toggleRawBtn.textContent = "Rohes JSON anzeigen";
-      clearFeedbackUI();
-      resultContainer.innerHTML = `
-        <div class="no-result">
-          Modell wird aufgerufen, bitte warten…
-        </div>
-      `;
+    async function classifyImage() {
+      const file = fileInput.files && fileInput.files[0];
+      if (!file) return;
 
-      const formData = new FormData();
-      formData.append("file", selectedFile);
+      classifyBtn.disabled = true;
+      classifyBtn.innerHTML = "<span class='emoji'>⏳</span><span>Analyse läuft …</span>";
+      setStatus("info", null, "Bild wird an das Backend gesendet …");
 
       try {
-        const response = await fetch(API_URL, {
+        const formData = new FormData();
+        formData.append("file", file);
+
+        const response = await fetch(backendUrl(), {
           method: "POST",
           body: formData,
         });
 
         if (!response.ok) {
-          const errText = await response.text();
-          statusEl.textContent = `Fehler vom Server (Status ${response.status}).`;
-          setStatusPill("error", "Serverfehler");
-          resultContainer.innerHTML = `
-            <div class="no-result">
-              Serverfehler beim Klassifizieren.<br>
-              Details:<br>
-              <code>${errText.replace(/</g, "&lt;")}</code>
-            </div>
-          `;
-        } else {
-          const data = await response.json();
-          statusEl.textContent = "Ergebnis erfolgreich erhalten.";
-          setStatusPill("success", "Ergebnis bereit");
-          renderResult(data);
+          let detail = `HTTP ${response.status}`;
+          try {
+            const errJson = await response.json();
+            if (errJson && errJson.error) {
+              detail = errJson.error;
+            }
+          } catch (_) { /* ignorieren */ }
+
+          setStatus("error", null, `Fehler bei /classify: ${detail}`);
+          classifyBtn.disabled = false;
+          classifyBtn.innerHTML = "<span class='emoji'>🚀</span><span>Bild klassifizieren</span>";
+          return;
         }
+
+        let data = await response.json();
+
+        // Falls das Backend ausnahmsweise einen String liefern würde
+        if (typeof data === "string") {
+          data = JSON.parse(data);
+        }
+
+        lastResult = data;
+        renderResult(data);
+        setStatus("success", null, "Ergebnis erfolgreich erhalten.");
       } catch (err) {
-        console.error("Fetch-Fehler:", err);
-        statusEl.textContent =
-          "Netzwerkfehler: " + err.message +
-          "\nPrüfe:\n- Läuft das Backend auf Port 8000?\n- Bist du im selben WLAN wie der Server?\n- Stimmt die IP im Browser (Adresszeile)?";
-        setStatusPill("error", "Netzwerkfehler");
-        resultContainer.innerHTML = `
-          <div class="no-result">
-            Netzwerkfehler beim Aufruf von <code>${API_URL}</code>.<br>
-            Öffne die Browser-Konsole für Details.
-          </div>
-        `;
+        console.error(err);
+        setStatus("error", null, "Backend nicht erreichbar oder Antwort ungültig.");
       } finally {
-        sendBtn.disabled = false;
+        classifyBtn.disabled = false;
+        classifyBtn.innerHTML = "<span class='emoji'>🚀</span><span>Bild klassifizieren</span>";
       }
-    });
+    }
 
-    // Rohes JSON ein-/ausblenden
-    toggleRawBtn.addEventListener("click", () => {
-      rawVisible = !rawVisible;
-      resultRaw.style.display = rawVisible ? "block" : "none";
-      toggleRawBtn.textContent = rawVisible ? "Rohes JSON ausblenden" : "Rohes JSON anzeigen";
-    });
-
-    // Feedback-Buttons
-    fbYes.addEventListener("click", () => {
-      feedbackState = "yes";
-      fbYes.classList.add("active", "yes");
-      fbNo.classList.remove("active", "no");
-      feedbackExtra.classList.remove("visible");
-      fbStatus.textContent = "Feedback: Vorschlag wird als korrekt markiert.";
-    });
-
-    fbNo.addEventListener("click", () => {
-      feedbackState = "no";
-      fbNo.classList.add("active", "no");
-      fbYes.classList.remove("active", "yes");
-      feedbackExtra.classList.add("visible");
-      fbStatus.textContent = "Bitte korrigierten TARIC und optional Kommentar eintragen.";
-    });
-
-    // Feedback lokal speichern (localStorage)
-    fbSave.addEventListener("click", () => {
-      if (!lastResult) {
-        fbStatus.textContent = "Kein Ergebnis vorhanden, das gespeichert werden könnte.";
+    function updateConfidenceUI(conf) {
+      if (conf === null || Number.isNaN(conf)) {
+        confValEl.textContent = "–";
+        confBarEl.style.width = "0%";
+        confBadgeEl.classList.remove("low", "medium", "high");
+        confLabelEl.textContent = "keine Bewertung";
         return;
       }
 
-      if (feedbackState !== "no") {
-        fbStatus.textContent = "Nur bei 'Nein, ist falsch' wird detailliertes Feedback gespeichert.";
-        return;
+      const pct = Math.round(conf * 100);
+      confValEl.textContent = pct + " %";
+      confBarEl.style.width = Math.min(100, Math.max(0, pct)) + "%";
+
+      confBadgeEl.classList.remove("low", "medium", "high");
+
+      if (pct < 50) {
+        confBadgeEl.classList.add("low");
+        confLabelEl.textContent = "niedrig";
+      } else if (pct < 80) {
+        confBadgeEl.classList.add("medium");
+        confLabelEl.textContent = "mittel";
+      } else {
+        confBadgeEl.classList.add("high");
+        confLabelEl.textContent = "hoch";
+      }
+    }
+
+    function renderResult(data) {
+      const taric = data.taric_code || "──────────";
+      const cn = data.cn_code || "────────";
+      const hs = data.hs_chapter || "──";
+      const conf = typeof data.confidence === "number" ? data.confidence : null;
+      const reason = data.short_reason || "Keine Begründung vorhanden.";
+
+      taricEl.textContent = taric;
+      cnEl.textContent = cn;
+      hsEl.textContent = (hs ?? "").toString().padStart(2, "0");
+
+      updateConfidenceUI(conf);
+
+      reasonEl.textContent = reason;
+
+      altListEl.innerHTML = "";
+      if (Array.isArray(data.possible_alternatives) && data.possible_alternatives.length > 0) {
+        data.possible_alternatives.forEach((alt) => {
+          const li = document.createElement("li");
+          const code = alt.taric_code || "──────────";
+          const r = alt.short_reason || "Keine Begründung.";
+          li.textContent = `${code}: ${r}`;
+          altListEl.appendChild(li);
+        });
+      } else {
+        const li = document.createElement("li");
+        li.textContent = "Keine Alternativcodes angegeben.";
+        altListEl.appendChild(li);
       }
 
-      const correctTaric = fbCorrectTaric.value.trim();
-      const comment = fbComment.value.trim();
+      const id = data.id ?? "–";
+      const fn = data.filename ?? "–";
+      metaResultEl.textContent = `ID: ${id} · Datei: ${fn}`;
 
-      if (!correctTaric && !comment) {
-        fbStatus.textContent = "Bitte entweder einen korrekten TARIC oder einen Kommentar angeben.";
-        return;
-      }
+      btnOk.classList.remove("saved");
+      btnNo.classList.remove("saved");
+    }
 
+    function storeFeedback(isCorrect) {
+      if (!lastResult) return;
       const entry = {
         timestamp: new Date().toISOString(),
-        predicted_taric: lastResult.taric_code || null,
-        predicted_cn: lastResult.cn_code || null,
-        predicted_hs: lastResult.hs_chapter || null,
+        id: lastResult.id ?? null,
+        filename: lastResult.filename ?? null,
+        taric_code: lastResult.taric_code || null,
+        cn_code: lastResult.cn_code || null,
+        hs_chapter: lastResult.hs_chapter || null,
         confidence: lastResult.confidence ?? null,
-        correct_taric: correctTaric || null,
-        comment: comment || null,
-        filename: selectedFile ? selectedFile.name : null,
+        short_reason: lastResult.short_reason || null,
+        possible_alternatives: lastResult.possible_alternatives || [],
+        feedback: isCorrect ? "ok" : "wrong",
       };
 
-      let existing = [];
+      let all = [];
       try {
         const raw = localStorage.getItem("taric_feedback");
-        if (raw) {
-          existing = JSON.parse(raw);
-        }
-      } catch (e) {
-        console.warn("Konnte vorhandenes Feedback nicht lesen:", e);
+        if (raw) all = JSON.parse(raw);
+      } catch {
+        all = [];
       }
+      all.push(entry);
+      localStorage.setItem("taric_feedback", JSON.stringify(all));
 
-      existing.push(entry);
-      localStorage.setItem("taric_feedback", JSON.stringify(existing));
+      if (isCorrect) {
+        btnOk.classList.add("saved");
+        btnNo.classList.remove("saved");
+      } else {
+        btnNo.classList.add("saved");
+        btnOk.classList.remove("saved");
+      }
+    }
 
-      fbStatus.textContent = "Feedback lokal gespeichert. (localStorage: 'taric_feedback')";
-    });
-
-    // Initialer Status
-    setStatusPill("idle", "Warte auf Bild");
-    statusEl.textContent = "Bitte ein Bild auswählen und dann klassifizieren.";
+    classifyBtn.addEventListener("click", classifyImage);
+    btnOk.addEventListener("click", () => storeFeedback(true));
+    btnNo.addEventListener("click", () => storeFeedback(false));
   </script>
 </body>
 </html>

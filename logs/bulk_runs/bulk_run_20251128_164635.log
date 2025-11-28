@@ -1,0 +1,16 @@
+2025-11-28 16:46:35 [INFO] Bulk-Evaluationslauf gestartet.
+2025-11-28 16:46:35 [INFO] Log-Datei: logs/bulk_runs/bulk_run_20251128_164635.log
+2025-11-28 16:46:35 [INFO] Backend-URL: http://127.0.0.1:8000
+2025-11-28 16:46:35 [INFO] Endpoint-Pfad: /classify
+2025-11-28 16:46:35 [INFO] Input-Ordner: data/taric_bulk_input
+2025-11-28 16:46:35 [INFO] Done-Ordner: data/taric_bulk_done
+2025-11-28 16:46:35 [INFO] Error-Ordner: data/taric_bulk_error
+2025-11-28 16:46:35 [INFO] Batch-Größe: 30
+2025-11-28 16:46:35 [INFO] Gefundene Bilddateien: 1
+2025-11-28 16:46:35 [INFO] Verarbeite Batch 1: 1 Bilder
+2025-11-28 16:46:35 [INFO] Sende Bild: 15-6.webp
+2025-11-28 16:47:35 [ERROR] Fehler bei 15-6.webp: HTTPConnectionPool(host='127.0.0.1', port=8000): Read timed out. (read timeout=60.0)
+2025-11-28 16:47:36 [INFO] Bulk-Evaluationslauf beendet.
+2025-11-28 16:47:36 [INFO] Erfolgreich: 0, Fehler: 1
+2025-11-28 16:47:36 [INFO] Ergebnis-CSV: logs/bulk_runs/results_bulk_20251128_164635.csv
+2025-11-28 16:47:36 [INFO] Log-Datei: logs/bulk_runs/bulk_run_20251128_164635.log

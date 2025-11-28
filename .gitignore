@@ -1,23 +1,89 @@
-# virtuelle Umgebungen
+# --------------------------------------------------------
+# Virtuelle Umgebungen
+# --------------------------------------------------------
 .venv/
 .venv_taric/
 
+# --------------------------------------------------------
 # Python Cache
+# --------------------------------------------------------
 __pycache__/
 *.pyc
 
+# --------------------------------------------------------
 # macOS
+# --------------------------------------------------------
 .DS_Store
 
+# --------------------------------------------------------
 # API-Key / Secrets
+# --------------------------------------------------------
 API_GEMINI.txt
 
-# lokale Datenbanken
+# --------------------------------------------------------
+# Lokale SQLite / Testdatenbanken
+# --------------------------------------------------------
 *.db
 
-# lokale Bilddaten
+# --------------------------------------------------------
+# Lokale Bilddaten
+# --------------------------------------------------------
 bilder/
 bilder_uploads/
 
+# --------------------------------------------------------
 # VS Code Workspace (optional)
+# --------------------------------------------------------
 .vscode/
+
+# --------------------------------------------------------
+# TARIC Projekt – Backup/Kopie/Test Dateien aus dem Screenshot
+# --------------------------------------------------------
+
+# 1) Dateien, die mit Nummern beginnen:
+#    Beispiel: 1_backend.py, 2_backend.py, 3_index.html, 33_evaluation.html
+[0-9]*_*.py
+[0-9]*_*.html
+[0-9]*_*.*
+
+# 2) Dateien mit „alt“, „backup“, „copy“, „dup“, „test“
+*alt.*
+*ALT.*
+*backup.*
+*BACKUP.*
+*copy.*
+*COPY.*
+*dup.*
+*DUP.*
+*test.*
+*TEST.*
+
+# 3) Dateien mit Leerzeichen im Namen (oft temporär)
+* *.*
+
+# 4) Spezielle Problemdateien aus deinem Screenshot
+lernenwas_falsch*.* 
+notfunctional__backend.py
+TARIC-CODE*dup*.md
+
+# 5) Sicherungskopien von Evaluation/Index Varianten
+*_evaluation_copy.html
+*_evaluation_alt.html
+*_evaluation_old.html
+*_evaluation_tmp.html
+
+*_index_copy.html
+*_index_alt.html
+*_index_old.html
+*_index_tmp.html
+
+# 6) Shell Scripts aus Tests/Tools
+*_tmp.sh
+*_old.sh
+
+# --------------------------------------------------------
+# OPTIONAL: Node/Frontend (falls irgendwann dazu kommt)
+# --------------------------------------------------------
+# node_modules/
+# dist/
+
