@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <title>TARIC Bildklassifikation (Gemini)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg: #0f172a;
+      --bg-panel: #111827;
+      --bg-panel-alt: #020617;
+      --border: #1f2937;
+      --accent: #2563eb;
+      --accent-soft: rgba(37,99,235,0.12);
+      --accent-strong: rgba(37,99,235,0.4);
+      --text: #e5e7eb;
+      --text-muted: #9ca3af;
+      --error: #ef4444;
+      --success: #22c55e;
+      --warn: #eab308;
+      --low: #f97316;
+      --radius: 14px;
+      --shadow: 0 18px 45px rgba(15,23,42,0.75);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+        "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #020617, #020617 55%, #000 100%);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .page {
+      width: 100%;
+      max-width: 980px;
+      background: linear-gradient(145deg, #020617 0%, #020617 45%, #020617 100%);
+      border-radius: 24px;
+      border: 1px solid rgba(148,163,184,0.35);
+      box-shadow: var(--shadow);
+      padding: 16px 16px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    header {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 10px;
+    }
+
+    .header-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    h1 {
+      font-size: 1.35rem;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    h1 .icon-main {
+      font-size: 1.4rem;
+    }
+
+    h1 span.badge {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 0.15rem 0.6rem;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      border: 1px solid var(--accent-strong);
+      color: #bfdbfe;
+    }
+
+    header p {
+      margin: 0;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    .nav-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+
+    .nav-link {
+      text-decoration: none;
+      padding: 6px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.4);
+      color: #e5e7eb;
+      font-size: 0.8rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      background: radial-gradient(circle at top, #1e293b, #020617);
+      transition: transform 0.1s ease, box-shadow 0.1s ease,
+        background 0.1s ease, border-color 0.1s ease;
+    }
+
+    .nav-link span {
+      font-size: 0.95rem;
+    }
+
+    .nav-link:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 25px rgba(15,23,42,0.7);
+      border-color: rgba(191,219,254,0.6);
+      background: radial-gradient(circle at top, #1d4ed8, #020617);
+    }
+
+    main {
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+      gap: 16px;
+    }
+
+    @media (max-width: 768px) {
+      main {
+        display: flex;
+        flex-direction: column;
+      }
+    }
+
+    .panel {
+      background: radial-gradient(circle at top left, #0b1120, #020617 65%);
+      border-radius: var(--radius);
+      border: 1px solid rgba(31,41,55,0.9);
+      padding: 12px 12px 14px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.55);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .panel h2 {
+      margin: 0 0 4px 0;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .panel h2 small {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+    }
+
+    .panel h2 .icon {
+      font-size: 1.1rem;
+    }
+
+    .file-drop {
+      border-radius: 16px;
+      border: 1px dashed rgba(148,163,184,0.7);
+      padding: 10px 12px;
+      background: radial-gradient(circle at top, rgba(15,23,42,0.9), #020617);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+
+    .file-drop input {
+      display: none;
+    }
+
+    .file-drop-icon {
+      font-size: 1.4rem;
+      padding: 6px;
+      border-radius: 999px;
+      background: rgba(15,23,42,0.9);
+      border: 1px solid rgba(148,163,184,0.6);
+    }
+
+    .file-drop-label {
+      flex: 1;
+    }
+
+    .file-drop-title {
+      font-weight: 500;
+    }
+
+    .file-meta {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .preview-box {
+      margin-top: 8px;
+      border-radius: var(--radius);
+      border: 1px solid rgba(31,41,55,0.9);
+      padding: 6px;
+      background: radial-gradient(circle at top, #020617, #020617 60%, #000 100%);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .preview-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .preview-header span.icon {
+      font-size: 1rem;
+    }
+
+    .preview-box img {
+      max-width: 100%;
+      border-radius: 10px;
+      display: block;
+    }
+
+    .preview-placeholder {
+      text-align: center;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      padding: 12px 6px;
+    }
+
+    .status {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .status strong {
+      color: #e5e7eb;
+    }
+
+    .btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .btn {
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.6);
+      padding: 7px 14px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      background: radial-gradient(circle at top, #1e3a8a, #111827);
+      color: #e5e7eb;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      transition: transform 0.12s ease, box-shadow 0.12s ease,
+        background 0.12s ease, border-color 0.12s ease;
+      box-shadow: 0 10px 25px rgba(37,99,235,0.35);
+    }
+
+    .btn span.icon {
+      font-size: 1rem;
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: default;
+      box-shadow: none;
+    }
+
+    .btn:hover:not(:disabled) {
+      transform: translateY(-1px);
+      border-color: rgba(191,219,254,0.9);
+      background: radial-gradient(circle at top, #1d4ed8, #020617);
+    }
+
+    .btn-secondary {
+      background: radial-gradient(circle at top, #111827, #020617);
+      box-shadow: none;
+    }
+
+    .btn-secondary:hover:not(:disabled) {
+      background: radial-gradient(circle at top, #1f2937, #020617);
+    }
+
+    .result-box {
+      border-radius: var(--radius);
+      border: 1px solid rgba(31,41,55,0.9);
+      padding: 10px;
+      background: radial-gradient(circle at top, #020617, #020617 60%, #000 100%);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      font-size: 0.85rem;
+    }
+
+    .result-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 8px;
+    }
+
+    .id-block {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .id-block .id-main {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #e5e7eb;
+    }
+
+    .id-block .filename {
+      font-size: 0.75rem;
+    }
+
+    .confidence-block {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      align-items: flex-end;
+      min-width: 150px;
+    }
+
+    .confidence-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      border: 1px solid rgba(148,163,184,0.7);
+      background: rgba(15,23,42,0.9);
+    }
+
+    .confidence-chip span.icon {
+      font-size: 0.9rem;
+    }
+
+    .confidence-chip span.value {
+      font-weight: 600;
+    }
+
+    /* Confidence-Farben */
+    .conf-low {
+      border-color: rgba(248,113,113,0.9);
+      background: rgba(127,29,29,0.9);
+      color: #fecaca;
+    }
+
+    .conf-mid {
+      border-color: rgba(250,204,21,0.9);
+      background: rgba(113,63,18,0.9);
+      color: #fef9c3;
+    }
+
+    .conf-high {
+      border-color: rgba(34,197,94,0.9);
+      background: rgba(22,101,52,0.9);
+      color: #bbf7d0;
+    }
+
+    .confidence-bar {
+      width: 160px;
+      height: 6px;
+      border-radius: 999px;
+      background: rgba(31,41,55,0.85);
+      overflow: hidden;
+    }
+
+    .confidence-bar-inner {
+      height: 100%;
+      border-radius: inherit;
+      width: 0%;
+      transition: width 0.2s ease;
+      background: linear-gradient(90deg, #22c55e, #eab308);
+    }
+
+    .result-section {
+      border-radius: 10px;
+      padding: 6px 8px;
+      background: rgba(15,23,42,0.8);
+      border: 1px solid rgba(31,41,55,0.8);
+    }
+
+    .section-title {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 3px;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .section-title span.icon {
+      font-size: 0.9rem;
+    }
+
+    .taric-main {
+      font-size: 1.06rem;
+      font-weight: 600;
+    }
+
+    .codes-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      font-size: 0.8rem;
+      margin-top: 4px;
+    }
+
+    .code-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      padding: 3px 9px;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.7);
+      background: rgba(15,23,42,0.9);
+      font-size: 0.78rem;
+    }
+
+    .code-pill strong {
+      color: #e5e7eb;
+    }
+
+    .reason-text {
+      font-size: 0.85rem;
+    }
+
+    .reason-text span.placeholder {
+      color: var(--text-muted);
+      font-style: italic;
+    }
+
+    .alt-list {
+      margin: 0;
+      padding-left: 1rem;
+      font-size: 0.83rem;
+    }
+
+    .alt-list li {
+      margin-bottom: 2px;
+    }
+
+    .no-result {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    pre {
+      margin: 0;
+      margin-top: 6px;
+      padding: 8px;
+      border-radius: 10px;
+      background: #020617;
+      font-size: 0.78rem;
+      max-height: 260px;
+      overflow: auto;
+      border: 1px solid rgba(31,41,55,0.9);
+    }
+
+    .toggle-raw {
+      border: none;
+      background: transparent;
+      color: #bfdbfe;
+      font-size: 0.8rem;
+      cursor: pointer;
+      padding: 0;
+      text-decoration: underline;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      margin-top: 4px;
+    }
+
+    .toggle-raw span.icon {
+      font-size: 0.9rem;
+    }
+
+    .toggle-raw:hover {
+      color: #e5e7eb;
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <div class="header-bar">
+        <div>
+          <h1>
+            <span class="icon-main">📦</span>
+            TARIC Klassifikation per Foto
+            <span class="badge">Gemini</span>
+          </h1>
+          <p>
+            Foto hochladen → Modell ermittelt den wahrscheinlichsten TARIC-Code inklusive
+            Begründung und Alternativen. Die Ergebnisse landen in <code>taric_live.db</code>.
+          </p>
+        </div>
+        <div class="nav-links">
+          <a href="evaluation.html" class="nav-link">
+            <span>🔍</span><span>Evaluation</span>
+          </a>
+          <a href="auswertung.html" class="nav-link">
+            <span>📊</span><span>DB-Auswertung</span>
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <!-- Linke Spalte: Upload -->
+      <section class="panel">
+        <h2>
+          <span class="icon">📷</span>
+          Bild-Upload
+          <small>Schritt&nbsp;1</small>
+        </h2>
+
+        <label class="file-drop">
+          <div class="file-drop-icon">📸</div>
+          <div class="file-drop-label">
+            <div class="file-drop-title">Bild auswählen oder direkt aufnehmen</div>
+            <div class="file-meta">
+              Unterstützt: JPG, PNG, WEBP · Kamera auf Smartphone nutzbar
+            </div>
+          </div>
+          <input id="fileInput" type="file" accept="image/*" capture="environment" />
+        </label>
+
+        <div class="preview-box">
+          <div class="preview-header">
+            <div>
+              <span class="icon">🖼️</span>
+              <span id="previewTitle">Vorschau</span>
+            </div>
+            <div id="previewInfo"></div>
+          </div>
+          <img id="preview" alt="Vorschau" style="display:none;" />
+          <div id="previewPlaceholder" class="preview-placeholder">
+            Noch kein Bild ausgewählt.
+          </div>
+        </div>
+
+        <div class="status" id="status">
+          <strong>Status:</strong> Bitte ein Bild auswählen.
+        </div>
+
+        <div class="btn-row">
+          <button id="sendBtn" class="btn" disabled>
+            <span class="icon">🚀</span>
+            <span>Klassifizieren</span>
+          </button>
+          <button id="resetBtn" class="btn btn-secondary">
+            <span class="icon">♻️</span>
+            <span>Zurücksetzen</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- Rechte Spalte: Ergebnis -->
+      <section class="panel">
+        <h2>
+          <span class="icon">📑</span>
+          Ergebnis
+          <small>Schritt&nbsp;2</small>
+        </h2>
+        <div id="resultContainer" class="result-box">
+          <div class="no-result">
+            Noch kein Ergebnis. Starte eine Klassifikation, um TARIC-Daten zu sehen.
+          </div>
+        </div>
+        <button id="toggleRawBtn" class="toggle-raw" type="button">
+          <span class="icon">🔎</span>
+          <span>Rohes JSON anzeigen</span>
+        </button>
+        <pre id="rawJson" style="display:none;"></pre>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    // Backend-Basis dynamisch: gleicher Host, Port 8000
+    const BACKEND_PORT = "8000";
+    const API_HOST = window.location.hostname || "localhost";
+    const API_BASE = `http://${API_HOST}:${BACKEND_PORT}`;
+    const API_URL = `${API_BASE}/classify`;
+
+    const fileInput = document.getElementById("fileInput");
+    const preview = document.getElementById("preview");
+    const previewPlaceholder = document.getElementById("previewPlaceholder");
+    const previewInfo = document.getElementById("previewInfo");
+    const sendBtn = document.getElementById("sendBtn");
+    const resetBtn = document.getElementById("resetBtn");
+    const statusEl = document.getElementById("status");
+    const resultContainer = document.getElementById("resultContainer");
+    const toggleRawBtn = document.getElementById("toggleRawBtn");
+    const rawJson = document.getElementById("rawJson");
+
+    let selectedFile = null;
+    let rawVisible = false;
+
+    function setStatus(text) {
+      statusEl.innerHTML = `<strong>Status:</strong> ${text}`;
+    }
+
+    function classifyConfidence(confPct) {
+      if (confPct >= 80) return { cls: "conf-high", icon: "✅", label: "hoch" };
+      if (confPct >= 50) return { cls: "conf-mid", icon: "⚠️", label: "mittel" };
+      return { cls: "conf-low", icon: "❗️", label: "niedrig" };
+    }
+
+    function renderResult(data) {
+      if (!data || typeof data !== "object") {
+        resultContainer.innerHTML =
+          `<div class="no-result">Unerwartetes Antwortformat vom Backend.</div>`;
+        return;
+      }
+
+      const {
+        id,
+        filename,
+        taric_code,
+        cn_code,
+        hs_chapter,
+        confidence,
+        short_reason,
+        possible_alternatives
+      } = data;
+
+      const conf = typeof confidence === "number"
+        ? confidence
+        : Number(confidence || 0);
+      const confPct = isNaN(conf) ? 0 : Math.round(conf * 100);
+
+      const confMeta = classifyConfidence(confPct);
+
+      const alternatives = Array.isArray(possible_alternatives)
+        ? possible_alternatives
+        : [];
+
+      let altHtml = "";
+      if (alternatives.length > 0) {
+        altHtml = `<div class="result-section">
+          <div class="section-title">
+            <span class="icon">🧭</span><span>Alternativen</span>
+          </div>
+          <ul class="alt-list">
+        `;
+        for (const alt of alternatives) {
+          const c = alt.taric_code || "";
+          const r = alt.short_reason || "";
+          altHtml += `<li><code>${c}</code> – ${r}</li>`;
+        }
+        altHtml += `</ul></div>`;
+      }
+
+      resultContainer.innerHTML = `
+        <div>
+          <div class="result-header">
+            <div class="id-block">
+              <div>taric_live.id</div>
+              <div class="id-main">${id ?? "–"}</div>
+              <div class="filename">${filename || ""}</div>
+            </div>
+            <div class="confidence-block">
+              <div class="confidence-chip ${confMeta.cls}">
+                <span class="icon">${confMeta.icon}</span>
+                <span class="value">${confPct}%</span>
+                <span>Confidence (${confMeta.label})</span>
+              </div>
+              <div class="confidence-bar">
+                <div class="confidence-bar-inner" style="width:${confPct}%;"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="result-section">
+            <div class="section-title">
+              <span class="icon">🏷️</span><span>TARIC-Code</span>
+            </div>
+            <div class="taric-main">
+              ${taric_code || "<span class='placeholder'>nicht gesetzt</span>"}
+            </div>
+            <div class="codes-row">
+              ${
+                cn_code
+                  ? `<span class="code-pill"><strong>CN</strong> ${cn_code}</span>`
+                  : ""
+              }
+              ${
+                hs_chapter
+                  ? `<span class="code-pill"><strong>HS</strong> ${hs_chapter}</span>`
+                  : ""
+              }
+            </div>
+          </div>
+
+          <div class="result-section">
+            <div class="section-title">
+              <span class="icon">🧠</span><span>Begründung</span>
+            </div>
+            <div class="reason-text">
+              ${
+                short_reason
+                  ? short_reason
+                  : "<span class='placeholder'>keine Begründung</span>"
+              }
+            </div>
+          </div>
+
+          ${altHtml}
+        </div>
+      `;
+
+      rawJson.textContent = JSON.stringify(data, null, 2);
+    }
+
+    fileInput.addEventListener("change", () => {
+      const file = fileInput.files[0];
+      if (!file) {
+        selectedFile = null;
+        preview.style.display = "none";
+        previewPlaceholder.style.display = "block";
+        previewInfo.textContent = "";
+        setStatus("Bitte ein Bild auswählen.");
+        sendBtn.disabled = true;
+        return;
+      }
+
+      selectedFile = file;
+      sendBtn.disabled = false;
+      setStatus("Bild gewählt. Du kannst jetzt klassifizieren.");
+
+      const sizeKB = Math.round(file.size / 1024);
+      previewInfo.textContent = `${file.name} · ${sizeKB} KB`;
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        preview.src = e.target.result;
+        preview.style.display = "block";
+        previewPlaceholder.style.display = "none";
+      };
+      reader.readAsDataURL(file);
+    });
+
+    sendBtn.addEventListener("click", async () => {
+      if (!selectedFile) return;
+
+      const formData = new FormData();
+      formData.append("file", selectedFile);
+
+      sendBtn.disabled = true;
+      setStatus("Sende Bild an Backend …");
+
+      try {
+        const response = await fetch(API_URL, {
+          method: "POST",
+          body: formData,
+        });
+
+        if (!response.ok) {
+          const errText = await response.text();
+          setStatus(`Fehler vom Server (Status ${response.status}).`);
+          resultContainer.innerHTML = `
+            <div class="no-result">
+              Serverfehler beim Klassifizieren.<br />
+              <code>${errText.replace(/</g,"&lt;")}</code>
+            </div>
+          `;
+        } else {
+          const data = await response.json();
+          setStatus("Ergebnis erfolgreich erhalten.");
+          renderResult(data);
+        }
+      } catch (err) {
+        console.error(err);
+        setStatus("Netzwerkfehler beim Senden des Bildes.");
+        resultContainer.innerHTML = `
+          <div class="no-result">
+            Netzwerkfehler beim Klassifizieren.<br />
+            Details: <code>${String(err)}</code>
+          </div>
+        `;
+      } finally {
+        sendBtn.disabled = false;
+      }
+    });
+
+    resetBtn.addEventListener("click", () => {
+      fileInput.value = "";
+      selectedFile = null;
+      preview.style.display = "none";
+      previewPlaceholder.style.display = "block";
+      previewInfo.textContent = "";
+      resultContainer.innerHTML = `
+        <div class="no-result">
+          Noch kein Ergebnis. Starte eine Klassifikation, um TARIC-Daten zu sehen.
+        </div>
+      `;
+      rawJson.textContent = "";
+      rawJson.style.display = "none";
+      rawVisible = false;
+      toggleRawBtn.innerHTML = `<span class="icon">🔎</span><span>Rohes JSON anzeigen</span>`;
+      setStatus("Bitte ein Bild auswählen.");
+    });
+
+    toggleRawBtn.addEventListener("click", () => {
+      rawVisible = !rawVisible;
+      rawJson.style.display = rawVisible ? "block" : "none";
+      toggleRawBtn.innerHTML = rawVisible
+        ? `<span class="icon">🙈</span><span>Rohes JSON ausblenden</span>`
+        : `<span class="icon">🔎</span><span>Rohes JSON anzeigen</span>`;
+    });
+  </script>
+</body>
+</html>

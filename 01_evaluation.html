@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <title>TARIC Evaluation – Zollprüfung</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg: #020617;
+      --bg-panel: #0f172a;
+      --bg-panel-alt: #020617;
+      --border: #1f2937;
+      --accent: #2563eb;
+      --accent-soft: rgba(37, 99, 235, 0.12);
+      --accent-strong: rgba(37, 99, 235, 0.4);
+      --text: #e5e7eb;
+      --text-muted: #9ca3af;
+      --error: #f97373;
+      --success: #4ade80;
+      --radius: 16px;
+      --shadow: 0 18px 45px rgba(15, 23, 42, 0.8);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+        "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #1f2937 0, #020617 45%, #000 100%);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .shell {
+      width: 100%;
+      max-width: 1200px;
+      background: linear-gradient(145deg, var(--bg-panel), var(--bg-panel-alt));
+      border-radius: 24px;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      padding: 20px 20px 26px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* ------------------------------------------------------------------
+       Kopfbereich: Titel + Navigation
+       ------------------------------------------------------------------ */
+    .header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 10px;
+    }
+
+    .title-block {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .title-line {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 1.4rem;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+    }
+
+    .title-icon {
+      font-size: 1.5rem;
+    }
+
+    .subtitle {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    .nav-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 999px;
+      padding: 8px 16px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+      box-shadow: 0 12px 30px rgba(37, 99, 235, 0.35);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 16px 40px rgba(37, 99, 235, 0.5);
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+    }
+
+    .btn-outline:hover {
+      border-color: var(--accent);
+      color: var(--text);
+    }
+
+    .btn-small {
+      padding: 6px 10px;
+      font-size: 0.8rem;
+    }
+
+    /* ------------------------------------------------------------------
+       Layout: 2 Spalten – links Bild, rechts Info + Bewertung
+       ------------------------------------------------------------------ */
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.4fr);
+      gap: 18px;
+      margin-top: 4px;
+    }
+
+    .card {
+      background: rgba(15, 23, 42, 0.98);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      padding: 12px 14px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+
+    .card-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .badge {
+      font-size: 0.75rem;
+      padding: 2px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    /* Bild-Bereich */
+    .image-wrapper {
+      position: relative;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      background: #020617;
+      min-height: 260px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .image-wrapper img {
+      max-width: 100%;
+      max-height: 420px;
+      display: block;
+      object-fit: contain;
+      background: #020617;
+    }
+
+    .image-filename {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+      word-break: break-all;
+    }
+
+    /* Info-Tabelle rechts */
+    .detail-grid {
+      display: grid;
+      grid-template-columns: 130px minmax(0, 1fr);
+      gap: 4px 10px;
+      font-size: 0.85rem;
+    }
+
+    .detail-label {
+      color: var(--text-muted);
+    }
+
+    .detail-value {
+      font-family: ui-monospace, Menlo, Monaco, Consolas, "Liberation Mono",
+        "Courier New", monospace;
+      font-size: 0.85rem;
+    }
+
+    .taric-code {
+      font-weight: 600;
+      letter-spacing: 0.06em;
+    }
+
+    .short-reason {
+      font-size: 0.85rem;
+      line-height: 1.4;
+    }
+
+    .json-block {
+      margin-top: 4px;
+      padding: 6px 8px;
+      border-radius: 10px;
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px dashed var(--border);
+      font-family: ui-monospace, Menlo, Monaco, Consolas, "Liberation Mono",
+        "Courier New", monospace;
+      font-size: 0.78rem;
+      max-height: 160px;
+      overflow: auto;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+
+    /* Bewertungsbereich */
+    .form-section-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-top: 4px;
+      margin-bottom: 2px;
+    }
+
+    .digits-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 6px;
+    }
+
+    .digit-btn {
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      padding: 4px 8px;
+      font-size: 0.8rem;
+      background: rgba(15, 23, 42, 0.95);
+      color: var(--text-muted);
+      cursor: pointer;
+      min-width: 28px;
+      text-align: center;
+    }
+
+    .digit-btn.selected {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px var(--accent-soft);
+    }
+
+    .field-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+
+    .field {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      font-size: 0.8rem;
+    }
+
+    .field label {
+      color: var(--text-muted);
+    }
+
+    .field input,
+    .field textarea {
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: #020617;
+      padding: 6px 8px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.8rem;
+      resize: vertical;
+      min-height: 30px;
+    }
+
+    .field textarea {
+      min-height: 60px;
+    }
+
+    .field input:focus,
+    .field textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px var(--accent-soft);
+    }
+
+    .actions-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    .nav-buttons {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .status-bar {
+      margin-top: 4px;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+      gap: 6px;
+    }
+
+    .status-message.ok {
+      color: var(--success);
+    }
+
+    .status-message.error {
+      color: var(--error);
+    }
+
+    .empty-state {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      padding: 20px;
+      text-align: center;
+    }
+
+    @media (max-width: 900px) {
+      body {
+        padding: 12px;
+      }
+      .shell {
+        padding: 16px 14px 20px;
+      }
+      .layout {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <!-- ============================================================= -->
+    <!-- Kopfbereich                                                  -->
+    <!-- ============================================================= -->
+    <header class="header">
+      <div class="title-block">
+        <div class="title-line">
+          <span class="title-icon">⚖️</span>
+          <span>TARIC Evaluation – Zollprüfung</span>
+        </div>
+        <div class="subtitle">
+          Sichtung der Klassifikationsergebnisse und Bestätigung,
+          bis zu welcher Stelle der TARIC-Code korrekt ist.
+        </div>
+      </div>
+
+      <div class="nav-actions">
+        <button id="toggle-unreviewed" class="btn btn-outline btn-small">
+          Nur unbewertete
+        </button>
+        <a href="index.html" class="btn btn-primary btn-small">
+          <span>🔍</span>
+          <span>TARIC Klassifikation</span>
+        </a>
+      </div>
+    </header>
+
+    <!-- ============================================================= -->
+    <!-- Hauptbereich: Bild + Informationen + Bewertung                -->
+    <!-- ============================================================= -->
+    <main id="content">
+      <div id="empty-state" class="empty-state" style="display:none;">
+        Keine Datensätze gefunden. Bitte Klassifikationen durchführen oder Filter ändern.
+      </div>
+
+      <div id="evaluation-layout" class="layout" style="display:none;">
+        <!-- ------------------------------ -->
+        <!-- Linke Karte: Bild             -->
+        <!-- ------------------------------ -->
+        <section class="card">
+          <div class="card-header">
+            <div class="card-title">
+              <span>📷 Produktbild</span>
+            </div>
+            <span id="badge-index" class="badge">0 / 0</span>
+          </div>
+
+          <div class="image-wrapper">
+            <img id="product-image" alt="Produktbild" />
+          </div>
+
+          <div class="image-filename" id="image-filename"></div>
+        </section>
+
+        <!-- ------------------------------ -->
+        <!-- Rechte Karte: Daten + Bewertung-->
+        <!-- ------------------------------ -->
+        <section class="card">
+          <div class="card-header">
+            <div class="card-title">
+              <span>📄 Klassifikationsdaten</span>
+            </div>
+            <span id="badge-reviewed" class="badge">nicht bewertet</span>
+          </div>
+
+          <!-- Grunddaten -->
+          <div class="detail-grid" id="details-grid">
+            <div class="detail-label">ID</div>
+            <div class="detail-value" id="field-id">–</div>
+
+            <div class="detail-label">Zeit</div>
+            <div class="detail-value" id="field-created">–</div>
+
+            <div class="detail-label">TARIC</div>
+            <div class="detail-value taric-code" id="field-taric">–</div>
+
+            <div class="detail-label">CN</div>
+            <div class="detail-value" id="field-cn">–</div>
+
+            <div class="detail-label">HS-Kapitel</div>
+            <div class="detail-value" id="field-hs">–</div>
+
+            <div class="detail-label">Confidence</div>
+            <div class="detail-value" id="field-confidence">–</div>
+          </div>
+
+          <div class="form-section-title">Kurzbegründung</div>
+          <div class="short-reason" id="field-short-reason">
+            –
+          </div>
+
+          <div class="form-section-title">Alternativen (JSON)</div>
+          <pre class="json-block" id="field-alternatives">–</pre>
+
+          <!-- Bewertung -->
+          <div class="form-section-title">
+            Bewertung Zollprofi – korrekte Stellen des TARIC-Codes (0–10)
+          </div>
+
+          <div class="digits-row" id="digits-row">
+            <!-- Buttons 0–10 werden per JS gebaut -->
+          </div>
+
+          <div class="field-row">
+            <div class="field">
+              <label for="input-reviewer">Reviewer (Name/Kürzel)</label>
+              <input id="input-reviewer" type="text" placeholder="z. B. M. Mustermann" />
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="input-comment">Kommentar</label>
+            <textarea id="input-comment" placeholder="Bemerkungen zur Klassifikation…"></textarea>
+          </div>
+
+          <div class="actions-row">
+            <div class="nav-buttons">
+              <button id="btn-prev" class="btn btn-outline btn-small">⟵ Zurück</button>
+              <button id="btn-next" class="btn btn-outline btn-small">Weiter ⟶</button>
+            </div>
+
+            <div class="nav-buttons">
+              <button id="btn-save" class="btn btn-primary btn-small">
+                💾 Speichern
+              </button>
+              <button id="btn-save-next" class="btn btn-primary btn-small">
+                💾 Speichern & weiter
+              </button>
+            </div>
+          </div>
+
+          <div class="status-bar">
+            <div id="status-backend">Backend: –</div>
+            <div id="status-message" class="status-message">–</div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // ================================================================
+    // HILFSFUNKTIONEN: Backend-URL + einfache DOM-Utilities
+    // ================================================================
+
+    function getBackendBaseUrl() {
+      // Backend läuft (wie bei dir) auf Port 8000,
+      // Hostname aus aktueller Seite (Mac-IP oder localhost)
+      const host = window.location.hostname || "localhost";
+      return `http://${host}:8000`;
+    }
+
+    function $(id) {
+      return document.getElementById(id);
+    }
+
+    // ================================================================
+    // GLOBALER ZUSTAND
+    // ================================================================
+    const state = {
+      items: [],
+      index: 0,
+      onlyUnreviewed: true,
+      selectedDigits: null, // 0–10
+    };
+
+    // ================================================================
+    // UI INITIALISIEREN: Digit-Buttons 0–10
+    // ================================================================
+
+    function initDigitButtons() {
+      const row = $("digits-row");
+      row.innerHTML = "";
+      for (let i = 0; i <= 10; i++) {
+        const btn = document.createElement("button");
+        btn.className = "digit-btn";
+        btn.textContent = i.toString();
+        btn.dataset.value = i.toString();
+        btn.addEventListener("click", () => {
+          state.selectedDigits = i;
+          updateDigitButtons();
+        });
+        row.appendChild(btn);
+      }
+    }
+
+    function updateDigitButtons() {
+      const buttons = $("digits-row").querySelectorAll(".digit-btn");
+      buttons.forEach((btn) => {
+        const val = parseInt(btn.dataset.value, 10);
+        if (state.selectedDigits === val) {
+          btn.classList.add("selected");
+        } else {
+          btn.classList.remove("selected");
+        }
+      });
+    }
+
+    // ================================================================
+    // DATEN LADEN
+    // ================================================================
+
+    async function loadItems() {
+      const backend = getBackendBaseUrl();
+      const limit = 100;
+      const onlyUnreviewed = state.onlyUnreviewed ? "true" : "false";
+      const url = `${backend}/api/evaluation/items?limit=${limit}&only_unreviewed=${onlyUnreviewed}`;
+
+      $("status-backend").textContent = `Backend: ${url}`;
+      setStatus("Lade Datensätze …", "neutral");
+
+      try {
+        const resp = await fetch(url);
+        if (!resp.ok) {
+          throw new Error(`HTTP ${resp.status}`);
+        }
+        const data = await resp.json();
+        state.items = data;
+        state.index = 0;
+
+        if (!data || data.length === 0) {
+          $("evaluation-layout").style.display = "none";
+          $("empty-state").style.display = "block";
+          setStatus("Keine Datensätze gefunden.", "neutral");
+          return;
+        }
+
+        $("evaluation-layout").style.display = "grid";
+        $("empty-state").style.display = "none";
+        renderCurrentItem();
+        setStatus("Datensätze geladen.", "ok");
+      } catch (err) {
+        console.error("Fehler beim Laden:", err);
+        $("evaluation-layout").style.display = "none";
+        $("empty-state").style.display = "block";
+        setStatus("Fehler beim Laden der Daten: " + err.message, "error");
+      }
+    }
+
+    // ================================================================
+    // AKTUELLEN DATENSATZ RENDERN
+    // ================================================================
+
+    function renderCurrentItem() {
+      const items = state.items;
+      if (!items || items.length === 0) {
+        return;
+      }
+
+      const idx = Math.min(Math.max(state.index, 0), items.length - 1);
+      state.index = idx;
+      const item = items[idx];
+
+      // Badge oben links
+      $("badge-index").textContent = `${idx + 1} / ${items.length}`;
+
+      // Bild (kommt vom http.server aus bilder_uploads/)
+      const img = $("product-image");
+      const filename = item.filename || "";
+      const host = window.location.host; // z. B. 192.168.7.124:8080
+      const imageUrl = `http://${host}/bilder_uploads/${filename}`;
+      img.src = imageUrl;
+      img.alt = filename || "Produktbild";
+      $("image-filename").textContent = filename;
+
+      // Felder
+      $("field-id").textContent = item.id ?? "–";
+      $("field-created").textContent = item.created_at ?? "–";
+      $("field-taric").textContent = item.taric_code ?? "–";
+      $("field-cn").textContent = item.cn_code ?? "–";
+      $("field-hs").textContent = item.hs_chapter ?? "–";
+      $("field-confidence").textContent =
+        item.confidence != null ? item.confidence.toFixed(2) : "–";
+      $("field-short-reason").textContent = item.short_reason ?? "–";
+
+      // Alternativen JSON schön darstellen
+      let alternativesStr = "–";
+      if (item.alternatives_json) {
+        try {
+          const alt = JSON.parse(item.alternatives_json);
+          alternativesStr = JSON.stringify(alt, null, 2);
+        } catch {
+          alternativesStr = item.alternatives_json;
+        }
+      }
+      $("field-alternatives").textContent = alternativesStr;
+
+      // Evaluationsstatus
+      const badge = $("badge-reviewed");
+      if (item.evaluation_id) {
+        badge.textContent = `bewertet: ${item.correct_digits ?? "?"} Stellen`;
+        badge.style.borderColor = "rgba(74,222,128,0.9)";
+        badge.style.color = "#bbf7d0";
+      } else {
+        badge.textContent = "nicht bewertet";
+        badge.style.borderColor = "rgba(148,163,184,0.7)";
+        badge.style.color = "var(--text-muted)";
+      }
+
+      // Form-Felder setzen
+      state.selectedDigits =
+        typeof item.correct_digits === "number" ? item.correct_digits : null;
+      updateDigitButtons();
+
+      $("input-reviewer").value = item.reviewer || "";
+      $("input-comment").value = item.comment || "";
+
+      // Status zurücksetzen
+      setStatus("Bereit für Bewertung.", "neutral");
+    }
+
+    // ================================================================
+    // SPEICHERN
+    // ================================================================
+
+    async function saveCurrentItem(goNextAfterSave) {
+      const items = state.items;
+      if (!items || items.length === 0) return;
+
+      const idx = state.index;
+      const item = items[idx];
+
+      if (state.selectedDigits == null) {
+        setStatus("Bitte zuerst eine Anzahl korrekter Stellen (0–10) wählen.", "error");
+        return;
+      }
+
+      const backend = getBackendBaseUrl();
+      const url = `${backend}/api/evaluation/save`;
+
+      const body = {
+        taric_live_id: item.id,
+        correct_digits: state.selectedDigits,
+        reviewer: $("input-reviewer").value || null,
+        comment: $("input-comment").value || null,
+      };
+
+      setStatus("Speichere Bewertung …", "neutral");
+
+      try {
+        const resp = await fetch(url, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(body),
+        });
+
+        if (!resp.ok) {
+          const errText = await resp.text();
+          throw new Error(`HTTP ${resp.status}: ${errText}`);
+        }
+
+        const data = await resp.json();
+        console.log("Speichern OK:", data);
+
+        // Lokale Daten aktualisieren
+        item.correct_digits = body.correct_digits;
+        item.reviewer = body.reviewer;
+        item.comment = body.comment;
+        item.evaluation_id = item.evaluation_id || 1; // irgendein Wert ≠ null damit als bewertet angezeigt
+        // reviewed_at kommt beim nächsten Reload korrekt aus dem Backend,
+        // für die Anzeige hier reicht die Info „bewertet“.
+
+        setStatus("Bewertung gespeichert.", "ok");
+        renderCurrentItem();
+
+        if (goNextAfterSave) {
+          goNext();
+        }
+      } catch (err) {
+        console.error("Speicherfehler:", err);
+        setStatus("Fehler beim Speichern: " + err.message, "error");
+      }
+    }
+
+    // ================================================================
+    // Navigation zwischen Datensätzen
+    // ================================================================
+
+    function goPrev() {
+      if (!state.items.length) return;
+      state.index = Math.max(0, state.index - 1);
+      renderCurrentItem();
+    }
+
+    function goNext() {
+      if (!state.items.length) return;
+
+      if (state.index < state.items.length - 1) {
+        state.index += 1;
+        renderCurrentItem();
+      } else {
+        // am Ende: optional neue Ladung holen
+        setStatus("Am Ende der Liste. Ggf. neuen Batch laden.", "neutral");
+      }
+    }
+
+    // ================================================================
+    // Status-Anzeige
+    // ================================================================
+
+    function setStatus(message, kind) {
+      const el = $("status-message");
+      el.textContent = message || "–";
+      el.classList.remove("ok", "error");
+      if (kind === "ok") el.classList.add("ok");
+      if (kind === "error") el.classList.add("error");
+    }
+
+    // ================================================================
+    // EVENT-HANDLER
+    // ================================================================
+
+    function initEventHandlers() {
+      $("btn-prev").addEventListener("click", () => goPrev());
+      $("btn-next").addEventListener("click", () => goNext());
+      $("btn-save").addEventListener("click", () => saveCurrentItem(false));
+      $("btn-save-next").addEventListener("click", () => saveCurrentItem(true));
+
+      $("toggle-unreviewed").addEventListener("click", () => {
+        state.onlyUnreviewed = !state.onlyUnreviewed;
+        $("toggle-unreviewed").textContent = state.onlyUnreviewed
+          ? "Nur unbewertete"
+          : "Alle Datensätze";
+        loadItems();
+      });
+    }
+
+    // ================================================================
+    // START
+    // ================================================================
+
+    window.addEventListener("DOMContentLoaded", () => {
+      initDigitButtons();
+      initEventHandlers();
+      loadItems();
+    });
+  </script>
+</body>
+</html>
