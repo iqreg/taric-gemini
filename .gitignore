@@ -86,3 +86,13 @@ TARIC-CODE*dup*.md
 # --------------------------------------------------------
 # node_modules/
 # dist/
+# TARIC Bulk Daten
+data/taric_bulk_source/
+data/taric_bulk_input/
+data/taric_bulk_done/
+data/taric_bulk_error/
+data/taric_bulk_originals/
+data/taric_bulk_log.csv
+
+# Uploads
+bilder_uploads/
