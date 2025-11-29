@@ -4,7 +4,7 @@ import sqlite3
 import time
 import traceback
 from pathlib import Path
-from typing import Optional, List
+from typing import Optional, List, Dict, Any
 
 from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
@@ -19,18 +19,30 @@ import google.generativeai as genai
 
 BASE_DIR = Path(__file__).resolve().parent
 DB_PATH = BASE_DIR / "taric_live.db"
+
+# Hier speichert das Backend alle hochgeladenen Bilder,
+# damit sie später im Evaluationsmodul genutzt werden können.
 IMAGE_DIR = BASE_DIR / "bilder_uploads"
 IMAGE_DIR.mkdir(parents=True, exist_ok=True)
 
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-#GEMINI_MODEL_NAME = os.getenv("GEMINI_MODEL_NAME", "gemini-1.5-flash")
+# GEMINI_MODEL_NAME = os.getenv("GEMINI_MODEL_NAME", "gemini-1.5-flash")
 GEMINI_MODEL_NAME = os.getenv("GEMINI_MODEL_NAME", "gemini-2.5-flash")
+
+# Erlaubte Bildformate (inkl. WEBP)
+ALLOWED_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp"}
+ALLOWED_MIME_TYPES = {
+    "image/jpeg",
+    "image/png",
+    "image/webp",
+}
 
 if GEMINI_API_KEY:
     genai.configure(api_key=GEMINI_API_KEY)
 else:
     print("WARNUNG: GEMINI_API_KEY ist nicht gesetzt. /classify wird nicht funktionieren.")
 
+# Systemprompt für das Modell (unverändert aus deiner Version)
 SYSTEM_PROMPT = """
 Du bist ein erfahrener EU-Zoll- und TARIC-Experte.
 Deine Aufgabe ist es, anhand eines Produktfotos den wahrscheinlichsten TARIC-Code
@@ -80,7 +92,9 @@ USER_TEXT = "Bestimme für dieses Produktfoto den TARIC-Code und gib nur das JSO
 # DB-Helfer
 # --------------------------------------------------
 
+
 def get_conn() -> sqlite3.Connection:
+    """Öffnet eine SQLite-Connection mit Row-Access per Spaltennamen."""
     conn = sqlite3.connect(DB_PATH, check_same_thread=False)
     conn.row_factory = sqlite3.Row
     return conn
@@ -89,17 +103,15 @@ def get_conn() -> sqlite3.Connection:
 def init_db() -> None:
     """
     Stellt sicher:
-    - taric_live existiert (falls nicht, wird angelegt)
-    - taric_evaluation existiert (falls nicht, wird angelegt)
+    - taric_live existiert
+    - taric_evaluation existiert
     - Spalte superviser_bewertung in taric_evaluation existiert
     """
     conn = get_conn()
     cur = conn.cursor()
 
     # taric_live
-    cur.execute(
-        "SELECT name FROM sqlite_master WHERE type='table' AND name='taric_live';"
-    )
+    cur.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='taric_live';")
     if not cur.fetchone():
         cur.execute(
             """
@@ -126,19 +138,19 @@ def init_db() -> None:
         cur.execute(
             """
             CREATE TABLE taric_evaluation (
-                id              INTEGER PRIMARY KEY AUTOINCREMENT,
-                taric_live_id   INTEGER NOT NULL,
-                correct_digits  INTEGER NOT NULL,
-                reviewer        TEXT,
-                comment         TEXT,
-                reviewed_at     TEXT DEFAULT CURRENT_TIMESTAMP,
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                taric_live_id INTEGER NOT NULL,
+                correct_digits INTEGER,
+                reviewer TEXT,
+                comment TEXT,
                 superviser_bewertung INTEGER,
+                reviewed_at TEXT,
                 UNIQUE (taric_live_id)
             );
             """
         )
     else:
-        # Spalte superviser_bewertung bei Bedarf nachziehen
+        # Spalte superviser_bewertung bei Bedarf nachziehen (Migration)
         cur.execute("PRAGMA table_info(taric_evaluation);")
         cols = [row["name"] for row in cur.fetchall()]
         if "superviser_bewertung" not in cols:
@@ -157,6 +169,7 @@ init_db()
 # --------------------------------------------------
 # Modell-Helfer
 # --------------------------------------------------
+
 
 def extract_json_from_text(raw: str) -> dict:
     """
@@ -177,6 +190,7 @@ def extract_json_from_text(raw: str) -> dict:
             lines = lines[:-1]
         txt = "\n".join(lines).strip()
 
+    # Versuchen, das JSON anhand der äußeren Klammern zu finden
     start = txt.find("{")
     end = txt.rfind("}")
     if start == -1 or end == -1 or end <= start:
@@ -186,12 +200,23 @@ def extract_json_from_text(raw: str) -> dict:
     return json.loads(json_str)
 
 
-def classify_with_gemini(image_bytes: bytes, filename: str, content_type: Optional[str]) -> dict:
+def classify_with_gemini(
+    image_bytes: bytes, filename: str, content_type: Optional[str]
+) -> dict:
+    """
+    Ruft das Gemini-Modell mit Bild + Systemprompt auf und gibt ein
+    JSON-ähnliches Dict mit Standardfeldern + optionalem 'usage'-Block zurück.
+    """
     if not GEMINI_API_KEY:
         raise RuntimeError("GEMINI_API_KEY ist nicht gesetzt")
 
     model = genai.GenerativeModel(GEMINI_MODEL_NAME)
+
+    # MIME-Type bestimmen; WEBP explizit zulassen. Bei unbekanntem oder
+    # leerem Typ wird defensiv image/jpeg verwendet.
     mime = content_type or "image/jpeg"
+    if mime not in ALLOWED_MIME_TYPES:
+        mime = "image/jpeg"
 
     result = model.generate_content(
         [
@@ -209,6 +234,15 @@ def classify_with_gemini(image_bytes: bytes, filename: str, content_type: Option
 
     parsed = extract_json_from_text(raw_text)
 
+    # Token-Nutzung (usage_metadata) nach Möglichkeit übernehmen.
+    usage = getattr(result, "usage_metadata", None)
+    if usage is not None:
+        parsed["usage"] = {
+            "prompt_tokens": getattr(usage, "prompt_token_count", None),
+            "completion_tokens": getattr(usage, "candidates_token_count", None),
+            "total_tokens": getattr(usage, "total_token_count", None),
+        }
+
     # Standardfelder absichern
     parsed.setdefault("taric_code", None)
     parsed.setdefault("cn_code", None)
@@ -223,15 +257,16 @@ def classify_with_gemini(image_bytes: bytes, filename: str, content_type: Option
 def store_classification(filename: str, data: dict) -> int:
     """
     Speichert das Klassifikationsergebnis in taric_live und gibt die neue ID zurück.
+    Die komplette Modellantwort (inkl. usage) wird als JSON im Feld raw_response_json abgelegt.
     """
     conn = get_conn()
     cur = conn.cursor()
 
     confidence = data.get("confidence")
     try:
-        confidence_val = float(confidence)
-    except Exception:
-        confidence_val = 0.0
+        confidence_val = float(confidence) if confidence is not None else None
+    except (TypeError, ValueError):
+        confidence_val = None
 
     cur.execute(
         """
@@ -282,6 +317,8 @@ app.add_middleware(
 
 
 class EvaluationIn(BaseModel):
+    """Payload für das Speichern/Korrigieren einer Bewertung."""
+
     taric_live_id: int
     correct_digits: int
     reviewer: Optional[str] = None
@@ -294,26 +331,46 @@ async def classify(file: UploadFile = File(...)):
     """
     Nimmt ein Bild entgegen, ruft Gemini auf, speichert das Ergebnis
     in taric_live und gibt das Ergebnis zurück.
+
+    Diese Route wird sowohl von der Web-UI (Einzelbild) als auch vom
+    bulk-evaluation-Script verwendet.
     """
     try:
+        if not GEMINI_API_KEY:
+            return JSONResponse(
+                status_code=503,
+                content={"error": "GEMINI_API_KEY ist nicht gesetzt."},
+            )
+
         data = await file.read()
         if not data:
             return JSONResponse(
                 status_code=400, content={"error": "Leere Datei erhalten."}
             )
 
+        # Dateiendung ermitteln und gegen Whitelist prüfen
+        original_name = file.filename or "upload.jpg"
+        suffix = Path(original_name).suffix.lower() or ".jpg"
+        if suffix not in ALLOWED_EXTENSIONS:
+            return JSONResponse(
+                status_code=400,
+                content={
+                    "error": f"Dateiformat {suffix} wird nicht unterstützt. "
+                    f"Erlaubt sind: {', '.join(sorted(ALLOWED_EXTENSIONS))}"
+                },
+            )
+
         # Bild speichern (für Evaluation)
-        suffix = Path(file.filename or "upload.jpg").suffix or ".jpg"
         ts = time.strftime("%Y%m%d_%H%M%S")
-        filename = f"{ts}_{int(time.time()*1000)}{suffix}"
+        filename = f"{ts}_{int(time.time() * 1000)}{suffix}"
         img_path = IMAGE_DIR / filename
         with img_path.open("wb") as f:
             f.write(data)
 
-        # Modell
+        # Modell aufrufen
         try:
             model_result = classify_with_gemini(
-                data, filename=file.filename or filename, content_type=file.content_type
+                data, filename=original_name, content_type=file.content_type
             )
         except Exception as e:
             traceback.print_exc()
@@ -321,10 +378,10 @@ async def classify(file: UploadFile = File(...)):
                 status_code=500, content={"error": f"Fehler bei Modellaufruf: {e}"}
             )
 
-        # DB
+        # Ergebnis in DB speichern
         new_id = store_classification(filename, model_result)
 
-        response = {
+        response: Dict[str, Any] = {
             "id": new_id,
             "filename": filename,
             "taric_code": model_result.get("taric_code"),
@@ -333,6 +390,7 @@ async def classify(file: UploadFile = File(...)):
             "confidence": model_result.get("confidence"),
             "short_reason": model_result.get("short_reason"),
             "possible_alternatives": model_result.get("possible_alternatives"),
+            "usage": model_result.get("usage"),
         }
         return JSONResponse(content=response)
     except Exception as e:
@@ -352,30 +410,38 @@ async def get_evaluation_items(
     """
     Liefert Klassifikationen inklusive (optional vorhandener) Bewertung
     aus taric_live + taric_evaluation.
+
+    Parameter:
+    - limit: max. Anzahl Datensätze
+    - only_unreviewed: nur Fälle ohne Bewertung
+    - only_reviewed: nur bereits bewertete Fälle
     """
     conn = get_conn()
     cur = conn.cursor()
 
     base_sql = """
         SELECT
-            l.id AS taric_live_id,
-            l.filename,
-            l.created_at,
-            l.taric_code,
-            l.cn_code,
-            l.hs_chapter,
-            l.confidence,
-            l.short_reason,
-            l.alternatives_json,
-            e.id AS evaluation_id,
-            e.correct_digits,
-            e.reviewer,
-            e.comment,
-            e.superviser_bewertung
+            l.id              AS taric_live_id,
+            l.filename        AS filename,
+            l.created_at      AS created_at,
+            l.taric_code      AS taric_code,
+            l.cn_code         AS cn_code,
+            l.hs_chapter      AS hs_chapter,
+            l.confidence      AS confidence,
+            l.short_reason    AS short_reason,
+            l.alternatives_json AS alternatives_json,
+            l.raw_response_json AS raw_response_json,
+            e.id              AS evaluation_id,
+            e.correct_digits  AS correct_digits,
+            e.reviewer        AS reviewer,
+            e.comment         AS comment,
+            e.superviser_bewertung AS superviser_bewertung,
+            e.reviewed_at     AS reviewed_at
         FROM taric_live l
         LEFT JOIN taric_evaluation e
           ON e.taric_live_id = l.id
     """
+
 
     where: List[str] = []
     params: List[object] = []
@@ -395,8 +461,32 @@ async def get_evaluation_items(
     rows = cur.fetchall()
     conn.close()
 
-    items = []
+    items: List[dict] = []
     for r in rows:
+        alternatives_json = r["alternatives_json"] or "[]"
+        raw_response_json = r["raw_response_json"] or "{}"
+
+        try:
+            alternatives = json.loads(alternatives_json)
+        except Exception:
+            alternatives = []
+
+        try:
+            raw_response = json.loads(raw_response_json)
+        except Exception:
+            raw_response = {}
+
+        eval_block = None
+        if r["evaluation_id"] is not None:
+            eval_block = {
+                "id": r["evaluation_id"],
+                "correct_digits": r["correct_digits"],
+                "reviewer": r["reviewer"],
+                "comment": r["comment"],
+                "superviser_bewertung": r["superviser_bewertung"],
+                "reviewed_at": r["reviewed_at"],
+            }
+
         items.append(
             {
                 "taric_live_id": r["taric_live_id"],
@@ -407,12 +497,9 @@ async def get_evaluation_items(
                 "hs_chapter": r["hs_chapter"],
                 "confidence": r["confidence"],
                 "short_reason": r["short_reason"],
-                "alternatives_json": r["alternatives_json"],
-                "evaluation_id": r["evaluation_id"],
-                "correct_digits": r["correct_digits"],
-                "reviewer": r["reviewer"],
-                "comment": r["comment"],
-                "superviser_bewertung": r["superviser_bewertung"],
+                "alternatives": alternatives,
+                "raw_response": raw_response,
+                "evaluation": eval_block,
             }
         )
 
@@ -503,15 +590,15 @@ async def summary():
             COUNT(*) AS cnt,
             MIN(short_reason) AS any_reason
         FROM taric_live
-        WHERE taric_code IS NOT NULL
+        WHERE taric_code IS NOT NULL AND taric_code <> ''
         GROUP BY taric_code
-        ORDER BY cnt DESC, taric_code ASC
+        ORDER BY cnt DESC
         """
     )
     rows = cur.fetchall()
     conn.close()
 
-    result = []
+    result: List[dict] = []
     for r in rows:
         result.append(
             {
@@ -526,4 +613,5 @@ async def summary():
 
 @app.get("/health")
 async def health():
+    """Einfache Health-Check-Route für Monitoring und Tests."""
     return {"status": "ok"}
