@@ -98,3 +98,18 @@ data/taric_bulk_log.csv
 
 # Uploads
 bilder_uploads/
+# Backup-Dateien
+bck*
+backup_files/
+*dup.md
+
+# Logs
+*.log
+
+# lokale Umgebungsdateien
+*.env
+recipients.txt
+backend_url.json
+projectfiles.txt
+start_all.command
+start_all.sh
