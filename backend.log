@@ -1,57 +1,40 @@
 INFO:     Will watch for changes in these directories: ['/Users/qb/projects/taric-gemini']
 INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
-INFO:     Started reloader process [94702] using WatchFiles
+INFO:     Started reloader process [6078] using WatchFiles
 /Users/qb/projects/taric-gemini/.venv_taric/lib/python3.10/site-packages/google/api_core/_python_version_support.py:266: FutureWarning: You are using a Python version (3.10.13) which Google will stop supporting in new releases of google.api_core once it reaches its end of life (2026-10-04). Please upgrade to the latest Python version, or at least Python 3.11, to continue receiving updates for google.api_core past that date.
   warnings.warn(message, FutureWarning)
-INFO:     Started server process [94705]
+INFO:     Started server process [6081]
 INFO:     Waiting for application startup.
 INFO:     Application startup complete.
 DB initialisiert / geprüft.
-INFO:     45.130.105.219:0 - "GET /api/evaluation/items?limit=200&only_unreviewed=true HTTP/1.1" 200 OK
-INFO:     45.88.190.174:0 - "GET /api/evaluation/items?limit=200&only_unreviewed=true HTTP/1.1" 200 OK
-INFO:     192.168.7.103:38354 - "GET /api/evaluation/items?limit=200&only_unreviewed=true HTTP/1.1" 200 OK
-INFO:     192.168.7.103:38354 - "GET /api/evaluation/items?limit=200&only_unreviewed=true HTTP/1.1" 200 OK
-INFO:     192.168.7.103:38354 - "GET /api/evaluation/items?limit=200&only_unreviewed=true HTTP/1.1" 200 OK
-INFO:     45.88.190.174:0 - "GET /api/evaluation/items?limit=200&only_unreviewed=true HTTP/1.1" 200 OK
-INFO:     45.130.105.219:0 - "GET /api/evaluation/items?limit=200&only_unreviewed=true HTTP/1.1" 200 OK
-INFO:     81.217.96.57:0 - "POST /classify HTTP/1.1" 200 OK
-INFO:     45.130.105.219:0 - "GET /api/evaluation/items?limit=200&only_unreviewed=true HTTP/1.1" 200 OK
-INFO:     81.217.96.57:0 - "GET /api/evaluation/items?limit=200&only_unreviewed=true HTTP/1.1" 200 OK
-INFO:     81.217.96.57:0 - "POST /classify HTTP/1.1" 200 OK
-INFO:     81.217.96.57:0 - "POST /classify HTTP/1.1" 200 OK
-INFO:     45.130.105.219:0 - "GET /api/evaluation/items?limit=200&only_unreviewed=true HTTP/1.1" 200 OK
-INFO:     81.217.96.57:0 - "POST /classify HTTP/1.1" 200 OK
-INFO:     45.130.105.219:0 - "GET /api/evaluation/items?limit=200&only_unreviewed=true HTTP/1.1" 200 OK
-INFO:     81.217.96.57:0 - "POST /classify HTTP/1.1" 200 OK
-INFO:     45.130.105.219:0 - "GET /api/evaluation/items?limit=200&only_unreviewed=true HTTP/1.1" 200 OK
-INFO:     81.217.96.57:0 - "POST /classify HTTP/1.1" 200 OK
-INFO:     45.130.105.219:0 - "GET /api/evaluation/items?limit=200&only_unreviewed=true HTTP/1.1" 200 OK
-INFO:     192.168.7.124:64472 - "GET /api/evaluation/items?limit=200&only_unreviewed=true HTTP/1.1" 200 OK
-INFO:     45.130.105.219:0 - "GET /api/evaluation/items?limit=200&only_unreviewed=true HTTP/1.1" 200 OK
-INFO:     45.130.105.219:0 - "GET /summary HTTP/1.1" 200 OK
-INFO:     45.130.105.219:0 - "GET /summary HTTP/1.1" 200 OK
-INFO:     81.217.96.57:0 - "GET /summary HTTP/1.1" 200 OK
-INFO:     45.130.105.219:0 - "GET /summary HTTP/1.1" 200 OK
-INFO:     81.217.96.57:0 - "GET /summary HTTP/1.1" 200 OK
-INFO:     45.88.190.174:0 - "GET /api/evaluation/items?limit=200&only_unreviewed=true HTTP/1.1" 200 OK
-INFO:     45.88.190.174:0 - "GET /api/evaluation/items?limit=200&only_unreviewed=true HTTP/1.1" 200 OK
-INFO:     45.88.190.174:0 - "GET /api/evaluation/items?limit=200&only_unreviewed=true HTTP/1.1" 200 OK
-INFO:     45.88.190.174:0 - "GET /api/evaluation/items?limit=200&only_unreviewed=true HTTP/1.1" 200 OK
-INFO:     45.88.190.174:0 - "GET /api/evaluation/items?limit=200&only_unreviewed=true HTTP/1.1" 200 OK
-INFO:     45.88.190.174:0 - "GET /summary HTTP/1.1" 200 OK
-INFO:     45.88.190.174:0 - "GET /api/evaluation/items?limit=200&only_unreviewed=true HTTP/1.1" 200 OK
-INFO:     45.88.190.174:0 - "GET /api/evaluation/items?limit=200&only_unreviewed=true HTTP/1.1" 200 OK
-INFO:     45.88.190.174:0 - "GET /api/evaluation/items?limit=200&only_unreviewed=true HTTP/1.1" 200 OK
-INFO:     45.88.190.174:0 - "GET /api/evaluation/items?limit=200&only_unreviewed=true HTTP/1.1" 200 OK
-INFO:     45.88.190.174:0 - "GET /api/evaluation/items?limit=200&only_unreviewed=true HTTP/1.1" 200 OK
-INFO:     45.88.190.174:0 - "GET /api/evaluation/items?limit=200&only_reviewed=true HTTP/1.1" 200 OK
-INFO:     45.88.190.174:0 - "GET /api/evaluation/items?limit=200&only_unreviewed=true HTTP/1.1" 200 OK
-INFO:     45.88.190.174:0 - "POST /classify HTTP/1.1" 200 OK
-INFO:     45.88.190.174:0 - "GET /api/evaluation/items?limit=200&only_unreviewed=true HTTP/1.1" 200 OK
-INFO:     45.88.190.174:0 - "GET /api/evaluation/items?limit=200&only_unreviewed=true HTTP/1.1" 200 OK
-INFO:     45.88.190.174:0 - "GET /api/evaluation/items?limit=200&only_unreviewed=true HTTP/1.1" 200 OK
-INFO:     81.217.96.57:0 - "GET /summary HTTP/1.1" 200 OK
-INFO:     81.217.96.57:0 - "GET /summary HTTP/1.1" 200 OK
-INFO:     81.217.96.57:0 - "GET /summary HTTP/1.1" 200 OK
-INFO:     81.217.96.57:0 - "POST /classify HTTP/1.1" 200 OK
-INFO:     81.217.96.57:0 - "GET /api/evaluation/items?limit=200&only_unreviewed=true HTTP/1.1" 200 OK
+INFO:     72.145.144.237:0 - "GET /summary HTTP/1.1" 200 OK
+INFO:     72.145.144.237:0 - "GET /api/evaluation/items?limit=200&only_unreviewed=true HTTP/1.1" 200 OK
+INFO:     45.88.190.165:0 - "GET /api/evaluation/items?limit=200&only_unreviewed=true HTTP/1.1" 200 OK
+INFO:     45.88.190.165:0 - "GET /api/evaluation/items?limit=200&only_unreviewed=true HTTP/1.1" 200 OK
+INFO:     45.88.190.165:0 - "GET /api/evaluation/items?limit=200&only_unreviewed=true HTTP/1.1" 200 OK
+INFO:     45.88.190.165:0 - "POST /classify HTTP/1.1" 200 OK
+INFO:     45.88.190.165:0 - "GET /api/evaluation/items?limit=200&only_unreviewed=true HTTP/1.1" 200 OK
+INFO:     45.88.190.165:0 - "GET /summary HTTP/1.1" 200 OK
+INFO:     45.88.190.165:0 - "GET /api/evaluation/items?limit=200&only_unreviewed=true HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52125 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52125 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:52127 - "GET / HTTP/1.1" 404 Not Found
+INFO:     217.217.114.215:0 - "GET /api/evaluation/items?limit=200&only_unreviewed=true HTTP/1.1" 200 OK
+INFO:     45.88.190.165:0 - "GET /api/evaluation/items?limit=200&only_unreviewed=true HTTP/1.1" 200 OK
+INFO:     45.88.190.165:0 - "GET /api/evaluation/items?limit=200&only_unreviewed=true HTTP/1.1" 200 OK
+INFO:     48.209.223.79:0 - "GET /summary HTTP/1.1" 200 OK
+INFO:     48.209.223.79:0 - "GET /api/evaluation/items?limit=200&only_unreviewed=true HTTP/1.1" 200 OK
+INFO:     2001:4bb8:106:f768:3008:82e2:dd0d:4038:0 - "POST /classify HTTP/1.1" 200 OK
+INFO:     217.217.114.215:0 - "GET /api/evaluation/items?limit=200&only_unreviewed=true HTTP/1.1" 200 OK
+INFO:     217.217.114.215:0 - "GET /api/evaluation/items?limit=200&only_unreviewed=true HTTP/1.1" 200 OK
+INFO:     217.217.114.215:0 - "GET /api/evaluation/items?limit=200&only_unreviewed=true HTTP/1.1" 200 OK
+INFO:     217.217.114.215:0 - "GET /api/evaluation/items?limit=200&only_unreviewed=true HTTP/1.1" 200 OK
+INFO:     217.217.114.215:0 - "GET /api/evaluation/items?limit=200&only_unreviewed=true HTTP/1.1" 200 OK
+INFO:     2001:4bb8:106:f768:3008:82e2:dd0d:4038:0 - "POST /classify HTTP/1.1" 200 OK
+INFO:     217.217.114.215:0 - "GET /api/evaluation/items?limit=200&only_unreviewed=true HTTP/1.1" 200 OK
+INFO:     2001:4bb8:106:f768:3008:82e2:dd0d:4038:0 - "POST /classify HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [6081]
+INFO:     Stopping reloader process [6078]

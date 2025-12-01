@@ -1,175 +1,86 @@
-127.0.0.1 - - [30/Nov/2025 13:48:09] "GET / HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 13:48:10] code 404, message File not found
-127.0.0.1 - - [30/Nov/2025 13:48:10] "GET /favicon.ico HTTP/1.1" 404 -
-127.0.0.1 - - [30/Nov/2025 13:48:13] "GET /evaluation.html HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 13:48:26] "GET /backend_url.json HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 13:48:27] "GET /bilder_uploads/20251130_130439_1764504279586.jpg HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 13:48:36] "GET /index.html HTTP/1.1" 200 -
-192.168.7.103 - - [30/Nov/2025 13:50:12] "GET /evaluation.html HTTP/1.1" 200 -
-192.168.7.103 - - [30/Nov/2025 13:50:12] "GET /backend_url.json HTTP/1.1" 200 -
-192.168.7.103 - - [30/Nov/2025 13:50:14] "GET /bilder_uploads/20251130_130439_1764504279586.jpg HTTP/1.1" 304 -
-192.168.7.103 - - [30/Nov/2025 13:50:27] "GET /evaluation.html HTTP/1.1" 304 -
-192.168.7.103 - - [30/Nov/2025 13:50:28] "GET /evaluation.html HTTP/1.1" 304 -
-192.168.7.103 - - [30/Nov/2025 13:50:32] "GET /backend_url.json HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 13:52:45] "GET /index.html HTTP/1.1" 304 -
-127.0.0.1 - - [30/Nov/2025 13:54:07] "GET /index.html HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 13:54:07] code 404, message File not found
-127.0.0.1 - - [30/Nov/2025 13:54:07] "GET /favicon.ico HTTP/1.1" 404 -
-127.0.0.1 - - [30/Nov/2025 13:54:32] "GET /index.html HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 13:54:33] code 404, message File not found
-127.0.0.1 - - [30/Nov/2025 13:54:33] "GET /favicon.ico HTTP/1.1" 404 -
-127.0.0.1 - - [30/Nov/2025 13:54:57] "GET /evaluation.html HTTP/1.1" 304 -
-127.0.0.1 - - [30/Nov/2025 13:54:57] "GET /backend_url.json HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 13:54:58] "GET /bilder_uploads/20251130_130439_1764504279586.jpg HTTP/1.1" 304 -
-127.0.0.1 - - [30/Nov/2025 13:56:06] "GET /index.html HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 13:57:56] "GET /index.html HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 13:59:07] "GET /backend_url.json HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 13:59:34] "GET /bilder_uploads/20251130_031520_1764468920299.webp HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 13:59:53] "GET /evaluation.html HTTP/1.1" 304 -
-127.0.0.1 - - [30/Nov/2025 13:59:53] "GET /backend_url.json HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 13:59:54] "GET /bilder_uploads/20251130_135912_1764507552653.jpg HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 14:00:21] "GET /evaluation.html HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 14:00:21] "GET /backend_url.json HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 14:00:22] "GET /bilder_uploads/20251130_135912_1764507552653.jpg HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 14:01:22] "GET /bilder_uploads/20251130_130439_1764504279586.jpg HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 14:01:28] "GET /bilder_uploads/20251130_031520_1764468920299.webp HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 14:01:37] "GET /bilder_uploads/20251130_031508_1764468908855.webp HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 14:01:39] "GET /bilder_uploads/20251130_031457_1764468897550.webp HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 14:01:46] "GET /index.html HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 14:02:25] "GET /backend_url.json HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 14:03:35] "GET /index.html HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 14:03:53] "GET /backend_url.json HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 14:04:28] "GET /bilder_uploads/20251130_130439_1764504279586.jpg HTTP/1.1" 304 -
-127.0.0.1 - - [30/Nov/2025 14:04:55] "GET /index.html HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 14:04:56] "GET /evaluation.html HTTP/1.1" 304 -
-127.0.0.1 - - [30/Nov/2025 14:04:56] "GET /backend_url.json HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 14:04:56] "GET /bilder_uploads/20251130_140357_1764507837777.jpg HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 14:05:21] "GET /backend_url.json HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 14:05:50] "GET /backend_url.json HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 14:05:50] "GET /bilder_uploads/20251130_140523_1764507923996.jpg HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 14:07:54] "GET /index.html HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 14:08:14] "GET /backend_url.json HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 14:08:38] "GET /evaluation.html HTTP/1.1" 304 -
-127.0.0.1 - - [30/Nov/2025 14:08:39] "GET /backend_url.json HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 14:08:39] "GET /bilder_uploads/20251130_140817_1764508097774.jpg HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 14:09:20] "GET /index.html HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 14:09:56] "GET /backend_url.json HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 14:10:09] "GET /backend_url.json HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 14:10:10] "GET /bilder_uploads/20251130_140959_1764508199783.jpg HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 14:10:26] "GET /bilder_uploads/20251130_140817_1764508097774.jpg HTTP/1.1" 304 -
-192.168.7.124 - - [30/Nov/2025 14:12:49] "GET /evaluation.html HTTP/1.1" 200 -
-192.168.7.124 - - [30/Nov/2025 14:12:49] "GET /bilder_uploads/20251130_140959_1764508199783.jpg HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 14:17:09] "GET /bilder_uploads/20251130_140523_1764507923996.jpg HTTP/1.1" 304 -
-127.0.0.1 - - [30/Nov/2025 14:19:11] "GET /index.html HTTP/1.1" 304 -
-127.0.0.1 - - [30/Nov/2025 14:19:15] "GET /evaluation.html HTTP/1.1" 304 -
-127.0.0.1 - - [30/Nov/2025 14:19:15] "GET /backend_url.json HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 14:19:16] "GET /bilder_uploads/20251130_140959_1764508199783.jpg HTTP/1.1" 304 -
-127.0.0.1 - - [30/Nov/2025 14:19:21] "GET /auswertung.html HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 14:19:21] "GET /backend_url.json HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 14:19:47] "GET /backend_url.json HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 14:20:04] "GET /auswertung.html HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 14:20:04] "GET /backend_url.json HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 14:20:07] "GET /backend_url.json HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 14:20:27] "GET /index.html HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 14:20:36] "GET /backend_url.json HTTP/1.1" 200 -
-192.168.7.103 - - [30/Nov/2025 14:22:37] "GET /backend_url.json HTTP/1.1" 200 -
-192.168.7.103 - - [30/Nov/2025 14:22:37] code 404, message File not found
-192.168.7.103 - - [30/Nov/2025 14:22:37] "GET /favicon.ico HTTP/1.1" 404 -
-192.168.7.103 - - [30/Nov/2025 14:22:38] "GET /bilder_uploads/20251130_140959_1764508199783.jpg HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 14:23:01] "GET /index.html HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 14:23:02] code 404, message File not found
-127.0.0.1 - - [30/Nov/2025 14:23:02] "GET /favicon.ico HTTP/1.1" 404 -
-127.0.0.1 - - [30/Nov/2025 14:23:08] "GET /evaluation.html HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 14:23:26] "GET /backend_url.json HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 14:23:28] "GET /bilder_uploads/20251130_140959_1764508199783.jpg HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 14:24:24] "GET /evaluation.html HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 14:24:25] code 404, message File not found
-127.0.0.1 - - [30/Nov/2025 14:24:25] "GET /favicon.ico HTTP/1.1" 404 -
-127.0.0.1 - - [30/Nov/2025 14:26:11] "GET /backend_url.json HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 14:26:13] "GET /bilder_uploads/20251130_140959_1764508199783.jpg HTTP/1.1" 304 -
-127.0.0.1 - - [30/Nov/2025 14:26:55] "GET /bilder_uploads/20251130_140817_1764508097774.jpg HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 14:26:59] "GET /bilder_uploads/20251130_140523_1764507923996.jpg HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 14:27:05] "GET /bilder_uploads/20251130_140357_1764507837777.jpg HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 14:45:47] "GET /backend_url.json HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 14:45:47] code 404, message File not found
-127.0.0.1 - - [30/Nov/2025 14:45:47] "GET /favicon.ico HTTP/1.1" 404 -
-127.0.0.1 - - [30/Nov/2025 14:45:48] "GET /bilder_uploads/20251130_140959_1764508199783.jpg HTTP/1.1" 304 -
-127.0.0.1 - - [30/Nov/2025 14:45:50] "GET /index.html HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 14:46:02] "GET /evaluation.html HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 14:46:03] "GET /backend_url.json HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 14:46:13] "GET /auswertung.html HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 14:46:14] "GET /backend_url.json HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 14:46:17] "GET /index.html HTTP/1.1" 304 -
-127.0.0.1 - - [30/Nov/2025 14:46:22] "GET /evaluation.html HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 14:46:22] "GET /backend_url.json HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 14:46:26] "GET /backend_url.json HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 14:47:04] "GET /index.html HTTP/1.1" 304 -
-127.0.0.1 - - [30/Nov/2025 14:47:33] "GET /evaluation.html HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 14:47:34] code 404, message File not found
-127.0.0.1 - - [30/Nov/2025 14:47:34] "GET /favicon.ico HTTP/1.1" 404 -
-127.0.0.1 - - [30/Nov/2025 14:47:34] "GET /backend_url.json HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 14:47:36] "GET /bilder_uploads/20251130_140959_1764508199783.jpg HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 14:47:39] "GET /index.html HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 14:47:50] "GET /index.html HTTP/1.1" 304 -
-127.0.0.1 - - [30/Nov/2025 14:47:51] "GET /evaluation.html HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 14:47:52] "GET /backend_url.json HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 15:22:10] "GET /evaluation.html HTTP/1.1" 304 -
-127.0.0.1 - - [30/Nov/2025 15:22:11] code 404, message File not found
-127.0.0.1 - - [30/Nov/2025 15:22:11] "GET /favicon.ico HTTP/1.1" 404 -
-127.0.0.1 - - [30/Nov/2025 15:22:11] "GET /backend_url.json HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 15:22:13] "GET /bilder_uploads/20251130_140959_1764508199783.jpg HTTP/1.1" 304 -
-127.0.0.1 - - [30/Nov/2025 15:22:45] "GET /bilder_uploads/20251129_151019_1764425419489.jpg HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 15:22:51] "GET /bilder_uploads/20251128_232522_1764368722104.jpg HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 15:22:55] "GET /bilder_uploads/20251128_232243_1764368563520.jpg HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 15:23:20] "GET /bilder_uploads/1764352403_17643523533554978491139434877775.jpg HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 15:23:24] "GET /bilder_uploads/1764333453_1764333406436896149211530904522.jpg HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 17:18:42] "GET /evaluation.html HTTP/1.1" 304 -
-127.0.0.1 - - [30/Nov/2025 17:18:42] code 404, message File not found
-127.0.0.1 - - [30/Nov/2025 17:18:42] "GET /favicon.ico HTTP/1.1" 404 -
-127.0.0.1 - - [30/Nov/2025 17:18:42] "GET /backend_url.json HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 17:18:43] code 404, message File not found
-127.0.0.1 - - [30/Nov/2025 17:18:43] "GET /backend_url.json HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 17:18:43] "GET /favicon.ico HTTP/1.1" 404 -
-127.0.0.1 - - [30/Nov/2025 17:18:47] "GET /bilder_uploads/20251130_140959_1764508199783.jpg HTTP/1.1" 304 -
-127.0.0.1 - - [30/Nov/2025 17:18:48] "GET /index.html HTTP/1.1" 304 -
-127.0.0.1 - - [30/Nov/2025 17:19:15] code 404, message File not found
-127.0.0.1 - - [30/Nov/2025 17:19:15] "GET /favicon.ico HTTP/1.1" 404 -
-127.0.0.1 - - [30/Nov/2025 17:20:01] "GET /backend_url.json HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 17:20:52] "GET /evaluation.html HTTP/1.1" 304 -
-127.0.0.1 - - [30/Nov/2025 17:20:52] "GET /backend_url.json HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 17:20:53] "GET /bilder_uploads/20251130_172014_1764519614947.jpg HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 17:21:03] "GET /bilder_uploads/20251130_140817_1764508097774.jpg HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 17:21:07] "GET /bilder_uploads/20251130_140523_1764507923996.jpg HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 19:34:16] code 404, message File not found
-127.0.0.1 - - [30/Nov/2025 19:34:16] "GET /favicon.ico HTTP/1.1" 404 -
-127.0.0.1 - - [30/Nov/2025 19:34:17] "GET /bilder_uploads/20251130_172014_1764519614947.jpg HTTP/1.1" 304 -
-127.0.0.1 - - [30/Nov/2025 19:34:21] "GET /index.html HTTP/1.1" 304 -
-127.0.0.1 - - [30/Nov/2025 19:34:24] "GET /evaluation.html HTTP/1.1" 304 -
-127.0.0.1 - - [30/Nov/2025 19:34:24] "GET /backend_url.json HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 19:36:33] "GET /auswertung.html HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 19:36:33] "GET /backend_url.json HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 19:36:33] code 404, message File not found
-127.0.0.1 - - [30/Nov/2025 19:36:33] "GET /favicon.ico HTTP/1.1" 404 -
-127.0.0.1 - - [30/Nov/2025 19:36:37] "GET /auswertung.html HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 19:36:37] "GET /backend_url.json HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 19:36:40] "GET /auswertung.html HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 19:36:41] "GET /backend_url.json HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 19:37:31] "GET /index.html HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 19:37:54] "GET /backend_url.json HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 19:39:11] "GET /evaluation.html HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 19:39:11] "GET /backend_url.json HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 19:39:12] "GET /bilder_uploads/20251130_193809_1764527889443.jpg HTTP/1.1" 200 -
-127.0.0.1 - - [30/Nov/2025 19:39:35] code 404, message File not found
-127.0.0.1 - - [30/Nov/2025 19:39:35] "GET /favicon.ico HTTP/1.1" 404 -
-127.0.0.1 - - [30/Nov/2025 19:39:35] code 404, message File not found
-127.0.0.1 - - [30/Nov/2025 19:39:35] "GET /apple-touch-icon.png HTTP/1.1" 404 -
-127.0.0.1 - - [30/Nov/2025 19:39:35] code 404, message File not found
-127.0.0.1 - - [30/Nov/2025 19:39:35] "GET /apple-touch-icon-precomposed.png HTTP/1.1" 404 -
-127.0.0.1 - - [30/Nov/2025 19:39:43] code 404, message File not found
-127.0.0.1 - - [30/Nov/2025 19:39:43] "GET /apple-touch-icon-120x120-precomposed.png HTTP/1.1" 404 -
-127.0.0.1 - - [30/Nov/2025 19:39:44] code 404, message File not found
-127.0.0.1 - - [30/Nov/2025 19:39:44] "GET /apple-touch-icon-120x120.png HTTP/1.1" 404 -
-127.0.0.1 - - [30/Nov/2025 19:39:44] code 404, message File not found
-127.0.0.1 - - [30/Nov/2025 19:39:44] "GET /apple-touch-icon.png HTTP/1.1" 404 -
-127.0.0.1 - - [30/Nov/2025 19:39:44] code 404, message File not found
-127.0.0.1 - - [30/Nov/2025 19:39:44] "GET /apple-touch-icon.png HTTP/1.1" 404 -
+127.0.0.1 - - [01/Dec/2025 08:37:51] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [01/Dec/2025 08:37:52] code 404, message File not found
+127.0.0.1 - - [01/Dec/2025 08:37:52] "GET /favicon.ico HTTP/1.1" 404 -
+127.0.0.1 - - [01/Dec/2025 08:38:13] "GET /index.html HTTP/1.1" 200 -
+127.0.0.1 - - [01/Dec/2025 08:38:13] "GET /auswertung.html HTTP/1.1" 200 -
+127.0.0.1 - - [01/Dec/2025 08:38:13] "GET /evaluation.html HTTP/1.1" 200 -
+127.0.0.1 - - [01/Dec/2025 08:38:14] "GET /backend_url.json HTTP/1.1" 200 -
+127.0.0.1 - - [01/Dec/2025 08:38:15] code 404, message File not found
+127.0.0.1 - - [01/Dec/2025 08:38:15] "GET /favicon.ico HTTP/1.1" 404 -
+127.0.0.1 - - [01/Dec/2025 08:38:15] "GET /backend_url.json HTTP/1.1" 200 -
+127.0.0.1 - - [01/Dec/2025 08:38:15] code 404, message File not found
+127.0.0.1 - - [01/Dec/2025 08:38:15] "GET /favicon.ico HTTP/1.1" 404 -
+127.0.0.1 - - [01/Dec/2025 08:38:16] code 404, message File not found
+127.0.0.1 - - [01/Dec/2025 08:38:16] "GET /favicon.ico HTTP/1.1" 404 -
+127.0.0.1 - - [01/Dec/2025 08:38:16] "GET /bilder_uploads/20251130_193809_1764527889443.jpg HTTP/1.1" 200 -
+127.0.0.1 - - [01/Dec/2025 08:42:47] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [01/Dec/2025 08:42:48] code 404, message File not found
+127.0.0.1 - - [01/Dec/2025 08:42:48] "GET /favicon.ico HTTP/1.1" 404 -
+127.0.0.1 - - [01/Dec/2025 08:42:55] "GET /evaluation.html HTTP/1.1" 200 -
+127.0.0.1 - - [01/Dec/2025 08:42:56] "GET /backend_url.json HTTP/1.1" 200 -
+127.0.0.1 - - [01/Dec/2025 08:42:58] "GET /bilder_uploads/20251130_193809_1764527889443.jpg HTTP/1.1" 200 -
+127.0.0.1 - - [01/Dec/2025 08:53:18] "GET /backend_url.json HTTP/1.1" 200 -
+127.0.0.1 - - [01/Dec/2025 08:53:19] code 404, message File not found
+127.0.0.1 - - [01/Dec/2025 08:53:19] "GET /favicon.ico HTTP/1.1" 404 -
+127.0.0.1 - - [01/Dec/2025 08:53:22] "GET /index.html HTTP/1.1" 200 -
+127.0.0.1 - - [01/Dec/2025 08:53:36] "GET /backend_url.json HTTP/1.1" 200 -
+127.0.0.1 - - [01/Dec/2025 09:00:28] "GET /backend_url.json HTTP/1.1" 200 -
+127.0.0.1 - - [01/Dec/2025 09:01:10] "GET /backend_url.json HTTP/1.1" 200 -
+127.0.0.1 - - [01/Dec/2025 09:01:12] "GET /bilder_uploads/20251201_090034_1764576034011.jpg HTTP/1.1" 200 -
+127.0.0.1 - - [01/Dec/2025 09:01:45] "GET /auswertung.html HTTP/1.1" 200 -
+127.0.0.1 - - [01/Dec/2025 09:01:46] "GET /backend_url.json HTTP/1.1" 200 -
+127.0.0.1 - - [01/Dec/2025 09:02:10] "GET /backend_url.json HTTP/1.1" 200 -
+127.0.0.1 - - [01/Dec/2025 09:02:13] "GET /bilder_uploads/20251201_090034_1764576034011.jpg HTTP/1.1" 304 -
+127.0.0.1 - - [01/Dec/2025 09:05:53] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [01/Dec/2025 09:05:54] code 404, message File not found
+127.0.0.1 - - [01/Dec/2025 09:05:54] "GET /favicon.ico HTTP/1.1" 404 -
+127.0.0.1 - - [01/Dec/2025 09:05:57] "GET /evaluation.html HTTP/1.1" 200 -
+127.0.0.1 - - [01/Dec/2025 09:05:57] "GET /backend_url.json HTTP/1.1" 200 -
+127.0.0.1 - - [01/Dec/2025 09:05:59] "GET /bilder_uploads/20251201_090034_1764576034011.jpg HTTP/1.1" 200 -
+127.0.0.1 - - [01/Dec/2025 09:07:02] "GET /evaluation.html HTTP/1.1" 304 -
+127.0.0.1 - - [01/Dec/2025 09:07:03] "GET /backend_url.json HTTP/1.1" 200 -
+127.0.0.1 - - [01/Dec/2025 09:07:03] "GET /evaluation.html HTTP/1.1" 304 -
+127.0.0.1 - - [01/Dec/2025 09:07:04] "GET /backend_url.json HTTP/1.1" 200 -
+127.0.0.1 - - [01/Dec/2025 09:07:06] "GET /bilder_uploads/20251201_090034_1764576034011.jpg HTTP/1.1" 304 -
+127.0.0.1 - - [01/Dec/2025 09:25:25] "HEAD / HTTP/1.1" 200 -
+127.0.0.1 - - [01/Dec/2025 09:25:26] "HEAD / HTTP/1.1" 200 -
+127.0.0.1 - - [01/Dec/2025 09:25:27] "HEAD / HTTP/1.1" 200 -
+127.0.0.1 - - [01/Dec/2025 09:25:43] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [01/Dec/2025 09:25:46] code 404, message File not found
+127.0.0.1 - - [01/Dec/2025 09:25:46] "GET /favicon.ico HTTP/1.1" 404 -
+127.0.0.1 - - [01/Dec/2025 09:26:24] "GET /evaluation.html HTTP/1.1" 200 -
+127.0.0.1 - - [01/Dec/2025 09:26:24] "GET /auswertung.html HTTP/1.1" 200 -
+127.0.0.1 - - [01/Dec/2025 09:26:24] "GET /index.html HTTP/1.1" 200 -
+127.0.0.1 - - [01/Dec/2025 09:26:26] "GET /backend_url.json HTTP/1.1" 200 -
+127.0.0.1 - - [01/Dec/2025 09:26:27] code 404, message File not found
+127.0.0.1 - - [01/Dec/2025 09:26:27] "GET /favicon.ico HTTP/1.1" 404 -
+127.0.0.1 - - [01/Dec/2025 09:26:27] "GET /backend_url.json HTTP/1.1" 200 -
+127.0.0.1 - - [01/Dec/2025 09:26:28] code 404, message File not found
+127.0.0.1 - - [01/Dec/2025 09:26:28] "GET /favicon.ico HTTP/1.1" 404 -
+127.0.0.1 - - [01/Dec/2025 09:26:29] code 404, message File not found
+127.0.0.1 - - [01/Dec/2025 09:26:29] "GET /favicon.ico HTTP/1.1" 404 -
+127.0.0.1 - - [01/Dec/2025 09:26:29] "GET /bilder_uploads/20251201_090034_1764576034011.jpg HTTP/1.1" 200 -
+127.0.0.1 - - [01/Dec/2025 09:27:51] "HEAD / HTTP/1.1" 200 -
+127.0.0.1 - - [01/Dec/2025 09:27:52] "HEAD / HTTP/1.1" 200 -
+127.0.0.1 - - [01/Dec/2025 09:27:52] "HEAD / HTTP/1.1" 200 -
+127.0.0.1 - - [01/Dec/2025 09:27:53] "HEAD / HTTP/1.1" 200 -
+127.0.0.1 - - [01/Dec/2025 09:28:06] "HEAD / HTTP/1.1" 200 -
+127.0.0.1 - - [01/Dec/2025 09:28:07] "HEAD / HTTP/1.1" 200 -
+127.0.0.1 - - [01/Dec/2025 09:30:51] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [01/Dec/2025 09:30:51] code 404, message File not found
+127.0.0.1 - - [01/Dec/2025 09:30:51] "GET /favicon.ico HTTP/1.1" 404 -
+127.0.0.1 - - [01/Dec/2025 09:31:49] "GET /backend_url.json HTTP/1.1" 200 -
+127.0.0.1 - - [01/Dec/2025 09:32:17] "GET /backend_url.json HTTP/1.1" 200 -
+127.0.0.1 - - [01/Dec/2025 09:32:20] "GET /bilder_uploads/20251201_093157_1764577917685.jpg HTTP/1.1" 200 -
+127.0.0.1 - - [01/Dec/2025 09:33:15] "GET /index.html HTTP/1.1" 200 -
+127.0.0.1 - - [01/Dec/2025 09:33:36] "GET /backend_url.json HTTP/1.1" 200 -
+127.0.0.1 - - [01/Dec/2025 09:33:38] "GET /bilder_uploads/20251201_093157_1764577917685.jpg HTTP/1.1" 304 -
+127.0.0.1 - - [01/Dec/2025 09:33:48] "GET /backend_url.json HTTP/1.1" 200 -
+127.0.0.1 - - [01/Dec/2025 09:33:58] "GET /backend_url.json HTTP/1.1" 200 -
+127.0.0.1 - - [01/Dec/2025 09:33:59] "GET /bilder_uploads/20251201_093157_1764577917685.jpg HTTP/1.1" 304 -
+127.0.0.1 - - [01/Dec/2025 09:34:01] "GET /backend_url.json HTTP/1.1" 200 -
+127.0.0.1 - - [01/Dec/2025 09:34:11] "GET /backend_url.json HTTP/1.1" 200 -
+127.0.0.1 - - [01/Dec/2025 09:34:13] "GET /bilder_uploads/20251201_093157_1764577917685.jpg HTTP/1.1" 304 -
+127.0.0.1 - - [01/Dec/2025 09:34:44] "GET /backend_url.json HTTP/1.1" 200 -
+127.0.0.1 - - [01/Dec/2025 09:34:46] "GET /bilder_uploads/20251201_093413_1764578053307.jpg HTTP/1.1" 200 -
+127.0.0.1 - - [01/Dec/2025 09:35:58] "GET /bilder_uploads/20251201_093157_1764577917685.jpg HTTP/1.1" 304 -
