@@ -590,6 +590,36 @@
       margin-top: 4px;
     }
 
+    /* EU-TARIC- und VZTA-Link unter dem Ergebnis */
+    .eu-link-row {
+      margin-top: 4px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .eu-link {
+      font-size: 11px;
+      color: #93c5fd;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      background: rgba(15, 23, 42, 0.9);
+    }
+
+    .eu-link::before {
+      content: "🌐";
+      font-size: 12px;
+    }
+
+    .eu-link:hover {
+      text-decoration: underline;
+    }
+
     @media (max-width: 480px) {
       body {
         padding: 8px 6px 24px;
@@ -772,6 +802,16 @@
               </div>
             </div>
 
+            <!-- EU-TARIC & VZTA Link -->
+            <div class="eu-link-row" id="eu-link-row" style="display:none;">
+              <a id="eu-link" href="#" class="eu-link" target="_blank" rel="noopener noreferrer">
+                EU-TARIC öffnen
+              </a>
+              <a id="vzta-link" href="#" class="eu-link" target="_blank" rel="noopener noreferrer">
+                VZTA (EU-BTI) öffnen
+              </a>
+            </div>
+
             <div>
               <div class="section-label">Begründung:</div>
               <p class="reason" id="reason-text">
@@ -812,26 +852,28 @@
 
   <script>
     // -----------------------------------
+    // Hilfsfunktion: heutiges Datum als SimDate (YYYYMMDD)
+    // -----------------------------------
+    function getTodayAsSimDate() {
+      const d = new Date();
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, "0");
+      const day = String(d.getDate()).padStart(2, "0");
+      return `${y}${m}${day}`;
+    }
+
+    // -----------------------------------
     // Backend-Modus & dynamische Base-URL
     // -----------------------------------
     let cloudflareBackendUrlCache = null;
 
-    /*function getBackendMode() {
-      try {
-        const stored = localStorage.getItem("taricBackendMode");
-        return stored === "cloudflare" ? "cloudflare" : "local";
-      } catch {
-        return "local";
-      }
-    }
-    */
     function getBackendMode() {
       try {
         const stored = localStorage.getItem("taricBackendMode");
         if (stored === "local" || stored === "cloudflare") {
           return stored;
         }
-        // Standardmodus, falls noch nichts gespeichert wurde:
+        // Standard: Cloudflare
         return "cloudflare";
       } catch {
         return "cloudflare";
@@ -926,6 +968,11 @@
     const btnOk = document.getElementById("btn-ok");
     const btnNo = document.getElementById("btn-no");
     const backendModeSelect = document.getElementById("backend-mode-select");
+
+    // EU-TARIC- & VZTA-Links
+    const euLinkRow = document.getElementById("eu-link-row");
+    const euLink = document.getElementById("eu-link");
+    const vztaLink = document.getElementById("vzta-link");
 
     let lastResult = null;
 
@@ -1035,6 +1082,46 @@
       }
     }
 
+    function updateEuLink(taric) {
+      // Nur anzeigen, wenn wir einen plausiblen numerischen TARIC-Code haben
+      if (taric && /^\d{4,}$/.test(String(taric))) {
+        const cleanTaric = String(taric).replace(/\D/g, "");
+        if (cleanTaric.length < 4) {
+          euLinkRow.style.display = "none";
+          euLink.removeAttribute("href");
+          if (vztaLink) vztaLink.removeAttribute("href");
+          return;
+        }
+
+        const prefixDigits = Math.min(8, cleanTaric.length);
+        const prefix = cleanTaric.substring(0, prefixDigits);
+        const simDate = getTodayAsSimDate();
+
+        // TARIC-Webabfrage
+        const euTaricUrl =
+          "https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp" +
+          `?Lang=de&Taric=${encodeURIComponent(prefix)}&Expand=true&SimDate=${simDate}`;
+
+        euLink.href = euTaricUrl;
+        euLink.textContent = `EU-TARIC für ${prefix}… öffnen`;
+
+        // VZTA / BTI-Webabfrage (allgemeine Suchseite, Code kann dort weiter genutzt werden)
+        if (vztaLink) {
+          const vztaUrl =
+            "https://ec.europa.eu/taxation_customs/dds2/ebti/ebti_consultation.jsp?Lang=de";
+          vztaLink.href = vztaUrl;
+          vztaLink.textContent = `VZTA / BTI-Abfrage (Code ${prefix}…)`;
+          vztaLink.style.display = "inline-flex";
+        }
+
+        euLinkRow.style.display = "flex";
+      } else {
+        euLinkRow.style.display = "none";
+        euLink.removeAttribute("href");
+        if (vztaLink) vztaLink.removeAttribute("href");
+      }
+    }
+
     function renderResult(data) {
       const taric = data.taric_code || "──────────";
       const cn = data.cn_code || "────────";
@@ -1047,6 +1134,7 @@
       hsEl.textContent = (hs ?? "").toString().padStart(2, "0");
 
       updateConfidenceUI(conf);
+      updateEuLink(data.taric_code || null);
 
       reasonEl.textContent = reason;
 

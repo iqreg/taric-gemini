@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>TARIC Evaluation – Zollprüfung</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg: #020617;
+      --bg-panel: #0f172a;
+      --border: #1f2937;
+      --accent: #2563eb;
+      --accent-soft: rgba(37, 99, 235, 0.12);
+      --accent-strong: rgba(37, 99, 235, 0.4);
+      --text: #e5e7eb;
+      --text-muted: #9ca3af;
+      --error: #ef4444;
+      --success: #22c55e;
+      --warning: #facc15;
+      --radius: 14px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+        "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #020617, #000 80%);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 16px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1200px;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      color: var(--accent);
+      margin-bottom: 24px;
+      font-size: 2em;
+    }
+
+    /* Status-Nachrichten (Pill) */
+    .status-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+      padding: 12px 20px;
+      background-color: var(--bg-panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .status-pill {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 9999px;
+      font-size: 0.85em;
+      font-weight: 600;
+    }
+
+    .status-info {
+      background-color: var(--accent-soft);
+      color: var(--accent);
+    }
+
+    .status-error {
+      background-color: rgba(239, 68, 68, 0.2);
+      color: var(--error);
+    }
+
+    .status-success {
+      background-color: rgba(34, 197, 94, 0.2);
+      color: var(--success);
+    }
+
+    .status-warning {
+      background-color: rgba(250, 202, 21, 0.2);
+      color: var(--warning);
+    }
+
+    /* Hauptinhalts-Layout */
+    .main-content {
+      display: flex;
+      gap: 32px;
+      padding: 20px;
+      background-color: var(--bg-panel);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+    }
+
+    .left-panel {
+      flex: 0 0 400px;
+      /* Feste Breite für das Bild und die Metadaten */
+    }
+
+    .right-panel {
+      flex-grow: 1;
+      /* Füllt den restlichen Raum */
+    }
+
+    /* Bild-Container (WICHTIG für Bild-Fix) */
+    .product-image-container {
+      width: 100%;
+      height: 300px;
+      /* Feste Höhe, damit der Container immer Platz einnimmt */
+      background-color: var(--bg-panel-alt);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 20px;
+      overflow: hidden;
+      /* WICHTIG */
+    }
+
+    #product-image {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      /* Bild passt in den Container */
+    }
+
+    /* Metadaten und Navigation */
+    .meta-box,
+    .form-section {
+      padding: 20px;
+      background-color: var(--bg);
+      border-radius: var(--radius);
+      margin-bottom: 20px;
+    }
+
+    .meta-item {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .meta-label {
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .meta-value {
+      font-weight: 500;
+      color: var(--text);
+      text-align: right;
+    }
+
+    .navigation-controls {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    /* Formularelemente und Buttons */
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+
+    input[type="text"],
+    textarea,
+    select {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 16px;
+      background-color: var(--bg-panel-alt);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text);
+      font-size: 1em;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    button {
+      padding: 10px 15px;
+      border: none;
+      border-radius: var(--radius);
+      cursor: pointer;
+      font-weight: 600;
+      transition: background-color 0.2s;
+    }
+
+    button.primary {
+      background-color: var(--accent);
+      color: white;
+    }
+
+    button.primary:hover:not(:disabled) {
+      background-color: #3b82f6;
+    }
+
+    button.secondary {
+      background-color: var(--border);
+      color: var(--text);
+    }
+
+    button.secondary:hover:not(:disabled) {
+      background-color: #374151;
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .save-controls {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      margin-top: 20px;
+    }
+
+    .taric-description-box {
+      border: 1px solid var(--border);
+      padding: 15px;
+      border-radius: var(--radius);
+      margin-top: 10px;
+      min-height: 100px;
+      background-color: var(--bg-panel-alt);
+    }
+
+    .taric-description-box p {
+      margin: 0;
+      color: var(--text-muted);
+      font-style: italic;
+    }
+    
+    .taric-description-box.official p {
+      color: var(--text);
+      font-style: normal;
+    }
+
+    .taric-code-pill {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 9999px;
+      font-size: 0.9em;
+      margin-right: 5px;
+      background-color: var(--accent-soft);
+      color: var(--accent);
+      font-weight: bold;
+    }
+
+    .taric-code-alt {
+      background-color: var(--border);
+      color: var(--text);
+      font-weight: 400;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>TARIC Evaluation & Nachkontrolle</h1>
+    <div class="status-container">
+      <div id="status-message">Daten werden geladen...</div>
+      <select id="backend-mode-select">
+        <option value="local">Lokales Backend (8000)</option>
+        <option value="cloudflare">Cloudflare Tunnel</option>
+      </select>
+    </div>
+
+    <div class="main-content">
+      <div class="left-panel">
+        <div class="product-image-container">
+          <img src="" alt="Produktbild" id="product-image" />
+        </div>
+
+        <div class="meta-box">
+          <div class="meta-item">
+            <span class="meta-label">ID / Dateiname:</span>
+            <span class="meta-value" id="meta-id">N/A</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Erstellt am:</span>
+            <span class="meta-value" id="meta-created">N/A</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Modell:</span>
+            <span class="meta-value" id="meta-model">N/A</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Datensätze geladen:</span>
+            <span class="meta-value" id="meta-count">0</span>
+          </div>
+        </div>
+
+        <div class="navigation-controls">
+          <button id="prev-btn" class="secondary" disabled>← Zurück</button>
+          <select id="filter-select" class="secondary" style="flex-grow: 1;">
+            <option value="unreviewed">Nur Unbewertete anzeigen</option>
+            <option value="all">Alle anzeigen</option>
+          </select>
+          <button id="next-btn" class="secondary" disabled>Weiter →</button>
+        </div>
+      </div>
+
+      <div class="right-panel">
+        <div class="form-section">
+          <h2>1. KI-Klassifikation</h2>
+          <label>Vorgeschlagener TARIC-Code:</label>
+          <p>
+            <span id="ki-taric-code" class="taric-code-pill"></span>
+          </p>
+
+          <label>Begründung der KI:</label>
+          <div class="taric-description-box" id="ki-reason">
+            <p>Wird geladen...</p>
+          </div>
+
+          <label>Mögliche Alternativen:</label>
+          <p id="ki-alternatives"></p>
+
+          <h3 style="margin-top: 20px;">2. Offizielle Beschreibung</h3>
+          <button id="fetch-description-btn" class="secondary">
+            Offizielle Beschreibung abrufen
+          </button>
+          <div class="taric-description-box" id="official-description-box">
+            <p>Klicken Sie, um die Beschreibung abzurufen.</p>
+          </div>
+
+        </div>
+
+        <div class="form-section" id="review-form">
+          <h2>3. Manuelle Bewertung</h2>
+          <label for="reviewer-name">Reviewer-Kürzel/Name</label>
+          <input type="text" id="reviewer-name" value="Zollprofi" />
+
+          <label for="supervisor-rating">Supervisor-Bewertung (Optional, 10 = Korrekt)</label>
+          <select id="supervisor-rating">
+            <option value="">(Nicht bewertet)</option>
+            <option value="10">10 (Vollständig Korrekt)</option>
+            <option value="8">8 (Geringe Abweichung)</option>
+            <option value="5">5 (Mittlere Abweichung)</option>
+            <option value="2">2 (Starke Abweichung)</option>
+            <option value="0">0 (Vollständig Falsch)</option>
+          </select>
+
+          <label for="comment-text">Kommentar/Korrektur</label>
+          <textarea id="comment-text" placeholder="Geben Sie hier Ihre Korrektur oder Anmerkung ein."></textarea>
+
+          <div class="save-controls">
+            <button id="save-btn" class="secondary" disabled>Bewertung speichern</button>
+            <button id="save-next-btn" class="primary" disabled>Speichern & Weiter</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // --------------------------------------------------
+    // Konfiguration & Backend-URL-Management
+    // --------------------------------------------------
+
+    let items = [];
+    let currentIndex = 0;
+    let cloudflareBackendUrlCache = null;
+
+    const DEFAULT_BACKEND_MODE = "local";
+    const CLOUDFLARE_URL_FILE = "backend_url.json";
+
+    const getBackendMode = () => {
+      return localStorage.getItem("backendMode") || DEFAULT_BACKEND_MODE;
+    };
+
+    const setBackendModeStored = (mode) => {
+      localStorage.setItem("backendMode", mode);
+      return mode;
+    };
+
+    /**
+     * Ruft die Backend-URL ab, entweder lokal (8000) oder über Cloudflare.
+     * @returns {string} Die vollständige Basis-URL des Backends.
+     */
+    const getBackendUrl = async () => {
+      const mode = getBackendMode();
+      if (mode === "local") {
+        return "http://localhost:8000";
+      }
+
+      // Cloudflare Mode: URL aus der JSON-Datei laden
+      if (cloudflareBackendUrlCache) {
+        return cloudflareBackendUrlCache;
+      }
+
+      try {
+        const response = await fetch(CLOUDFLARE_URL_FILE);
+        if (!response.ok) {
+          throw new Error(`Fehler beim Laden von ${CLOUDFLARE_URL_FILE}: ${response.status}`);
+        }
+        const data = await response.json();
+        cloudflareBackendUrlCache = data.backend_url;
+        return cloudflareBackendUrlCache;
+      } catch (err) {
+        console.error("Cloudflare URL konnte nicht geladen werden.", err);
+        setStatus("Fehler: Cloudflare URL konnte nicht geladen werden. Prüfen Sie `backend_url.json`.", "error");
+        return "http://localhost:8000"; // Fallback auf lokal
+      }
+    };
+
+
+    // --------------------------------------------------
+    // DOM-Elemente
+    // --------------------------------------------------
+
+    const statusMessage = document.getElementById("status-message");
+    const statusPill = document.querySelector(".status-pill");
+
+    const productImage = document.getElementById("product-image");
+    const kiTaricCode = document.getElementById("ki-taric-code");
+    const kiReason = document.getElementById("ki-reason");
+    const kiAlternatives = document.getElementById("ki-alternatives");
+
+    const officialDescriptionBox = document.getElementById("official-description-box");
+
+    const fetchDescriptionBtn = document.getElementById("fetch-description-btn");
+
+    const reviewerNameInput = document.getElementById("reviewer-name");
+    const supervisorRatingSelect = document.getElementById("supervisor-rating");
+    const commentTextarea = document.getElementById("comment-text");
+
+    const metaId = document.getElementById("meta-id");
+    const metaCreated = document.getElementById("meta-created");
+    const metaModel = document.getElementById("meta-model");
+    const metaCount = document.getElementById("meta-count");
+
+    const filterSelect = document.getElementById("filter-select");
+    const prevBtn = document.getElementById("prev-btn");
+    const nextBtn = document.getElementById("next-btn");
+    const saveBtn = document.getElementById("save-btn");
+    const saveNextBtn = document.getElementById("save-next-btn");
+    const backendModeSelect = document.getElementById("backend-mode-select");
+
+
+    // --------------------------------------------------
+    // Status & Meldungen
+    // --------------------------------------------------
+
+    const setStatus = (message, type = "info") => {
+      statusMessage.textContent = message;
+      statusPill.className = `status-pill status-${type}`;
+    };
+
+    // --------------------------------------------------
+    // Rendering-Funktionen
+    // --------------------------------------------------
+
+    const renderCurrent = () => {
+      if (!items.length) {
+        setStatus("Keine Datensätze gefunden. Bitte prüfen Sie die Datenbank.", "warning");
+        [prevBtn, nextBtn, saveBtn, saveNextBtn].forEach(btn => btn.disabled = true);
+        return;
+      }
+
+      const currentItem = items[currentIndex];
+
+      // --------------------------------------------------
+      // Bild und Taric-Code anzeigen (FIX für Bildanzeige)
+      // --------------------------------------------------
+      metaId.textContent = `${currentItem.id} / ${currentItem.filename}`;
+      metaCreated.textContent = new Date(currentItem.created_at).toLocaleString();
+      metaModel.textContent = currentItem.model_name;
+
+      const imageUrl = `${getBackendUrl()}${currentItem.image_url}`;
+      
+      // FIX: src leeren und dann neu setzen, um Lade-Probleme zu umgehen (Trotz 200 OK)
+      productImage.src = '';
+      setTimeout(() => {
+          productImage.src = imageUrl;
+      }, 0); 
+      
+      kiTaricCode.textContent = currentItem.taric_code || "N/A";
+      kiReason.innerHTML = `<p>${currentItem.short_reason || 'Keine Begründung vorhanden.'}</p>`;
+      
+      // Alternativen rendern
+      kiAlternatives.innerHTML = currentItem.possible_alternatives.map(alt =>
+        `<span class="taric-code-pill taric-code-alt">${alt}</span>`
+      ).join('');
+
+      // Formularfelder mit bestehenden Daten füllen (falls bereits bewertet)
+      reviewerNameInput.value = currentItem.reviewer || localStorage.getItem("reviewerName") || "Zollprofi";
+      supervisorRatingSelect.value = currentItem.superviser_bewertung !== null ? String(currentItem.superviser_bewertung) : "";
+      commentTextarea.value = currentItem.comment || "";
+
+      // Beschreibung auf Standard zurücksetzen
+      officialDescriptionBox.className = "taric-description-box";
+      officialDescriptionBox.innerHTML = '<p>Klicken Sie, um die Beschreibung abzurufen.</p>';
+      
+      // Navigationsbuttons aktualisieren
+      prevBtn.disabled = currentIndex === 0;
+      nextBtn.disabled = currentIndex === items.length - 1;
+      saveBtn.disabled = false;
+      saveNextBtn.disabled = false;
+    };
+
+    // --------------------------------------------------
+    // Datenabruf
+    // --------------------------------------------------
+
+    const loadData = async () => {
+      setStatus("Lade Daten...", "info");
+      const onlyUnreviewed = filterSelect.value === "unreviewed";
+      const backendUrl = await getBackendUrl();
+      const url = `${backendUrl}/api/evaluation/items?limit=200&only_unreviewed=${onlyUnreviewed}`;
+
+      try {
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error(`HTTP Fehler: ${response.status}`);
+        }
+        items = await response.json();
+        currentIndex = 0;
+        metaCount.textContent = items.length;
+        renderCurrent();
+        setStatus(`Erfolgreich ${items.length} Datensätze geladen.`, "success");
+      } catch (err) {
+        console.error("Fehler beim Laden der Daten:", err);
+        setStatus("Fehler beim Laden der Daten. Prüfen Sie die Backend-URL/Verbindung.", "error");
+        items = [];
+        metaCount.textContent = "0";
+        renderCurrent();
+      }
+    };
+
+    /**
+     * Ruft die offizielle TARIC-Beschreibung über die EU-API ab (via Backend-Proxy).
+     * @param {string} taricCode Der 10-stellige TARIC-Code.
+     */
+    const fetchOfficialDescription = async (taricCode) => {
+      if (!taricCode || taricCode.length !== 10) {
+        officialDescriptionBox.innerHTML = '<p style="color:var(--error)">Ungültiger 10-stelliger Code.</p>';
+        return;
+      }
+      
+      officialDescriptionBox.className = "taric-description-box";
+      officialDescriptionBox.innerHTML = '<p>Lade offizielle Beschreibung...</p>';
+      fetchDescriptionBtn.disabled = true;
+
+      const backendUrl = await getBackendUrl();
+      const url = `${backendUrl}/api/taric_official_description/${taricCode}`;
+
+      try {
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || `HTTP Fehler: ${response.status}`);
+        }
+        
+        // Anzeige bei Erfolg
+        officialDescriptionBox.className = "taric-description-box official";
+        officialDescriptionBox.innerHTML = `<p>${data.officialDescription}</p>`;
+
+      } catch (err) {
+        console.error("Fehler beim Abruf der offiziellen Beschreibung:", err);
+        officialDescriptionBox.className = "taric-description-box";
+        officialDescriptionBox.innerHTML = `<p style="color:var(--error)">Fehler: ${err.message || 'Abruf fehlgeschlagen'}</p>`;
+      } finally {
+        fetchDescriptionBtn.disabled = false;
+      }
+    };
+
+    // --------------------------------------------------
+    // Speicherfunktionen
+    // --------------------------------------------------
+
+    const saveCurrent = async (andNext = false) => {
+      if (!items.length) return;
+
+      const currentItem = items[currentIndex];
+      const reviewerName = reviewerNameInput.value.trim();
+      const supervisorRating = supervisorRatingSelect.value ? parseInt(supervisorRatingSelect.value, 10) : null;
+      const commentText = commentTextarea.value.trim();
+
+      if (!reviewerName) {
+        setStatus("Bitte geben Sie Ihr Reviewer-Kürzel/Namen ein.", "error");
+        return;
+      }
+
+      // Speichern des Namens für zukünftige Sitzungen
+      localStorage.setItem("reviewerName", reviewerName);
+
+      const payload = {
+        taric_live_id: currentItem.id,
+        // correct_digits wird hier hart auf 10 gesetzt, da es die Supervisor-Sicht ist
+        correct_digits: 10, 
+        reviewer: reviewerName,
+        comment: commentText || null,
+        superviser_bewertung: supervisorRating,
+      };
+
+      saveBtn.disabled = true;
+      saveNextBtn.disabled = true;
+      setStatus("Speichere Bewertung...", "info");
+
+      const backendUrl = await getBackendUrl();
+
+      try {
+        const response = await fetch(`${backendUrl}/api/evaluation/save`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || `HTTP Fehler: ${response.status}`);
+        }
+
+        setStatus("Bewertung erfolgreich gespeichert.", "success");
+
+        // Wenn "Speichern & Weiter" geklickt wurde:
+        if (andNext) {
+            // Wenn der Filter "unreviewed" aktiv ist, müssen wir den aktuellen Eintrag entfernen
+            if (filterSelect.value === "unreviewed') {
+                items.splice(currentIndex, 1);
+                // Wenn dies der letzte Eintrag war, gehen wir zum neuen Ende der Liste
+                if (currentIndex >= items.length) {
+                    currentIndex = Math.max(0, items.length - 1);
+                }
+                metaCount.textContent = items.length;
+            } else {
+                // Wenn Filter "all" aktiv, gehen wir einfach zum nächsten Index
+                if (currentIndex < items.length - 1) {
+                    currentIndex++;
+                }
+            }
+            renderCurrent();
+        } else {
+             // Einfach neu rendern, um gespeicherte Werte anzuzeigen (falls Filter "all" aktiv)
+             renderCurrent(); 
+        }
+
+      } catch (err) {
+        console.error(err);
+        setStatus("Fehler beim Speichern (Netzwerk oder Backend).", "error");
+      } finally {
+        saveBtn.disabled = false;
+        saveNextBtn.disabled = false;
+      }
+    };
+
+
+    // --------------------------------------------------
+    // Event-Listener & Initialisierung
+    // --------------------------------------------------
+
+    filterSelect.addEventListener("change", () => {
+      loadData();
+    });
+
+    prevBtn.addEventListener("click", () => {
+      if (!items.length) return;
+      if (currentIndex > 0) {
+        currentIndex--;
+        renderCurrent();
+      }
+    });
+
+    nextBtn.addEventListener("click", () => {
+      if (!items.length) return;
+      if (currentIndex < items.length - 1) {
+        currentIndex++;
+        renderCurrent();
+      }
+    });
+
+    fetchDescriptionBtn.addEventListener("click", () => {
+        if (!items.length) return;
+        fetchOfficialDescription(items[currentIndex].taric_code);
+    });
+
+    saveBtn.addEventListener("click", () => saveCurrent(false));
+    saveNextBtn.addEventListener("click", () => saveCurrent(true));
+
+    if (backendModeSelect) {
+      const mode = getBackendMode();
+      backendModeSelect.value = mode;
+      backendModeSelect.addEventListener("change", () => {
+        const newMode = setBackendModeStored(backendModeSelect.value);
+        cloudflareBackendUrlCache = null; 
+        setStatus(
+          newMode === "cloudflare"
+            ? "Backend-Modus: Cloudflare-Tunnel aktiv. Seite neu laden, falls Probleme auftreten."
+            : "Backend-Modus: lokales Backend (Port 8000). Seite neu laden, falls Probleme auftreten."
+        );
+        // optional: direkt neu laden
+        loadData();
+      });
+    }
+
+    // Initial laden
+    loadData();
+  </script>
+</body>
+
+</html>

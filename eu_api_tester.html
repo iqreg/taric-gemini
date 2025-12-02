@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>EU API Tester – TARIC</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg: #020617;
+      --bg-panel: #0f172a;
+      --border: #1f2937;
+      --accent: #2563eb;
+      --accent-soft: rgba(37, 99, 235, 0.12);
+      --accent-strong: rgba(37, 99, 235, 0.4);
+      --text: #e5e7eb;
+      --text-muted: #9ca3af;
+      --error: #ef4444;
+      --success: #22c55e;
+      --radius: 14px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+        "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #020617, #000 80%);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 16px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .page {
+      width: 100%;
+      max-width: 1080px;
+      background: linear-gradient(145deg, #020617 0%, #020617 55%, #020617 100%);
+      border-radius: 24px;
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      box-shadow: 0 18px 45px rgba(15, 23, 42, 0.75);
+      padding: 16px 16px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    header {
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 1.4rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    h1 span.icon {
+      font-size: 1.2rem;
+    }
+
+    header p {
+      margin: 0;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    .header-right {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+
+    .nav-link {
+      text-decoration: none;
+      padding: 6px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      color: #e5e7eb;
+      font-size: 0.8rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      background: radial-gradient(circle at top, #1e293b, #020617);
+      transition: transform 0.1s ease, box-shadow 0.1s ease,
+        background 0.1s ease, border-color 0.1s ease;
+    }
+
+    .nav-link span.icon {
+      font-size: 0.9rem;
+    }
+
+    .nav-link:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 25px rgba(15, 23, 42, 0.7);
+      border-color: rgba(191, 219, 254, 0.6);
+      background: radial-gradient(circle at top, #1d4ed8, #020617);
+    }
+
+    .nav-link.active {
+      border-color: rgba(129, 140, 248, 0.9);
+      background: radial-gradient(circle at top, #1d4ed8, #020617);
+    }
+
+    select {
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: #020617;
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      color: var(--text);
+      font-size: 0.8rem;
+    }
+
+    .backend-select {
+      font-size: 0.75rem;
+    }
+
+    main {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+      gap: 16px;
+    }
+
+    @media (max-width: 900px) {
+      main {
+        display: flex;
+        flex-direction: column;
+      }
+    }
+
+    .panel {
+      background: radial-gradient(circle at top left, #020617, #000 95%);
+      border-radius: var(--radius);
+      border: 1px solid rgba(31, 41, 55, 0.9);
+      padding: 12px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.55);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .panel h2 {
+      margin: 0 0 6px 0;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .panel h2 span.icon {
+      font-size: 1rem;
+    }
+
+    .thumb-box {
+      border-radius: 12px;
+      border: 1px solid rgba(31, 41, 55, 0.9);
+      padding: 8px;
+      background: #020617;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .thumb-box img {
+      max-width: 100%;
+      border-radius: 10px;
+      display: block;
+    }
+
+    .meta {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .meta strong {
+      color: #e5e7eb;
+    }
+
+    .codes {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      font-size: 0.8rem;
+    }
+
+    .code-pill {
+      border-radius: 999px;
+      padding: 3px 8px;
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      background: rgba(15, 23, 42, 0.85);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .code-pill strong {
+      color: #e5e7eb;
+    }
+
+    .confidence {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 4px;
+    }
+
+    .confidence span.label {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .confidence-bar {
+      flex: 1;
+      height: 6px;
+      border-radius: 999px;
+      background: rgba(31, 41, 55, 0.85);
+      overflow: hidden;
+    }
+
+    .confidence-bar-inner {
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #f97316, #facc15, #22c55e);
+      width: 0%;
+      transition: width 0.2s ease;
+    }
+
+    .confidence-pill {
+      font-size: 0.7rem;
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      background: rgba(15, 23, 42, 0.9);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .short-reason {
+      font-size: 0.85rem;
+    }
+
+    .short-reason strong {
+      color: #e5e7eb;
+    }
+
+    .no-data {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    .btn {
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      padding: 7px 14px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      background: radial-gradient(circle at top, #1e3a8a, #111827);
+      color: #e5e7eb;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      transition: transform 0.12s ease, box-shadow 0.12s ease,
+        background 0.12s ease, border-color 0.12s ease;
+      box-shadow: 0 10px 25px rgba(37, 99, 235, 0.35);
+    }
+
+    .btn span.icon {
+      font-size: 0.9rem;
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: default;
+      box-shadow: none;
+    }
+
+    .btn:hover:not(:disabled) {
+      transform: translateY(-1px);
+      border-color: rgba(191, 219, 254, 0.9);
+      background: radial-gradient(circle at top, #1d4ed8, #020617);
+    }
+
+    .status {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .status.ok {
+      color: var(--success);
+    }
+
+    .status.error {
+      color: var(--error);
+    }
+
+    .json-view {
+      background: #0b1220;
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      border-radius: 10px;
+      padding: 10px;
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+      font-size: 0.85rem;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    @media (max-width: 600px) {
+      .header-bar {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page">
+    <header>
+      <div class="header-bar">
+        <div>
+          <h1><span class="icon">🧪</span>EU API Tester</h1>
+          <p>Zeigt Bild aus taric_live + offiziellen TARIC-Text aus lokaler EU-Referenz.</p>
+        </div>
+        <div class="header-right">
+          <select id="backendModeSelect" class="backend-select">
+            <option value="local">Backend: Local</option>
+            <option value="cloudflare">Backend: Cloudflare</option>
+          </select>
+          <a href="index.html" class="nav-link">
+            <span class="icon">📷</span><span>Klassifikation</span>
+          </a>
+          <a href="evaluation.html" class="nav-link">
+            <span class="icon">🧪</span><span>Evaluation</span>
+          </a>
+          <a href="eu_api_tester.html" class="nav-link active">
+            <span class="icon">🌐</span><span>EU API</span>
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section class="panel">
+        <h2><span class="icon">🖼️</span>Bild &amp; Modell-Ergebnis</h2>
+        <div id="imageCard" class="thumb-box">
+          <div class="no-data">
+            Noch keine Daten geladen. Lade initialen Datensatz …
+          </div>
+        </div>
+        <div class="btn-row">
+          <button id="prevBtn" class="btn"><span class="icon">⬅️</span>Zurück</button>
+          <button id="nextBtn" class="btn"><span class="icon">➡️</span>Weiter</button>
+          <button id="reloadBtn" class="btn"><span class="icon">🔄</span>Neu laden</button>
+        </div>
+        <div class="status" id="statusLine"></div>
+      </section>
+
+      <section class="panel">
+        <h2><span class="icon">📡</span>Offizielle TARIC-Beschreibung (lokale EU-DB)</h2>
+        <div class="btn-row">
+          <input id="taricInput" type="text" placeholder="10-stelliger TARIC-Code" style="flex:1; min-width: 160px; padding:7px 10px; border-radius:999px; border:1px solid rgba(148,163,184,0.7); background:#020617; color:var(--text); font-size:0.9rem;" />
+          <button id="fetchOfficialBtn" class="btn"><span class="icon">🔍</span>EU-Text abrufen</button>
+        </div>
+        <div id="officialStatus" class="status"></div>
+        <div id="officialResult" class="json-view">Noch kein Abruf gestartet.</div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    // Backend-Mode & URL-Auflösung (aus evaluation.html übernommen)
+    let cloudflareBackendUrlCache = null;
+
+    function getBackendMode() {
+      try {
+        const stored = localStorage.getItem("taricBackendMode");
+        if (stored === "local" || stored === "cloudflare") {
+          return stored;
+        }
+        return "cloudflare";
+      } catch {
+        return "cloudflare";
+      }
+    }
+
+    function setBackendModeStored(mode) {
+      const val = mode === "cloudflare" ? "cloudflare" : "local";
+      try {
+        localStorage.setItem("taricBackendMode", val);
+      } catch { }
+      return val;
+    }
+
+    function getLocalApiBase() {
+      const host = window.location.hostname || "localhost";
+      const protocol = window.location.protocol === "https:" ? "https:" : "http:";
+      return `${protocol}//${host}:8000`;
+    }
+
+    async function loadCloudflareBackendUrlFromJson() {
+      if (cloudflareBackendUrlCache) {
+        return cloudflareBackendUrlCache;
+      }
+      try {
+        const res = await fetch("backend_url.json", { cache: "no-store" });
+        if (!res.ok) {
+          console.error("backend_url.json nicht erreichbar:", res.status);
+          return null;
+        }
+        const cfg = await res.json();
+        if (cfg.backend_url) {
+          const url = cfg.backend_url.replace(/\/+$/, "");
+          cloudflareBackendUrlCache = url;
+          return url;
+        } else {
+          console.error("backend_url.json enthält kein 'backend_url'");
+          return null;
+        }
+      } catch (err) {
+        console.error("Fehler beim Laden von backend_url.json:", err);
+        return null;
+      }
+    }
+
+    async function getBackendBaseUrl() {
+      const mode = getBackendMode();
+      if (mode === "cloudflare") {
+        const url = await loadCloudflareBackendUrlFromJson();
+        if (url) return url;
+        return getLocalApiBase();
+      }
+      return getLocalApiBase();
+    }
+
+    async function backendFetch(path, options = {}) {
+      const base = await getBackendBaseUrl();
+      const url = base + path;
+      console.log("backendFetch →", url);
+      return fetch(url, options);
+    }
+
+    // UI-Elemente
+    const imageCard = document.getElementById("imageCard");
+    const statusLine = document.getElementById("statusLine");
+    const officialStatus = document.getElementById("officialStatus");
+    const officialResult = document.getElementById("officialResult");
+    const taricInput = document.getElementById("taricInput");
+    const fetchOfficialBtn = document.getElementById("fetchOfficialBtn");
+    const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const reloadBtn = document.getElementById("reloadBtn");
+    const backendModeSelect = document.getElementById("backendModeSelect");
+
+    let items = [];
+    let currentIndex = 0;
+
+    function setStatus(text, mode = "normal") {
+      statusLine.classList.remove("ok", "error");
+      if (mode === "ok") statusLine.classList.add("ok");
+      if (mode === "error") statusLine.classList.add("error");
+      statusLine.textContent = text;
+    }
+
+    function setOfficialStatus(text, mode = "normal") {
+      officialStatus.classList.remove("ok", "error");
+      if (mode === "ok") officialStatus.classList.add("ok");
+      if (mode === "error") officialStatus.classList.add("error");
+      officialStatus.textContent = text;
+    }
+
+    async function loadData() {
+      setStatus("Lade taric_live-Datensätze …");
+      imageCard.innerHTML = `<div class="no-data">Lade Daten …</div>`;
+      items = [];
+      currentIndex = 0;
+
+      try {
+        const res = await backendFetch("/api/evaluation/items?limit=200");
+        if (!res.ok) {
+          const text = await res.text();
+          console.error("Fehler /api/evaluation/items:", text);
+          setStatus(`Fehler beim Laden: HTTP ${res.status}`, "error");
+          imageCard.innerHTML = `<div class="no-data">Fehler beim Laden der Daten.</div>`;
+          return;
+        }
+
+        const data = await res.json();
+        if (!Array.isArray(data) || data.length === 0) {
+          setStatus("Keine Datensätze gefunden.", "ok");
+          imageCard.innerHTML = `<div class="no-data">Keine Datensätze vorhanden.</div>`;
+          return;
+        }
+
+        items = data;
+        currentIndex = 0;
+        setStatus(`Geladen: ${items.length} Datensätze.`, "ok");
+        renderCurrent();
+      } catch (err) {
+        console.error(err);
+        setStatus("Backend nicht erreichbar.", "error");
+        imageCard.innerHTML = `<div class="no-data">Backend nicht erreichbar.</div>`;
+      }
+    }
+
+    function renderCurrent() {
+      if (!items.length) {
+        imageCard.innerHTML = `<div class="no-data">Keine Datensätze.</div>`;
+        return;
+      }
+
+      if (currentIndex < 0) currentIndex = 0;
+      if (currentIndex >= items.length) currentIndex = items.length - 1;
+
+      const item = items[currentIndex];
+      const filename = item.filename || "";
+      const imgSrc = `bilder_uploads/${filename}`;
+      console.log("Bild-URL:", imgSrc, "Filename:", filename);
+
+      const confRaw = typeof item.confidence === "number"
+        ? item.confidence
+        : Number(item.confidence || 0);
+      const conf = isNaN(confRaw) ? 0 : confRaw;
+      const confPct = Math.round(conf * 100);
+
+      imageCard.innerHTML = `
+        <img src="${imgSrc}" alt="${filename}" />
+        <div class="meta">
+          <div><strong>taric_live.id:</strong> ${item.taric_live_id ?? item.id ?? "–"}</div>
+          <div><strong>Datei:</strong> ${filename}</div>
+          <div><strong>Erfasst:</strong> ${item.created_at || ""}</div>
+        </div>
+        <div class="codes">
+          <span class="code-pill"><strong>TARIC</strong> ${item.taric_code || "–"}</span>
+          ${item.cn_code ? `<span class="code-pill"><strong>CN</strong> ${item.cn_code}</span>` : ""}
+          ${item.hs_chapter ? `<span class="code-pill"><strong>HS</strong> ${item.hs_chapter}</span>` : ""}
+        </div>
+        <div class="confidence">
+          <span class="label">Confidence:</span>
+          <div class="confidence-bar">
+            <div class="confidence-bar-inner" style="width:${confPct}%;"></div>
+          </div>
+          <span class="confidence-pill">${confPct}%</span>
+        </div>
+        <div class="short-reason">
+          <strong>Begründung:</strong><br />
+          ${item.short_reason || "<span style='color:#9ca3af'>keine Begründung</span>"}
+        </div>
+      `;
+
+      // TARIC-Code ins Eingabefeld spiegeln und automatische Abfrage starten
+      if (item.taric_code) {
+        taricInput.value = item.taric_code;
+        fetchOfficialDescription(item.taric_code);
+      } else {
+        setOfficialStatus("Kein TARIC-Code vorhanden – bitte manuell eingeben.", "error");
+        officialResult.textContent = "Keine Daten.";
+      }
+    }
+
+    async function fetchOfficialDescription(taricCode) {
+      if (!taricCode || taricCode.length !== 10) {
+        setOfficialStatus("Bitte gültigen 10-stelligen TARIC-Code eingeben.", "error");
+        officialResult.textContent = "Keine Daten.";
+        return;
+      }
+
+      setOfficialStatus(`Hole EU-Beschreibung für ${taricCode} …`);
+      officialResult.textContent = "Lade …";
+
+      try {
+        const res = await backendFetch(`/api/taric_official_description/${taricCode}`);
+        const text = await res.text();
+        let json;
+        try {
+          json = JSON.parse(text);
+        } catch {
+          setOfficialStatus(`Antwort kein JSON (HTTP ${res.status})`, "error");
+          officialResult.textContent = text;
+          return;
+        }
+
+        if (!res.ok) {
+          setOfficialStatus(`Fehler: HTTP ${res.status}`, "error");
+        } else {
+          setOfficialStatus("Erfolgreich geladen.", "ok");
+        }
+        officialResult.textContent = JSON.stringify(json, null, 2);
+      } catch (err) {
+        console.error(err);
+        setOfficialStatus("Fehler beim Abrufen.", "error");
+        officialResult.textContent = String(err);
+      }
+    }
+
+    // Event-Handler
+    prevBtn.addEventListener("click", () => {
+      if (!items.length) return;
+      if (currentIndex > 0) {
+        currentIndex--;
+        renderCurrent();
+      }
+    });
+
+    nextBtn.addEventListener("click", () => {
+      if (!items.length) return;
+      if (currentIndex < items.length - 1) {
+        currentIndex++;
+        renderCurrent();
+      }
+    });
+
+    reloadBtn.addEventListener("click", loadData);
+
+    fetchOfficialBtn.addEventListener("click", () => {
+      fetchOfficialDescription(taricInput.value.trim());
+    });
+
+    if (backendModeSelect) {
+      const mode = getBackendMode();
+      backendModeSelect.value = mode;
+      backendModeSelect.addEventListener("change", () => {
+        const newMode = setBackendModeStored(backendModeSelect.value);
+        cloudflareBackendUrlCache = null;
+        setStatus(
+          newMode === "cloudflare"
+            ? "Backend: Cloudflare-Tunnel aktiv. Seite neu laden falls Probleme."
+            : "Backend: lokal (Port 8000)."
+        );
+        loadData();
+      });
+    }
+
+    // Initial load
+    setStatus("Initialisiere …");
+    loadData();
+  </script>
+</body>
+
+</html>

@@ -460,6 +460,49 @@
       border: 1px solid rgba(148, 163, 184, 0.7);
     }
 
+    /* Offizielle TARIC-Beschreibung Panel */
+    .official-taric-panel .panel-header h3 {
+      margin: 0;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .official-taric-panel .panel-body {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 0.9rem;
+    }
+
+    .official-taric-panel .panel-body .label {
+      color: var(--text-muted);
+      margin-right: 6px;
+    }
+
+    .official-taric-panel .description-text {
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      border-radius: 10px;
+      padding: 10px;
+      line-height: 1.4;
+    }
+
+    .official-taric-panel .description-text p {
+      margin: 0;
+    }
+
+    .official-taric-panel .status-message {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin: 4px 0 0 0;
+    }
+
+    .official-taric-panel a {
+      color: #93c5fd;
+    }
+
     @media (max-width: 600px) {
       .header-bar {
         flex-direction: column;
@@ -581,6 +624,32 @@
           <strong>Status:</strong> noch keine Daten geladen.
         </div>
       </section>
+
+      <!-- Offizielle TARIC-Beschreibung -->
+      <section class="panel official-taric-panel">
+        <div class="panel-header">
+          <h3><span class="icon">🇪🇺</span>Offizielle TARIC-Beschreibung</h3>
+        </div>
+        <div class="panel-body">
+          <p>
+            <span class="label">Genutzter Präfix:</span>
+            <strong id="officialTaricPrefix">–</strong>
+            (<span id="officialTaricDigits">4</span> Stellen)
+          </p>
+          <p>
+            <span class="label">Simulationsdatum:</span>
+            <span id="officialTaricSimDate">–</span>
+          </p>
+          <p>
+            <span class="label">Quelle:</span>
+            <a href="#" id="officialTaricSourceUrl" target="_blank" rel="noopener noreferrer">–</a>
+          </p>
+          <div id="officialTaricDescription" class="description-text">
+            <p>Noch keine Daten geladen.</p>
+          </div>
+          <p class="status-message" id="officialTaricStatus"></p>
+        </div>
+      </section>
     </main>
   </div>
 
@@ -697,6 +766,25 @@
     const reviewerGroup = document.getElementById("reviewerGroup");
     const commentGroup = document.getElementById("commentGroup");
     const supervisorGroup = document.getElementById("supervisorGroup");
+
+    const officialTaricPrefixEl = document.getElementById("officialTaricPrefix");
+    const officialTaricDigitsEl = document.getElementById("officialTaricDigits");
+    const officialTaricSimDateEl = document.getElementById("officialTaricSimDate");
+    const officialTaricSourceUrlEl = document.getElementById("officialTaricSourceUrl");
+    const officialTaricDescriptionEl = document.getElementById("officialTaricDescription");
+    const officialTaricStatusEl = document.getElementById("officialTaricStatus");
+
+    // Standard: 8 Stellen (Backend hat Fallback 8 -> 6 -> 4)
+    let currentTaricDigits = 8;
+
+    // Helper: heutiges Datum als YYYYMMDD
+    function getTodayAsSimDate() {
+      const d = new Date();
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, "0");
+      const day = String(d.getDate()).padStart(2, "0");
+      return `${y}${m}${day}`;
+    }
 
     let items = [];
     let currentIndex = 0;
@@ -852,11 +940,102 @@
       selectChip(supervisorChipsContainer, null);
     }
 
+    function resetOfficialPanel() {
+      officialTaricPrefixEl.textContent = "–";
+      officialTaricDigitsEl.textContent = "4";
+      officialTaricSimDateEl.textContent = "–";
+      officialTaricSourceUrlEl.textContent = "–";
+      officialTaricSourceUrlEl.href = "#";
+      officialTaricDescriptionEl.innerHTML = "<p>Noch keine Daten geladen.</p>";
+      officialTaricStatusEl.textContent = "";
+      officialTaricStatusEl.style.color = "";
+    }
+
+    async function fetchOfficialTaricForCurrent(code) {
+      officialTaricDescriptionEl.innerHTML = "<p>EU-Daten werden geladen…</p>";
+      officialTaricStatusEl.textContent = "";
+      officialTaricStatusEl.style.color = "";
+
+      if (!code || code.length !== 10 || !/^\d+$/.test(code)) {
+        officialTaricDescriptionEl.innerHTML =
+          "<p style='color:var(--error);'>Kein gültiger 10-stelliger TARIC-Code verfügbar.</p>";
+        officialTaricStatusEl.textContent = "Abruf nicht gestartet.";
+        officialTaricStatusEl.style.color = "var(--error)";
+        return;
+      }
+
+      const simDate = "20251201"; // für deinen Testfall fix; alternativ: getTodayAsSimDate()
+      // const simDate = getTodayAsSimDate();
+
+      try {
+        const backendBase = await getBackendBaseUrl();
+        const url = new URL(`${backendBase}/api/taric_official_compare`);
+        url.searchParams.set("code", code);
+        url.searchParams.set("digits", String(currentTaricDigits));
+        url.searchParams.set("lang", "de");
+        url.searchParams.set("sim_date", simDate);
+
+        const resp = await fetch(url.toString());
+        const data = await resp.json();
+
+        if (!resp.ok) {
+          const msg = data.error || "Unbekannter Fehler beim EU-Abruf.";
+          officialTaricDescriptionEl.innerHTML =
+            `<p style="color:var(--error);">${msg}</p>`;
+
+          if (data.requested_url) {
+            officialTaricSourceUrlEl.textContent = "EU-TARIC im Browser öffnen";
+            officialTaricSourceUrlEl.href = data.requested_url;
+          } else {
+            officialTaricSourceUrlEl.textContent = "Keine URL";
+            officialTaricSourceUrlEl.removeAttribute("href");
+          }
+
+          officialTaricStatusEl.textContent = `EU-Abruf fehlgeschlagen (Status ${resp.status}).`;
+          officialTaricStatusEl.style.color = "var(--error)";
+          return;
+        }
+
+        officialTaricPrefixEl.textContent = data.used_prefix || code.substring(0, currentTaricDigits);
+        officialTaricDigitsEl.textContent = data.digits ?? currentTaricDigits;
+        officialTaricSimDateEl.textContent = data.sim_date || simDate;
+
+        const urlToShow = data.source_url || data.requested_url || null;
+        if (urlToShow) {
+          officialTaricSourceUrlEl.textContent = "EU-TARIC öffnen";
+          officialTaricSourceUrlEl.href = urlToShow;
+        } else {
+          officialTaricSourceUrlEl.textContent = "Keine URL";
+          officialTaricSourceUrlEl.removeAttribute("href");
+        }
+
+        if (data.official_description) {
+          officialTaricDescriptionEl.innerHTML = `<p>${data.official_description}</p>`;
+          officialTaricStatusEl.textContent = data.from_cache
+            ? "Daten aus Cache geladen."
+            : "Daten direkt von EU-TARIC geladen.";
+          officialTaricStatusEl.style.color = "var(--success)";
+        } else {
+          officialTaricDescriptionEl.innerHTML =
+            "<p style='color:var(--error);'>Keine Beschreibung gefunden.</p>";
+          officialTaricStatusEl.textContent = "EU-TARIC lieferte keinen Text für diesen Präfix.";
+          officialTaricStatusEl.style.color = "var(--error)";
+        }
+      } catch (err) {
+        console.error("Fehler beim Abruf der offiziellen TARIC-Beschreibung:", err);
+        officialTaricDescriptionEl.innerHTML =
+          "<p style='color:var(--error);'>Netzwerkfehler beim Zugriff auf das Backend oder die EU-Seite.</p>";
+        officialTaricStatusEl.textContent = "Netzwerkfehler.";
+        officialTaricStatusEl.style.color = "var(--error)";
+      }
+    }
+
     function renderCurrent() {
       if (!items.length) {
         indexInfo.textContent = "Datensatz 0 / 0";
         imageCard.innerHTML = `<div class="no-data">Keine Datensätze.</div>`;
         clearForm();
+        resetOfficialPanel();
         return;
       }
 
@@ -864,6 +1043,13 @@
       if (currentIndex >= items.length) currentIndex = items.length - 1;
 
       const item = items[currentIndex];
+      if (!item) {
+        officialTaricDescriptionEl.innerHTML =
+          "<p style='color:var(--error);'>Kein Datensatz geladen.</p>";
+        officialTaricStatusEl.textContent = "";
+        return;
+      }
+
       indexInfo.textContent = `Datensatz ${currentIndex + 1} / ${items.length}`;
 
       const filename = item.filename || "";
@@ -908,6 +1094,15 @@
 
       syncCorrectDigitsFromInput();
       syncSupervisorFromInput();
+
+      const taricCode = item.taric_code || item.taric || item.code;
+      if (taricCode) {
+        fetchOfficialTaricForCurrent(taricCode);
+      } else {
+        officialTaricDescriptionEl.innerHTML =
+          "<p style='color:var(--error);'>Kein TARIC-Code im Datensatz vorhanden.</p>";
+        officialTaricStatusEl.textContent = "";
+      }
     }
 
     async function saveCurrent(moveNext) {

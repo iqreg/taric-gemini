@@ -3,13 +3,17 @@ import json
 import sqlite3
 import time
 import traceback
+from datetime import date
 from pathlib import Path
 from typing import Optional, List, Dict, Any
 
-from fastapi import FastAPI, File, UploadFile
+from fastapi import FastAPI, File, UploadFile, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
+
+import httpx
+from bs4 import BeautifulSoup
 
 import google.generativeai as genai
 
@@ -302,6 +306,199 @@ def store_classification(filename: str, data: dict) -> int:
 
 
 # --------------------------------------------------
+# Offizielle TARIC-Referenz (EU) – Cache & Fetch
+# --------------------------------------------------
+
+
+def _extract_official_description_from_html(html: str, taric_prefix: str, digits: int) -> str | None:
+    """
+    Extrahiert aus der TARIC-Consultation-HTML den Beschreibungstext
+    für den angegebenen Präfix (z.B. '8517' bei digits=4).
+
+    Strategie:
+    - Anker-ID = Präfix auf 10 Stellen mit Nullen aufgefüllt (z.B. '8517000000')
+    - Passende Zeile / Container um diesen Anker herum suchen.
+    """
+    if not html:
+        return None
+
+    soup = BeautifulSoup(html, "html.parser")
+
+    anchor_id = taric_prefix.ljust(10, "0")
+    anchor = soup.find(id=anchor_id) or soup.find("a", attrs={"name": anchor_id})
+
+    if anchor:
+        container = anchor.find_parent("tr") or anchor.find_parent("div") or anchor.parent
+        if container:
+            text = " ".join(container.stripped_strings)
+            text = text.replace("\xa0", " ").strip()
+            if text:
+                return text
+
+    texts = soup.find_all(string=lambda s: s and taric_prefix in s)
+    collected = []
+    for t in texts:
+        parent = t.parent
+        if parent:
+            snippet = " ".join(parent.stripped_strings)
+            collected.append(snippet)
+
+    if collected:
+        unique = list(dict.fromkeys(collected))
+        combined = " | ".join(unique)
+        return combined[:4000]
+
+    return None
+
+
+def _get_cached_official_description(
+    taric_prefix: str,
+    digits: int,
+    sim_date: str,
+    lang: str = "de",
+) -> tuple[str | None, str | None]:
+    """
+    Liest vorhandene Daten aus taric_official_cache.
+    Rückgabe: (official_description, source_url) oder (None, None), wenn nichts gefunden.
+    """
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+    cur.execute(
+        """
+        SELECT official_description, source_url
+        FROM taric_official_cache
+        WHERE taric_prefix = ?
+          AND digits = ?
+          AND sim_date = ?
+          AND lang = ?
+        LIMIT 1
+        """,
+        (taric_prefix, digits, sim_date, lang),
+    )
+    row = cur.fetchone()
+    conn.close()
+
+    if row:
+        return row[0], row[1]
+    return None, None
+
+
+def _store_official_description_in_cache(
+    taric_prefix: str,
+    digits: int,
+    sim_date: str,
+    lang: str,
+    official_html: str,
+    official_description: str | None,
+    source_url: str,
+) -> None:
+    """Speichert das Ergebnis im Cache."""
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+    cur.execute(
+        """
+        INSERT INTO taric_official_cache (
+            taric_prefix, digits, sim_date, lang,
+            official_html, official_description, source_url, created_at, last_used_at
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))
+        """,
+        (taric_prefix, digits, sim_date, lang, official_html, official_description, source_url),
+    )
+    conn.commit()
+    conn.close()
+
+
+async def fetch_official_taric_description(
+    full_code: str,
+    digits: int = 4,
+    lang: str = "de",
+    sim_date: str | None = None,
+) -> dict:
+    """
+    Holt die offizielle Beschreibung von der EU-TARIC-Seite:
+    https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp
+
+    - full_code: 10-stelliger TARIC-Code aus deiner Klassifikation
+    - digits: wie viele Stellen als Präfix verwendet werden (z.B. 4 -> '8517')
+    - lang: 'de' (oder 'en' etc.)
+    - sim_date: Simulationsdatum YYYYMMDD; falls None -> heutiges Datum.
+    """
+
+    if not full_code.isdigit() or len(full_code) != 10:
+        return {
+            "error": "TARIC-Code muss 10-stellig und numerisch sein.",
+            "input_code": full_code,
+        }
+
+    if digits not in (4, 6, 8, 10):
+        digits = 4
+
+    taric_prefix = full_code[:digits]
+
+    if sim_date is None:
+        sim_date = date.today().strftime("%Y%m%d")
+
+    cached_desc, cached_url = _get_cached_official_description(
+        taric_prefix=taric_prefix,
+        digits=digits,
+        sim_date=sim_date,
+        lang=lang,
+    )
+    if cached_desc is not None:
+        return {
+            "input_code": full_code,
+            "used_prefix": taric_prefix,
+            "digits": digits,
+            "sim_date": sim_date,
+            "lang": lang,
+            "official_description": cached_desc,
+            "source_url": cached_url,
+            "from_cache": True,
+        }
+
+    base_url = "https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp"
+    params = {
+        "Lang": lang,
+        "Taric": taric_prefix,
+        "Expand": "true",
+        "SimDate": sim_date,
+    }
+
+    requested_url = None
+    async with httpx.AsyncClient(timeout=20.0) as client:
+        resp = await client.get(base_url, params=params)
+        requested_url = str(resp.request.url)
+        resp.raise_for_status()
+        html = resp.text
+
+    official_description = _extract_official_description_from_html(html, taric_prefix, digits)
+    final_url = str(resp.url)
+
+    _store_official_description_in_cache(
+        taric_prefix=taric_prefix,
+        digits=digits,
+        sim_date=sim_date,
+        lang=lang,
+        official_html=html,
+        official_description=official_description,
+        source_url=final_url,
+    )
+
+    return {
+        "input_code": full_code,
+        "used_prefix": taric_prefix,
+        "digits": digits,
+        "sim_date": sim_date,
+        "lang": lang,
+        "official_description": official_description,
+        "source_url": final_url,
+        "requested_url": requested_url or final_url,
+        "from_cache": False,
+    }
+
+
+# --------------------------------------------------
 # FastAPI-App
 # --------------------------------------------------
 
@@ -574,6 +771,90 @@ async def save_evaluation(payload: EvaluationIn):
     return JSONResponse(content={"status": "ok", "evaluation_id": eval_id})
 
 
+@app.get("/api/taric_official_description/{taric_code}")
+async def get_official_description(taric_code: str):
+    """
+    EU-API-TEST: Liefert die offizielle Beschreibung eines 10-stelligen TARIC-Codes
+    aus der lokalen Referenztabelle 'taric_reference'. Tabelle muss vorab mit EU-Daten
+    befüllt sein.
+    """
+    print(f"LOG: [EU-API-TEST] Versuch, offizielle Beschreibung für TARIC-Code: {taric_code} abzurufen.")
+
+    # 1) Eingabe validieren
+    if not taric_code or len(taric_code) != 10 or not taric_code.isdigit():
+        print(
+            f"LOG: [EU-API-TEST] ERROR - Ungültiger Code '{taric_code}'. "
+            "Muss 10-stellig und numerisch sein (400 Bad Request)."
+        )
+        return JSONResponse(
+            status_code=400,
+            content={"error": "Ungültiger TARIC-Code. Muss 10-stellig sein."},
+        )
+
+    conn = get_conn()
+    cur = conn.cursor()
+
+    try:
+        # 2) Lookup in lokaler Referenz-DB
+        cur.execute(
+            """
+            SELECT description_de
+            FROM taric_reference
+            WHERE taric_code = ?
+            LIMIT 1
+            """,
+            (taric_code,),
+        )
+        row = cur.fetchone()
+
+        if row:
+            description = row["description_de"]
+            print(f"LOG: [EU-API-TEST] SUCCESS - Beschreibung für {taric_code} erfolgreich gefunden.")
+            return JSONResponse(
+                content={
+                    "taricCode": taric_code,
+                    "officialDescription": description,
+                    "source": "Local TARIC Reference DB (EU Data)",
+                }
+            )
+
+        print(
+            f"LOG: [EU-API-TEST] WARNING - Code {taric_code} NICHT in 'taric_reference' gefunden (404 Not Found)."
+        )
+        return JSONResponse(
+            status_code=404,
+            content={
+                "error": "Code nicht in lokaler TARIC-Referenztabelle gefunden.",
+                "details": "Referenztabelle (taric_reference) muss mit EU-Daten befüllt werden. "
+                "API-Call kam an, aber der Code fehlt in der DB.",
+            },
+        )
+
+    except sqlite3.OperationalError as e:
+        print(
+            f"LOG: [EU-API-TEST] CRITICAL ERROR - Tabelle 'taric_reference' fehlt in DB. "
+            f"(500 Internal Server Error). Fehler: {e}"
+        )
+        return JSONResponse(
+            status_code=500,
+            content={
+                "error": "Datenbankfehler: Tabelle 'taric_reference' fehlt.",
+                "details": f"Bitte DB-Schema prüfen. Originalfehler: {e}",
+            },
+        )
+    except Exception as e:
+        print(
+            f"LOG: [EU-API-TEST] UNKNOWN ERROR - Unerwarteter Fehler im Endpoint. "
+            f"(500 Internal Server Error). Fehler: {e}"
+        )
+        return JSONResponse(
+            status_code=500,
+            content={"error": "Unerwarteter Serverfehler", "details": str(e)},
+        )
+    finally:
+        conn.close()
+
+
 @app.get("/summary")
 async def summary():
     """
@@ -615,3 +896,61 @@ async def summary():
 async def health():
     """Einfache Health-Check-Route für Monitoring und Tests."""
     return {"status": "ok"}
+
+
+@app.get("/api/taric_official_compare")
+async def taric_official_compare(
+    code: str = Query(..., description="10-stelliger TARIC-Code, z.B. 8517120000"),
+    digits: int = Query(4, description="Präfix-Länge: 4, 6, 8 oder 10"),
+    lang: str = Query("de", description="Sprachcode, z.B. 'de' oder 'en'"),
+    sim_date: str | None = Query(
+        None,
+        description="Simulationsdatum YYYYMMDD; wenn nicht gesetzt, wird das heutige Datum verwendet.",
+    ),
+):
+    """
+    API-Endpoint, der fetch_official_taric_description() aufruft und
+    die offizielle EU-Beschreibung plus Metadaten zurückgibt.
+    """
+
+    try:
+        result = await fetch_official_taric_description(
+            full_code=code,
+            digits=digits,
+            lang=lang,
+            sim_date=sim_date,
+        )
+
+        if "error" in result:
+            return JSONResponse(content=result, status_code=400)
+
+        return JSONResponse(content=result)
+
+    except httpx.HTTPStatusError as e:
+        requested_url = str(e.request.url) if e.request else None
+        return JSONResponse(
+            content={
+                "error": f"HTTP-Fehler beim Abruf der EU-TARIC-Seite: {e.response.status_code} {e.response.reason_phrase}",
+                "input_code": code,
+                "requested_url": requested_url,
+            },
+            status_code=502,
+        )
+    except httpx.HTTPError as e:
+        requested_url = str(e.request.url) if getattr(e, "request", None) else None
+        return JSONResponse(
+            content={
+                "error": f"Netzwerkfehler beim Abruf der EU-TARIC-Seite: {str(e)}",
+                "input_code": code,
+                "requested_url": requested_url,
+            },
+            status_code=502,
+        )
+    except Exception as e:
+        return JSONResponse(
+            content={
+                "error": f"Interner Fehler beim TARIC-Vergleich: {str(e)}",
+                "input_code": code,
+            },
+            status_code=500,
+        )

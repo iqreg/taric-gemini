@@ -1,0 +1,3314 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <html>
+    <head>
+        <title>TARIC-Konsultation</title>
+        <link type="text/css" rel="stylesheet" href="https://ec.europa.eu/taxation_customs/dds2/taric/europa/ddstaric_ecl.css">
+        <link type="text/css" rel="stylesheet" href="https://ec.europa.eu/taxation_customs/dds2/taric/europa/ecl/css/ecl-ec-preset-website.css">
+        <link type="text/css" rel="stylesheet" href="https://ec.europa.eu/taxation_customs/dds2/taric/measures.css">
+        <link type="text/css" rel="stylesheet" href="https://ec.europa.eu/taxation_customs/dds2/taric/goods.css">
+        <link type="text/css" rel="stylesheet" href="https://ec.europa.eu/taxation_customs/dds2/taric/ddstaric.css">
+        <!--[if IE]>
+        <style type="text/css">@import "https://ec.europa.eu/taxation_customs/dds2/taric/ddstaric-ie.css";</style> <![endif]-->
+        
+
+        <script type="text/javascript">
+
+            var myCars = new Array();
+
+            var sectiontree;
+            var chaptertree;
+            var validtariccodes;
+            var areacomboarray;
+            var comboMeasTypArray;
+            var innerDate;
+            var calendarPanel;
+            var overlayTarConsultPanelClicked = true;
+            var browser = navigator.appName;
+            var minCharFTSearch;
+
+            window.onpageshow = function (event) {
+                enableInputFieldsIE();
+            };
+
+            window.onload = function () {
+
+                enableAll();
+
+                setMinCharFTsearch('3');
+                setSelectedCountry('', 'de', buildDate('20251201'));
+                setSelectedMeasType('', 'de', buildDate('20251201'));
+
+                var measTyp = selectMeasType();
+
+                // back button -> form fields can't be filled
+                if (document.taric_form.MeasType.value.length > 0 ||
+                    document.taric_form.textSearch.value.length > 0 ||
+                    document.taric_form.measStartDat.value.length > 0 ||
+                    document.taric_form.measEndDat.value.length > 0 ||
+                    document.taric_form.GoodsText.value.length > 0 ||
+                    document.taric_form.MeasText.value.length > 0 ||
+                    document.taric_form.OrderNum.value.length > 0 ||
+                    document.taric_form.Regulation.value.length > 0 ||
+                    document.taric_form.StartPub.value.length > 0 ||
+                    document.taric_form.EndPub.value.length > 0 ||
+                    (measTyp != null && measTyp.length > 0)) {
+                    showMoreCriteria();
+                }
+
+                if (document.getElementById("taricCode") != null &&
+                    !loadJavascriptValidCodes(document.getElementById("taricCode").value, buildDate('20251201'), validateMeasuresParameters))
+                    validateMeasuresParameters();
+
+                autoSubmit(true);
+                displayRetrieveMeasuresButton();//To avoid flickering, display the retrieve measures after all...
+                if (location.href.indexOf("#") < 0) {
+                    setCursorFocus();
+                } else if (location.href.indexOf("#") == (location.href.length - 1)) {
+                    setCursorFocus();
+                }
+            }
+        </script>
+
+        <script type="text/javascript" src='https://ec.europa.eu/taxation_customs/dds2/taric/nomenclaturebrowser.js'></script>
+        <script type="text/javascript"
+                src='https://ec.europa.eu/taxation_customs/dds2/taric/area_combo/area_combo_de_20251201.js'></script>
+        <script type="text/javascript"
+                src='https://ec.europa.eu/taxation_customs/dds2/taric/meas_type_combo/meas_typ_combo_de_20251201.js'></script>
+        <script type="text/javascript" src='https://ec.europa.eu/taxation_customs/dds2/taric/overlay.js'></script>
+        <script type="text/javascript" src='https://ec.europa.eu/taxation_customs/dds2/taric/util.js'></script>
+        <script type="text/javascript" src='https://ec.europa.eu/taxation_customs/dds2/taric/tabs.js'></script>
+
+
+        
+<script type="text/javascript"><!--
+var keepParam;
+var months = new Array();
+var dateParameterName;
+var fieldContents;
+
+months[0] = "Januar";
+months[1] = "Februar";
+months[2] = "März";
+months[3] = "April";
+months[4] = "Mai";
+months[5] = "Juni";
+months[6] = "Juli";
+months[7] = "August";
+months[8] = "September";
+months[9] = "Oktober";
+months[10] = "November";
+months[11] = "Dezember";
+
+function keyUp(e)
+{
+	validateBeforeQuit();
+}
+
+function validateBeforeQuit()
+{
+  var date = validateInputDate();
+  if(date==null)
+    return false;
+  return true;
+}
+
+function enterKey(e)
+{
+  var keynum
+  var keychar
+  var numcheck
+
+  var enterId = (e.target || e.srcElement).id;
+  
+  if (enterId == "input_day" || enterId == "input_month" || enterId == "input_year")
+  {
+    if(window.event) <!--  IE -->
+    {
+      keynum = e.keyCode
+    } 
+    else if (e.which) <!--  Netscape/Firefox/Opera -->
+    {
+      keynum = e.which
+    }
+    if (keynum==13)
+    {
+      save();
+    }
+  }    
+}
+
+function save()
+{
+  if(!validateBeforeQuit())
+    return;
+  var link = new url(window.location.href);
+  var row;
+  for(row in fieldContents){
+     link.setParameter(fieldContents[row][0],fieldContents[row][1]);
+  }
+  var inputDay = document.getElementById("input_day");
+  var inputMonth = document.getElementById("input_month");
+  var inputYear = document.getElementById("input_year");  
+  var day = inputDay.value;
+  var month = inputMonth.value;
+  var year = inputYear.value;
+  var date = year+""+month+""+day;
+  link.setParameter(dateParameterName,date);
+  window.location.href = link.currentUrl;  
+}
+
+function inputFocus(element)
+{
+	reloadCalendar();
+  element.select(); 
+}
+
+function reloadCalendar()
+{
+  var date = validateInputDate();
+  if(date!=null)
+    reload(date.getTime(), dateParameterName, fieldContents);
+}
+
+function validateInputDate()
+{
+  var valid = true;
+	var inputDay = document.getElementById("input_day");
+  var inputMonth = document.getElementById("input_month");
+  var inputYear = document.getElementById("input_year");  
+  var day = inputDay.value;
+  var month = inputMonth.value;
+  var year = inputYear.value;
+
+  //check if the fields are numeric or not
+  var valid = true;
+  if(!isNumeric(day))
+  {
+    inputDay.style.color = "red";
+    valid = false;
+  }
+  if(!isNumeric(month))
+  {
+    inputMonth.style.color = "red";
+    valid = false;
+  }  
+  
+  if(!validateYear(year))
+  {
+    inputYear.style.color = "red";
+    valid = false;
+  }   
+  if(!valid)
+    return null;
+  
+  //validate all the date
+  var date = isValidDate(year, month, day); 
+  if(date!=null)
+  {
+	  inputDay.style.color = "black";
+	  inputMonth.style.color = "black";
+	  inputYear.style.color = "black";
+	  return date;
+  }
+
+  if(isValidDate(year, month, 1)!=null) //The day is not valid
+  {
+    inputDay.style.color = "red";
+  }
+  else
+  if(isValidDate(year, 1, 1)!=null) //The month is not valid
+  {
+    inputMonth.style.color = "red";
+  }
+  else
+  if(isValidDate(2000, 1, 1)!=null) //The year is not valid
+  {
+    inputYear.style.color = "red";
+  }
+
+  return null;
+}
+
+function validateYear(text)
+{
+	if(!isNumeric(text))
+		return false;
+
+	if(text.length !=4)
+		return false;
+
+	return true;
+}
+
+function isNumeric(text)
+{
+   var validChars = "0123456789";
+   var char;
+ 
+   for (i = 0; i < text.length; i++) 
+   { 
+	   char = text.charAt(i); 
+	   if (validChars.indexOf(char) == -1) 
+	   {
+	     return false;
+	   }
+   }
+   return true;
+}
+
+function reload(timeInMilliseconds, dateParameterName, keepParams)
+{ 
+  this.dateParameterName = dateParameterName;
+  this.fieldContents = keepParams;
+ 
+  loadYear(document.getElementById("year"), document.getElementById("input_year"), timeInMilliseconds)
+  loadMonth(document.getElementById("month"), document.getElementById("input_day"), document.getElementById("input_month"), timeInMilliseconds);
+  loadDays(timeInMilliseconds);
+}
+
+function loadMonth(element, inputZoneDay, inputZoneMonth, timeInMilliseconds)
+{
+  var currentDate = new Date(timeInMilliseconds);
+  
+  clearElement(element);
+
+  if (currentDate.getMonth() > 0)
+  {
+    var month = new Date(timeInMilliseconds);
+    month.setMonth(month.getMonth()-1);
+    var href = document.createElement("a");
+    href.setAttribute("href", "javascript:reload("+month.getTime()+", dateParameterName, fieldContents);");
+    href.setAttribute("onclick", "reload("+month.getTime()+", dateParameterName, fieldContents);");
+    href.appendChild(document.createTextNode("<<"));
+    element.appendChild(href);
+    element.appendChild(document.createTextNode(" "));
+  }
+
+  element.appendChild(document.createTextNode(months[currentDate.getMonth()]));
+
+  var m = ""+(currentDate.getMonth()+1);
+  if(m.length == 1)
+	  m = "0"+m;  
+  var d = ""+(currentDate.getDate());
+  if(d.length == 1)
+    d = "0"+d;  
+  inputZoneMonth.value = m;
+  inputZoneDay.value = d;
+
+  if (currentDate.getMonth() < 11)
+  {
+    element.appendChild(document.createTextNode(" "));
+    var month = new Date(timeInMilliseconds);
+    month.setMonth(month.getMonth()+1);
+    var href = document.createElement("a");
+    href.setAttribute("href", "javascript:reload("+month.getTime()+", dateParameterName, fieldContents);");
+    href.setAttribute("onclick", "reload("+month.getTime()+", dateParameterName, fieldContents);");
+    href.appendChild(document.createTextNode(">>"));
+    element.appendChild(href);
+  }
+}
+
+function loadYear(element, inputZone, timeInMilliseconds)
+{
+  var currentDate = new Date(timeInMilliseconds);
+
+  clearElement(element);
+
+  {
+    var year = new Date(timeInMilliseconds);
+    year.setFullYear(year.getFullYear()-1);
+    var href = document.createElement("a");
+    href.setAttribute("href", "javascript:reload("+year.getTime()+", dateParameterName, fieldContents);");
+    href.setAttribute("onclick", "reload("+year.getTime()+", dateParameterName, fieldContents);");
+
+    href.appendChild(document.createTextNode("<<"));
+    element.appendChild(href);
+    element.appendChild(document.createTextNode(" "));
+  }
+
+  element.appendChild(document.createTextNode(""+currentDate.getFullYear()));
+  inputZone.value = currentDate.getFullYear();
+  {
+    element.appendChild(document.createTextNode(" "));
+    var year = new Date(timeInMilliseconds);
+    year.setFullYear(year.getFullYear()+1);
+    var href = document.createElement("a");
+    href.setAttribute("href", "javascript:reload("+year.getTime()+", dateParameterName, fieldContents);");
+    href.setAttribute("onclick", "reload("+year.getTime()+", dateParameterName, fieldContents);");
+    href.appendChild(document.createTextNode(">>"));
+    element.appendChild(href);
+  }
+}
+
+function loadDays(timeInMilliseconds)
+{
+ 
+  var firstOfMonth = new Date(timeInMilliseconds);
+  firstOfMonth.setDate(1);
+  var week = 0;
+  var month = firstOfMonth.getMonth();
+
+  for (var i = 0; i < 6; i++)
+    for (var j = 0; j < 7; j++)
+      clearElement(document.getElementById("day"+i+""+j));
+
+  for (; firstOfMonth.getDay() < 7 && firstOfMonth.getMonth() == month; firstOfMonth.setDate(firstOfMonth.getDate()+1))
+  {
+    var day = document.getElementById("day"+week+""+firstOfMonth.getDay());
+    var href = document.createElement("a");
+    var date = 
+      firstOfMonth.getFullYear()+
+      (firstOfMonth.getMonth()+1 < 10 ? "0"+(firstOfMonth.getMonth()+1) : ""+(firstOfMonth.getMonth()+1))+
+      (firstOfMonth.getDate() < 10 ? "0"+firstOfMonth.getDate() : ""+firstOfMonth.getDate());
+    
+    var link = new url(window.location.href);
+    link.setParameter(dateParameterName,date);
+	for(row in fieldContents){
+	   link.setParameter(fieldContents[row][0],fieldContents[row][1]);
+	}
+   
+    href.setAttribute("href", link.currentUrl);
+    href.appendChild(document.createTextNode(firstOfMonth.getDate()));
+    day.appendChild(href);
+
+    if (firstOfMonth.getDay() == 0)
+      week++;
+  }
+}
+
+
+function today()
+{
+  var todayDate = new Date();
+
+  reload(todayDate.getTime(), dateParameterName, fieldContents);
+  
+  inputFocus(document.getElementById("input_year"));
+}
+
+function clearElement(element)
+{
+  while (element != null && element.hasChildNodes())
+    element.removeChild(element.lastChild);
+}
+
+--></script>
+
+        <script type="text/javascript">
+
+            function transformPicDate() {
+                var sd = document.getElementById("SimDatePic").value;
+                var splitDate = sd.split("-");
+                var formattedDate = splitDate[2] + splitDate[1] + splitDate[0];
+
+                return formattedDate;
+            }
+
+            function setCursorFocus() {
+                var taric = document.getElementById("taricCode");
+                if (taric == null)
+                    return;
+                taric.focus();
+            }
+
+            function displayRetrieveMeasuresButton() {
+                var button = document.getElementById("action_measures");
+                if (button != null)
+                    button.style.display = "block";
+            }
+
+            function enableInputFieldsIE() {
+                var e = document.getElementsByTagName('input'), i;
+                for (i = 0; i < e.length; ++i) {
+                    e[i].disabled = false;
+                }
+                e = document.getElementsByTagName('textarea');
+                for (i = 0; i < e.length; ++i) {
+                    e[i].disabled = false;
+                }
+            }
+
+            function enableAll() {
+                document.taric_form.goods_radio.disabled = false;
+                document.taric_form.measure_radio.disabled = false;
+                document.taric_form.textSearch.disabled = false;
+                document.taric_form.measStartDat.disabled = false;
+                document.taric_form.measEndDat.disabled = false;
+                document.taric_form.GoodsText.disabled = false;
+                document.taric_form.MeasText.disabled = false;
+                document.taric_form.Area.disabled = false;
+                document.taric_form.AdditionalCode.disabled = false;
+                document.taric_form.MeasType.disabled = false;
+                document.taric_form.OrderNum.disabled = false;
+                document.taric_form.Regulation.disabled = false;
+                document.taric_form.Taric.disabled = false;
+                document.taric_form.StartPub.disabled = false;
+                document.taric_form.EndPub.disabled = false;
+                document.taric_form.LangDescr.disabled = false;
+            }
+
+            function showMoreCriteria() {
+
+                document.getElementById("hide_more_criteria").style.display = "block";
+                document.getElementById("show_more_criteria").style.display = "none";
+                document.getElementById("text_search").style.display = "block";
+                document.getElementById("measure_type_order_number").style.display = "block";
+                //document.getElementById("order_number").style.display = "block";
+                //document.getElementById("pub_start_date_title").style.display = "block";
+                document.getElementById("pub_start_date").style.display = "block";
+                //document.getElementById("regulation_id").style.display = "block";
+            }
+
+            function buildSelectArea(lang, date) {
+                var areacomboarray;
+                var client = getClient();
+                client.open("GET", "area_combo/area_combo_" + lang + "_" + date + ".js", false);
+                client.send(null);
+                eval(client.responseText);
+
+                var selectString = "<select class='ecl-select  ' id='taricArea' ><option id='option_template' value='----------'></option>";
+
+                if (areacomboarray == null) {
+                    document.write(selectString);
+                    return;
+                }
+                var i = 0;
+                var countryTab;
+                for (i = 0; i < areacomboarray.length; i++) {
+                    countryTab = areacomboarray[i];
+                    if (countryTab[0] == "null")
+                        continue;
+
+                    selectString = selectString + "<option id='' value='" + countryTab[0] + "'>" + getCountryText(countryTab[2]) + " - " + getCountryText(countryTab[1]) + "</option>";
+                }
+                selectString = selectString + "</select>";
+                document.write(selectString);
+
+            }
+
+            function setMinCharFTsearch(minChar) {
+                minCharFTSearch = parseInt(minChar);
+            }
+
+            function setSelectedCountry(areaCode, lang, simDate) {
+
+                if (areacomboarray == null) {
+                    return;
+                }
+
+                var select = document.getElementById("taricArea");
+
+                if (select == null)
+                    return;
+                if (select.selectedIndex > 0)
+                    return;
+
+                var i = 0;
+                var countryTab;
+                var copy;
+
+                var selected = 0;
+                if (areaCode.length <= 0)
+                    selected = -1;
+
+                for (i = 0; i < areacomboarray.length; i++) {
+                    countryTab = areacomboarray[i];
+                    if (countryTab[0] == "null")
+                        continue;
+                    if (areaCode == countryTab[0])
+                        selected = i + 1; //The 0 value in the select is reserved for "------" all countries
+                }
+
+                if (selected >= 0)
+                    select.selectedIndex = selected;
+
+            }
+
+            function buildSelectMeasType(lang, date) {
+                var comboMeasTypArray;
+                var client = getClient();
+                client.open("GET", "meas_type_combo/meas_typ_combo_" + lang + "_" + date + ".js", false);
+                client.send(null);
+                eval(client.responseText);
+
+                document.write("<select class='ecl-select' id='measureType' multiple='multiple' size='10' style='padding: 0px'>");
+
+                if (comboMeasTypArray == null)
+                    return;
+
+                var i = 0;
+                var measTypTab;
+                var option = "";
+                var currentGroup = "";
+                var group = "";
+                for (i = 0; i < comboMeasTypArray.length; i++) {
+                    measTypTab = comboMeasTypArray[i];
+                    if (measTypTab[0] == "null")
+                        continue;
+                    if (measTypTab[3] != currentGroup) {
+                        if (currentGroup != "") {
+                            document.write("</optgroup>");
+                        }
+                        currentGroup = measTypTab[3];
+                        group = "<optgroup label='----" + currentGroup + "----'>";
+                        document.write(group);
+                    }
+                    option = "<option id='' value='" + measTypTab[0] + "' title='" + measTypTab[1] + "'>" + measTypTab[1] + "</option>";
+                    document.write(option);
+                }
+                document.write("</optgroup>");
+                document.write("</select>");
+
+            }
+
+            function setSelectedMeasType(masTypeId, lang, simDate) {
+
+                if (comboMeasTypArray == null)
+                    return;
+
+                var select = document.getElementById("measureType");
+                if (select == null)
+                    return;
+                if (select.selectedIndex > 0)
+                    return;
+
+                var i = 0;
+                var measTypTab;
+                var copy;
+
+                var selected = 0;
+                if (masTypeId.length <= 0)
+                    selected = -1;
+
+                setSelectValues(select, masTypeId);
+                /*if(selected >=0)
+                  select.selectedIndex=selected;*/
+
+            }
+
+            function getCountryText(text) {
+                if (text == null)
+                    return "";
+                if (text == "null")
+                    return "";
+                return text;
+            }
+
+            function mouseover(elementId) {
+                var elem = document.getElementById(elementId);
+                var className = elem.className;
+                className = "mouseover " + className;
+                elem.className = className;
+
+                var imgElem = document.getElementById(elementId + "img");
+                if (imgElem != null) {
+
+                    var style = imgElem.style.cssText;
+                    style = style.replace(/visibility:\s*hidden/i, "visibility: visible");
+
+                    imgElem.style.cssText = style;
+                }
+            }
+
+            function mouseout(elementId) {
+                var elem = document.getElementById(elementId);
+                var className = elem.className;
+                className = className.replace(/mouseover/gi, "");
+                elem.className = className;
+
+                var imgElem = document.getElementById(elementId + "img");
+                if (imgElem != null) {
+
+                    var style = imgElem.style.cssText;
+                    style = style.replace(/visibility:\s*visible/i, "visibility: hidden");
+
+                    imgElem.style.cssText = style;
+                }
+            }
+
+            function typeEnterKey(event) {
+                var enterId = (event.target || event.srcElement).id;
+
+                if (enterId == "taricCode") {
+                    var browseNomenclature = document.getElementById("taricCode").value.length != 10;
+                    if (browseNomenclature)
+                        browseClick();
+                    else
+                        searchButClick();
+                    return;
+                }
+
+                if (enterId == "taricArea" || enterId == "textSearch" || enterId == "measureType"
+                    || enterId == "OrderNum" || enterId == "measStartDat" ||
+                    enterId == "measEndDat" || enterId == "regulation") searchButClick();
+            }
+
+            function searchButClick() {
+                document.taric_form.SimDate.value = transformPicDate();
+                document.taric_form.method = "get";
+                if (!loadJavascriptValidCodes(document.getElementById("taricCode").value, buildDate(document.taric_form.SimDate.value), submitRequestMeasures)) {
+                    submitRequestMeasures();
+                }
+            }
+
+            function submitRequestMeasures() {
+                if (validateMeasuresParameters())
+                    showMeasuresPage();
+            }
+
+            function showErrorMessage(errDivName) {
+                var errDesc = document.getElementById(errDivName);
+                if (errDesc != null)
+                    errDesc.style.display = "block";
+            }
+
+            function hideErrorMessage(errDivName) {
+                var errDesc = document.getElementById(errDivName);
+                if (errDesc != null)
+                    errDesc.style.display = "none";
+            }
+
+            function validatePicDate() {
+                var regex = /^(0[1-9]|[12][0-9]|3[01])[- /.](0[1-9]|1[012])[- /.](19|20)\d\d$/;
+                var picdate = document.getElementById("SimDatePic").value;
+                var splitPicDate = picdate.split('-');
+                var newPicDate = new Date(splitPicDate[2], splitPicDate[1] - 1, splitPicDate[0]);
+                var currentdate = new Date();
+
+                if (newPicDate.valueOf() < currentdate.valueOf() && regex.test(picdate)) {
+                    return true;
+                } else {
+                    return false;
+                }
+
+            }
+
+            function validateAdditionalCodeLength() {
+                var additionalCode = document.getElementById("AdditionalCode").value;
+
+                if (additionalCode.length<4 && additionalCode.length>0 ) {
+                    showErrorMessage("error_additional_code");
+                    return false;
+                }
+                hideErrorMessage("error_additional_code");
+                return true;
+            }
+
+            function validateMeasuresCountry(areaCode) {
+                if (areaCode == null || areaCode.length <= 0) {
+                    hideErrorMessage("error_country_not_valid");
+                    return true;
+                }
+                if (areacomboarray == null) {
+                    showErrorMessage("error_country_not_valid");
+                    return false;
+                }
+
+                var i = 0;
+                var countryTab;
+                var copy;
+                var select = document.getElementById("taricArea");
+                if (select == null)
+                    return false;
+                var selected = 0;
+                if (areaCode.length <= 0)
+                    selected = -1;
+
+                for (i = 0; i < areacomboarray.length; i++) {
+                    countryTab = areacomboarray[i];
+                    if (countryTab[0] == "null")
+                        continue;
+                    if (areaCode == countryTab[0]) {
+                        hideErrorMessage("error_country_not_valid");
+                        return true;
+                    }
+                }
+                showErrorMessage("error_country_not_valid");
+                return false;
+            }
+
+            function validateMeasuresType(measType) {
+                if (measType == null || measType.length <= 0) {
+                    hideErrorMessage("error_meas_type_not_valid");
+                    return true;
+                }
+                if (comboMeasTypArray == null) {
+                    showErrorMessage("error_meas_type_not_valid");
+                    return false;
+                }
+
+                var i = 0;
+                var j = 0;
+                var measTypTab;
+                var copy;
+                var select = document.getElementById("measureType");
+                if (select == null)
+                    return false;
+                var selected = 0;
+                if (measType.length <= 0)
+                    selected = -1;
+
+                for (i = 0; i < comboMeasTypArray.length; i++) {
+                    measTypTab = comboMeasTypArray[i];
+                    if (measTypTab[0] == "null")
+                        continue;
+                    for (j = 0; j < measType.length; j++) {
+                        if (measType[j] == measTypTab[0]) {
+                            hideErrorMessage("error_meas_type_not_valid");
+                            return true;
+                        }
+                    }
+                }
+                showErrorMessage("error_meas_type_not_valid");
+                return false;
+            }
+
+            /**
+             * This function validates the input parameters in order to display the error messages at the page load level
+             **/
+            function validateMeasuresParameters() {
+                var status = true;
+
+                hideErrorMessage("error_taric_code_not_valid");
+                hideErrorMessage("error_taric_code_format");
+                hideErrorMessage("error_country_not_valid");
+                hideErrorMessage("error_search_text_empty");
+                hideErrorMessage("error_search_text_operand");
+                hideErrorMessage("error_search_text_quote");
+                hideErrorMessage("error_search_text_fulltext");
+                hideErrorMessage("error_meas_type_not_valid");
+                hideErrorMessage("error_order_number_format");
+                hideErrorMessage("error_regulation_format");
+                hideErrorMessage("error_meas_date");
+                hideErrorMessage("error_meas_date_range");
+                hideErrorMessage("error_simulation_date");
+                hideErrorMessage("error_additional_code");
+
+                if (!validatePicDate()) {
+                    showErrorMessage("error_simulation_date");
+                    //status = false;
+                }
+
+                if (!validateAdditionalCodeLength()) {
+                	status = false;
+                };
+
+                var taricCode = document.getElementById("taricCode").value;
+
+                if (taricCode != null && taricCode.length > 0) {
+                    if (taricCode.length % 2 != 0) {
+                        showErrorMessage("error_taric_code_format");
+                        status = false;
+                    } else if (!isNumeric(taricCode)) {
+                        showErrorMessage("error_taric_code_format");
+                        status = false;
+                    } else if (!isTaricCodeValid(taricCode)) {
+                        showErrorMessage("error_taric_code_not_valid");
+                        status = false;
+                    }
+                }
+
+                var text = document.getElementById("textSearch").value;
+
+                if (text != null && text.length > 0) {
+                    if (text.split(' ').join('') == '') {
+                        showErrorMessage("error_search_text_empty");
+                        status = false;
+                    }
+
+                    var ts = text.split(/ and| or/i);
+
+                    for (var i = 0; i < ts.length; i++) {
+                        if (ts[i].split(' ').join('') == '') {
+                            showErrorMessage("error_search_text_operand");
+                            status = false;
+                        }
+                    }
+
+                    if (text.split('\"').length % 2 == 0 || text.search('\"\"') != -1) {
+                        showErrorMessage("error_search_text_quote");
+                        status = false;
+                    }
+
+                    if (text.indexOf("%") > -1) {
+                        clearText = replaceAll('%|_', '', text);
+                        if (clearText.length < minCharFTSearch) {
+                            showErrorMessage("error_search_text_fulltext");
+                            status = false;
+                        }
+                    }
+
+                }
+
+                var orderNum = document.getElementById("OrderNum").value;
+
+                if (orderNum != null && orderNum.length > 6) {
+                    showErrorMessage("error_order_number_format");
+                    status = false;
+                }
+
+                var regulation = document.getElementById("regulation").value;
+
+                if (regulation != null && regulation.length > 0) {
+                    regulation = regulation.toUpperCase();
+
+                    if (!regulation.match("[A-Z]\\d{4}/\\d{2}$")) {
+                        showErrorMessage("error_regulation_format");
+                        status = false;
+                    }
+                }
+
+                if (!validateMeasuresCountry(selectCountry()) || !validateMeasuresType(selectMeasType())) status = false;
+
+                if (!validateMeasureStartDateInterval()) {
+                    status = false;
+                }
+
+                return status;
+            }
+
+            function replaceAll(find, replace, str) {
+                return str.replace(new RegExp(find, 'g'), replace);
+            }
+
+            function validateMeasureStartDateInterval() {
+                var valid = true;
+                var start = document.getElementById("measStartDat").value;
+                var end = document.getElementById("measEndDat").value;
+
+                if (start.length > 0) {
+                    var date = validateDateFormat(start);
+                    if (date != null) {
+                        document.taric_form.StartPub.value = formatDateParam(date);
+                    } else {
+                        document.taric_form.StartPub.value = "";
+                        valid = false;
+                    }
+                } else
+                    document.taric_form.StartPub.value = "";
+
+                if (end.length > 0) {
+                    var date = validateDateFormat(end);
+                    if (date != null) {
+                        document.taric_form.EndPub.value = formatDateParam(date);
+                    } else {
+                        document.taric_form.EndPub.value = "";
+                        valid = false;
+                    }
+                } else
+                    document.taric_form.EndPub.value = "";
+
+                if (!valid) showErrorMessage("error_meas_date");
+
+                if (valid && start.length > 0 && end.length > 0) {
+                    if (getDate(start) > getDate(end)) {
+                        showErrorMessage("error_meas_date_range");
+                        valid = false;
+                    }
+                }
+
+                return valid;
+            }
+
+            /**
+             **  Load the javascript files containing the valid taric codes.
+             **  after is the method of the after call.
+             **  Return true if the file is successfully loaded.
+             **
+             **/
+            function loadJavascriptValidCodes(taricCode, simDate, after) {
+
+                if (taricCode == null || taricCode.length < 1) {
+                    afterCall = after;
+                    if (afterCall != null)
+                        afterCall();
+                    return true;
+                }
+
+                if (!isNumeric(taricCode) || taricCode.length % 2 != 0) {
+                    return false;
+                }
+
+                var chapter = taricCode.substring(0, 2);
+                if (chapter == null)
+                    return false;
+
+                afterCall = after;
+                var client = getClient();
+                client.open("GET", "validtariccodes/valid_taric_codes_" + chapter + "_" + simDate + ".js", false);
+                client.send(null);
+                eval(client.responseText);
+                if (afterCall != null)
+                    afterCall();
+                return true;
+            }
+
+            function isTaricCodeValid(taricCode) {
+
+                while (taricCode.length < 10) {
+                    taricCode = taricCode + "0";
+                }
+
+                if (validtariccodes == null)
+                    return true;
+
+                for (var i = 0; i < validtariccodes.length; i++) {
+                    if (validtariccodes[i] == taricCode)
+                        return true;
+                }
+
+                return false;
+            }
+
+            function showMeasuresPage() {
+				var link = new url("measures.jsp");				
+
+                document.taric_form.SimDate.value = transformPicDate();
+
+                var textSearch = document.getElementById("textSearch").value;
+
+                if (textSearch.length > 0) {
+                    //if (document.getElementById("goods_radio").checked) {
+                    document.taric_form.GoodsText.value = textSearch;
+                    document.taric_form.MeasText.value = "";
+                    /*    }
+                     else {
+                        document.taric_form.MeasText.value = textSearch;
+                        document.taric_form.GoodsText.value = "";
+                      }*/
+                } else {
+                    document.taric_form.MeasText.value = "";
+                    document.taric_form.GoodsText.value = "";
+                }
+
+
+                var area = selectCountry();
+                if (area != null && area.length > 0) {
+                    link.setParameter("Area", area);
+                }
+                document.taric_form.Area.value = area;
+
+                var measTyp = selectMeasType();
+                if (measTyp != null && measTyp.length > 0) {
+                    link.setParameter("MeasType", measTyp);
+                }
+                document.taric_form.MeasType.value = measTyp;
+
+                /**
+                var measTyp = selectMeasType();
+                if (measTyp != null && measTyp.length > 0) {
+                    link.setParameter("MeasType", measTyp);
+                }
+                document.taric_form.MeasType.value = measTyp;
+                **/
+
+                // disbale to not submit
+                disableElement(document.taric_form.goods_radio);
+                disableElement(document.taric_form.measure_radio);
+                disableElement(document.taric_form.textSearch);
+                disableElement(document.taric_form.measStartDat);
+                disableElement(document.taric_form.measEndDat);
+                if (document.taric_form.GoodsText.value.length <= 0) disableElement(document.taric_form.GoodsText);
+                if (document.taric_form.MeasText.value.length <= 0) disableElement(document.taric_form.MeasText);
+                if (document.taric_form.Area.value.length <= 0) disableElement(document.taric_form.Area);
+                if (document.taric_form.AdditionalCode.value.length <= 0) disableElement(document.taric_form.AdditionalCode);
+                if (document.taric_form.MeasType.value.length <= 0) disableElement(document.taric_form.MeasType);
+                if (document.taric_form.OrderNum.value.length <= 0) disableElement(document.taric_form.OrderNum);
+                if (document.taric_form.Regulation.value.length <= 0) disableElement(document.taric_form.Regulation);
+                if (document.taric_form.Taric.value.length <= 0) disableElement(document.taric_form.Taric);
+                if (document.taric_form.StartPub.value.length <= 0) disableElement(document.taric_form.StartPub);
+                if (document.taric_form.EndPub.value.length <= 0) disableElement(document.taric_form.EndPub);
+
+
+                link.removeParameter("DocId");
+                document.taric_form.action = link.currentUrl;
+
+                var hiddenSubmitBtn = document.getElementById("hidden.retrieve.measures");
+
+                hideErrorMessage("error_country_not_valid");
+                hideErrorMessage("error_taric_code_not_valid");
+                hideErrorMessage("error_taric_code_format");
+                hideErrorMessage("error_meas_type_not_valid");
+                hideErrorMessage("error_order_number_format");
+                hideErrorMessage("error_regulation_format");
+
+                if (hiddenSubmitBtn.click) {
+                    enableInputFieldsIE();
+                    hiddenSubmitBtn.click();
+                } else {
+                    enableInputFieldsIE();
+                    document.taric_form.submit();
+                }
+            }
+
+            function showGoodsPage() {
+                var link = new url("goods.jsp");
+
+                document.taric_form.SimDate.value = transformPicDate();
+                var textSearch = document.getElementById("textSearch").value;
+
+                if (textSearch.length > 0) {
+                    document.taric_form.GoodsText.value = textSearch;
+                    document.taric_form.MeasText.value = "";
+                } else {
+                    document.taric_form.MeasText.value = "";
+                    document.taric_form.GoodsText.value = "";
+                }
+
+                var area = selectCountry();
+                if (area != null && area.length > 0) {
+                    link.setParameter("Area", area);
+                }
+                document.taric_form.Area.value = area;
+
+                // disbale to not submit
+                disableElement(document.taric_form.goods_radio);
+                disableElement(document.taric_form.measure_radio);
+                disableElement(document.taric_form.textSearch);
+                disableElement(document.taric_form.measStartDat);
+                disableElement(document.taric_form.measEndDat);
+                if (document.taric_form.GoodsText.value.length <= 0) disableElement(document.taric_form.GoodsText);
+                if (document.taric_form.MeasText.value.length <= 0) disableElement(document.taric_form.MeasText);
+                if (document.taric_form.Area.value.length <= 0) disableElement(document.taric_form.Area);
+                if (document.taric_form.MeasType.value.length <= 0) disableElement(document.taric_form.MeasType);
+                if (document.taric_form.OrderNum.value.length <= 0) disableElement(document.taric_form.OrderNum);
+                if (document.taric_form.Regulation.value.length <= 0) disableElement(document.taric_form.Regulation);
+                if (document.taric_form.Taric.value.length <= 0) disableElement(document.taric_form.Taric);
+                if (document.taric_form.StartPub.value.length <= 0) disableElement(document.taric_form.StartPub);
+                if (document.taric_form.EndPub.value.length <= 0) disableElement(document.taric_form.EndPub);
+
+
+                link.removeParameter("DocId");
+                document.taric_form.action = link.currentUrl;
+
+                hideErrorMessage("error_country_not_valid");
+                hideErrorMessage("error_taric_code_not_valid");
+                hideErrorMessage("error_taric_code_format");
+                hideErrorMessage("error_meas_type_not_valid");
+                hideErrorMessage("error_order_number_format");
+                hideErrorMessage("error_regulation_format");
+
+                enableInputFieldsIE();
+                document.taric_form.submit();
+            }
+
+            function disableElement(element) {
+
+                element.disabled = true;
+            }
+
+            function browseClick() {
+                var goodsText = document.getElementById("textSearch").value;
+                if (goodsText == null || goodsText.trim().length == 0) {
+                    var link = new url("taric_consultation.jsp");
+                    link.setParameter("Lang", "de");
+                    var langDescr = '';
+                    if (langDescr != '')
+                        link.setParameter("LangDescr", langDescr);
+
+                    var code = document.getElementById("taricCode").value;
+                    link.setParameter("Taric", code);
+                    link.setParameter("Area", selectCountry());
+                    link.setParameter("AdditionalCode", document.getElementById("AdditionalCode").value);
+
+                    //if (document.getElementById("goods_radio").checked)
+                    link.setParameter("GoodsText", document.getElementById("textSearch").value);
+                    //else
+                    //  link.setParameter("MeasText",document.getElementById("textSearch").value);
+                    link.setParameter("OrderNum", document.getElementById("OrderNum").value);
+                    link.setParameter("StartPub", document.getElementById("measStartDat").value);
+                    link.setParameter("EndPub", document.getElementById("measEndDat").value);
+                    link.setParameter("Regulation", document.getElementById("regulation").value);
+                    link.setParameter("Expand", "true");
+                    link.setParameter("SimDate", transformPicDate());
+                    var measTyp = selectMeasType();
+                    if (measTyp != null && measTyp.length > 0) {
+                        link.setParameter("MeasType", measTyp);
+                    }
+
+                    if (code != null && code.length > 0) {
+                        link.currentUrl += "#" + code;
+                        for (var i = 0; i < 10 - code.length; i++) {
+                            link.currentUrl += "0";
+                        }
+                    }
+					//link.currentUrl += "#searchedGoods";
+
+                    window.location.href = link.currentUrl;
+                } else {
+                    showGoodsPage();
+                }
+            }
+
+            function showNomenclatureBrowser() {
+                showPanel("nomenclaturebrowser.jsp", setValue, onOverlayLoad, "error_descr");
+            }
+
+            function switchQueryVisibility() {
+
+
+                var query1El = document.getElementById("text_search");
+                var query2El = document.getElementById("measure_type_order_number");
+                //var query3El = document.getElementById("order_number");
+                var query4El = document.getElementById("pub_start_date");
+                //var query5El = document.getElementById("pub_start_date_title");
+                //var query6El = document.getElementById("regulation_id");
+
+
+                var advancedLabel = document.getElementById("advancedLabel");
+
+
+                if (isVisible(query1El)) {
+
+                    setInvisible(query1El);
+                    setInvisible(query2El);
+                    //setInvisible(query3El);
+                    setInvisible(query4El);
+                    //setInvisible(query5El);
+                    //setInvisible(query6El);
+
+                    document.taric_form.MeasType.value = "";
+                    document.getElementById("measureType").selectedIndex = 0;
+                    document.taric_form.textSearch.value = "";
+                    document.taric_form.measStartDat.value = "";
+                    document.taric_form.measEndDat.value = "";
+                    document.taric_form.GoodsText.value = "";
+                    document.taric_form.MeasText.value = "";
+                    document.taric_form.OrderNum.value = "";
+                    document.taric_form.Regulation.value = "";
+                    document.taric_form.StartPub.value = "";
+                    document.taric_form.EndPub.value = "";
+
+                    document.getElementById("hide_more_criteria").style.display = "none";
+                    document.getElementById("show_more_criteria").style.display = "block";
+
+                    var link = new url(window.location.href);
+                    link.removeParameter("MeasType");
+                    link.removeParameter("GoodsText");
+                    link.removeParameter("MeasText");
+                    link.removeParameter("OrderNum");
+                    link.removeParameter("StartPub");
+                    link.removeParameter("EndPub");
+                    link.removeParameter("Regulation");
+                    window.location.href = link.currentUrl;
+
+                } else {
+
+                    setVisible(query1El);
+                    setVisible(query2El);
+                    //setVisible(query3El);
+                    setVisible(query4El);
+                    //setVisible(query5El);
+                    //setVisible(query6El);
+
+                    document.getElementById("hide_more_criteria").style.display = "block";
+                    document.getElementById("show_more_criteria").style.display = "none";
+                }
+            }
+
+            function lastWeek() {
+                var startEl = document.getElementById("measStartDat");
+                var endEl = document.getElementById("measEndDat");
+
+                var startDate = new Date();
+                startDate.setDate(startDate.getDate() - 7);
+
+                var today = new Date();
+                startEl.value = formatDate(startDate);
+                endEl.value = formatDate(today);
+
+                document.taric_form.StartPub.value = formatDateParam(startDate);
+                document.taric_form.EndPub.value = formatDateParam(today);
+            }
+
+            function lastMonth() {
+                var startEl = document.getElementById("measStartDat");
+                var endEl = document.getElementById("measEndDat");
+
+                var startDate = new Date();
+                startDate.setMonth(startDate.getMonth() - 1);
+
+                var today = new Date();
+                startEl.value = formatDate(startDate);
+                endEl.value = formatDate(today);
+
+                document.taric_form.StartPub.value = formatDateParam(startDate);
+                document.taric_form.EndPub.value = formatDateParam(today);
+            }
+
+
+            function formatDate(date) {
+                var day = date.getDate() + "";
+                var month = date.getMonth() + 1 + "";
+                var year = date.getFullYear();
+                while (day.length < 2) day = "0" + day;
+                while (month.length < 2) month = "0" + month;
+                return (day + "-" + month + "-" + year);
+            }
+
+
+            function formatDateParam(date) {
+                var day = date.getDate() + "";
+                var month = date.getMonth() + 1 + "";
+                var year = date.getFullYear();
+                while (day.length < 2) day = "0" + day;
+                while (month.length < 2) month = "0" + month;
+                return (year + month + day);
+            }
+        </script>
+
+        <script type="text/javascript">
+            /**
+             * Callback function for the overlay panel
+             */
+            function setValue(value) {
+                document.getElementById("taricCode").value = value[0];
+                document.getElementById("level").value = value[1];
+                setInvisible(document.getElementById("overlayPanel"));
+            }
+
+            /**
+             * Function called when overlay window is called
+             */
+            function beforeOverlay() {
+                <!--  document.getElementById("taric_consultation").style.visibility="hidden";-->
+            }
+
+            /**
+             * Function called when overlay window is loaded
+             */
+            function onOverlayLoad() {
+
+                if (document.getElementById("measure_description_tree") != null) {
+                    selectTaricCodeForMeasureDescription('de',
+                        document.getElementById("taricCode").value,
+                        document.getElementById("level").value,
+                        document.getElementById("simDate").value);
+                } else {
+                    selectTaricCode('de',
+                        document.getElementById("taricCode").value,
+                        '',
+                        document.getElementById("simDate").value,
+                        '', '', document.getElementById("textSearch").value);
+                }
+                // We must wait until the overlay panel is fully loaded to jump to the target anchor
+                if (location.href.indexOf("#") > -1) {
+                    if (browser == "Microsoft Internet Explorer") {
+                        var anchor = location.href.substring(location.href.indexOf("#"), location.href.length);
+                        if (anchor.length > 1) {
+                            anchor = anchor.substring(1, anchor.length);
+                            var position = getElementPosition(document.getElementById(anchor));
+                            scroll(position.left, position.top);
+                        }
+                    } else {
+                        window.location.href = location.href;
+                    }
+                }
+            }
+
+            function getElementPosition(el) {
+                var _x = 0;
+                var _y = 0;
+                while (el && !isNaN(el.offsetLeft) && !isNaN(el.offsetTop)) {
+                    _x += el.offsetLeft - el.scrollLeft;
+                    _y += el.offsetTop - el.scrollTop;
+                    el = el.parentNode;
+                }
+                return {top: _y, left: _x};
+            }
+
+
+            /**
+             * Function called when overlay window is return (after setValue)
+             */
+            function afterOverlay() {
+                window.location.href = window.location.href;
+            }
+
+            function autoSubmit(submitted) {
+
+                if (submitted != true) return;
+
+                showNomenclatureBrowser();
+            }
+
+            function showCalendarForStartPub(dateParameterName, language, event) {
+                var date = validateDateFormat(document.getElementById("measStartDat").value);
+                if (date == null)
+                    date = new Date();
+                showCalendarForGoods(formatDateParam(date), dateParameterName, language, event);
+            }
+
+            function showCalendarForEndPub(dateParameterName, language, event) {
+                var date = validateDateFormat(document.getElementById("measEndDat").value);
+                if (date == null)
+                    date = new Date();
+                showCalendarForGoods(formatDateParam(date), dateParameterName, language, event);
+            }
+
+            function showCalendarForGoods(dateStr, dateParameterName, language, event) {
+                var keepParam = new Array();
+                var i = 0;
+
+                if (document.getElementById("taricCode")) {
+                    keepParam[i] = new Array();
+                    keepParam[i][0] = "Taric";
+                    keepParam[i][1] = document.getElementById("taricCode").value;
+                    i++;
+
+                    keepParam[i] = new Array();
+                    keepParam[i][0] = "Area";
+                    keepParam[i][1] = selectCountry();
+                    i++;
+
+                    keepParam[i] = new Array();
+                    keepParam[i][0] = "MeasType";
+                    keepParam[i][1] = selectMeasType();
+                    i++;
+
+                    keepParam[i] = new Array();
+                    keepParam[i][0] = "GoodsText";
+                    keepParam[i][1] = document.getElementById("textSearch").value;
+                    i++;
+
+                    keepParam[i] = new Array();
+                    keepParam[i][0] = "OrderNum";
+                    keepParam[i][1] = document.getElementById("OrderNum").value;
+                    i++;
+
+                    if (dateParameterName != "StartPub") {
+                        keepParam[i] = new Array();
+                        keepParam[i][0] = "StartPub";
+                        var date = validateDateFormat(document.getElementById("measStartDat").value);
+                        if (date != null) {
+                            keepParam[i][1] = formatDateParam(date);
+                            document.taric_form.StartPub.value = formatDateParam(date);
+                        } else {
+                            keepParam[i][1] = "";
+                            document.taric_form.StartPub.value = "";
+                        }
+                        i++;
+                    }
+
+                    if (dateParameterName != "EndPub") {
+                        keepParam[i] = new Array();
+                        keepParam[i][0] = "EndPub";
+                        var date = validateDateFormat(document.getElementById("measEndDat").value);
+                        if (date != null) {
+                            keepParam[i][1] = formatDateParam(date);
+                            document.taric_form.EndPub.value = formatDateParam(date);
+                        } else {
+                            keepParam[i][1] = "";
+                            document.taric_form.EndPub.value = "";
+                        }
+                        i++;
+                    }
+
+                    keepParam[i] = new Array();
+                    keepParam[i][0] = "Regulation";
+                    keepParam[i][1] = document.getElementById("regulation").value;
+                    i++;
+
+                    var langDescr = '';
+                    if (langDescr != "") {
+                        keepParam[i] = new Array();
+                        keepParam[i][0] = "LangDescr";
+                        keepParam[i][1] = langDescr;
+                        i++;
+                    }
+                }
+                showTaricConsultationCalendar(dateStr, dateParameterName, language, event, keepParam);
+            }
+            
+            function setReferenceDate() {
+            	var newSimDate = transformPicDate();
+            	if (!validatePicDate()) {
+                    showErrorMessage("error_simulation_date");
+                } else {
+                	hideErrorMessage("error_simulation_date");
+                }
+            	/*if (newSimDate != 20251201) {
+            		window.location = "taric_consultation.jsp?Lang=de&SimDate="+newSimDate;
+            	}*/
+            }
+			
+			/*
+			function setReferenceDate() {
+            	var newSimDate = transformPicDate();
+            	if (newSimDate != 20251201) {
+					var queryParams = new URLSearchParams(window.location.search);
+					queryParams.set("SimDate",newSimDate);
+					
+            		window.location = "taric_consultation.jsp?"+queryParams.toString();
+            	}
+            }
+			*/
+        </script>
+
+    </head>
+    <body onclick="closeTarConsultOverlayPanels(event);" style="background-color: #FFFFFF;" class="yui-skin-sam">
+    <a name="top"></a>
+    <div class="layout" id="layout">
+        
+        
+        
+            
+            
+            
+            
+            
+            
+            <div>
+                
+                <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+
+
+
+
+
+
+
+
+    
+    
+    
+    
+
+
+
+
+
+
+
+
+
+
+
+    <script type="text/javascript" src="//europa.eu/webtools/load.js"></script>
+
+    <script type='application/json'>{"utility":"piwik","siteID":"335","sitePath":["ec.europa.eu\/1taxation_customs"],"siteSection":"dds2","is404":false}</script>
+
+
+
+<script type="text/javascript" src='https://ec.europa.eu/taxation_customs/dds2/taric/europa/js/language.js'></script>
+
+
+        <script type="text/javascript" src="https://ec.europa.eu/wel/cookie-consent/consent.js" ></script>
+
+
+
+<!--banner -->
+
+
+
+<!-- Defect#CUSTD00032674 fix changes - START-->
+
+
+<html xml:lang="en">
+<head>
+    <meta name="application" content="DDS2-TARIC"/>
+<meta name="version" content="3.9.1.1"/>
+
+<!-- Defect# CUSTD00024730 Start -->
+<!-- IPG Rule requires the following 7 metatags in all application pages. Additional metatags e.g. version and application can be added if required by the application. -->
+<meta http-equiv="Content-Language" content="de">
+<meta name="description" content="DDS2-TARIC Application page">
+<meta name="reference" content="DDS2-TARIC Reference">
+<meta name="creator" content="DG-TAXUD">
+<meta name="classification" content="DDS2-TARIC">
+<meta name="keywords" content="DDS2-TARIC, TARIC, DDS2">
+<meta name="date" content="">
+<meta http-equiv="Cache-control" content="public">
+<!-- Defect# CUSTD00024730 End -->
+    <meta charset="utf-8"/>
+    <meta content="width=device-width,initial-scale=1" name="viewport"/>
+    <meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+    <title>Header</title>
+    <link type="text/css" rel="stylesheet" href="https://ec.europa.eu/taxation_customs/dds2/taric/europa/ddstaric_ecl.css">
+    <script>var contextPath = "/taxation_customs/dds2/taric";</script>
+
+<script type="text/javascript" src='https://ec.europa.eu/taxation_customs/dds2/taric/europa/js/ec.js'></script>
+
+<link type="text/css" rel="stylesheet" href="https://ec.europa.eu/taxation_customs/dds2/taric/europa/ecl/css/ecl-ec-preset-website.css" media="screen">
+<link type="text/css" rel="stylesheet" href="https://ec.europa.eu/taxation_customs/dds2/taric/europa/ecl/css/ecl-ec-preset-website-print.css" media="print">
+<script type="text/javascript" src="https://ec.europa.eu/taxation_customs/dds2/taric/europa/ecl/scripts/ecl-ec-preset-website.js"></script>
+<script type="text/javascript">
+        function getClient()
+        {
+            var xmlhttp=null;
+            try
+            {
+                xmlhttp = new XMLHttpRequest();
+            }
+            catch (e)
+            {}
+            if (xmlhttp != null)
+                return xmlhttp;
+            try {
+                xmlhttp = new ActiveXObject("Msxml2.XMLHTTP");
+            }
+            catch (e)
+            {}
+            if (xmlhttp != null)
+                return xmlhttp;
+
+            try {
+                xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+            }
+            catch (E) {}
+            return xmlhttp;
+        }
+        window.addEventListener('load', function () {
+            var client = getClient();
+            client.open("GET", "/taxation_customs/dds2/taric/special_message.html", false);
+            client.send(null);
+            document.getElementById('message-container').innerHTML = client.responseText;
+        });
+
+
+    </script>
+
+
+    <script type="text/javascript">
+
+        function closeButton() {
+            document.getElementById("meta-container").removeChild(document.getElementById("message-container"));
+        }
+
+        function showOverlay() {
+            document.getElementById("language-list-overlay").style.display = 'block';
+        }
+
+        function closeOverlay() {
+            document.getElementById("language-list-overlay").style.display = 'none';
+        }
+
+
+        function toggleTiles(elem) {
+            setTimeout(function () {
+                elem.firstElementChild.firstElementChild.classList.toggle('tiles-focus');
+            }, 200);
+        }
+
+        // Implementation of startsWith fo IE
+        if (!String.prototype.startsWith) {
+            String.prototype.startsWith = function (searchString, position) {
+                position = position || 0;
+                return this.substr(position, searchString.length) === searchString;
+            };
+        }
+    </script>
+
+
+</head>
+<body>
+
+
+
+    
+    
+    
+
+    <div>
+		<div class="ecl-site-switcher ecl-site-switcher--header">
+			<div class="ecl-container">
+				<h2 class="ecl-u-sr-only">ECL site switcher</h2>
+				<ul id="ecl-site-switcher" class="ecl-site-switcher__list ecl-container">
+					<li class=" ecl-site-switcher__option"><a href="https://ec.europa.eu/commission/index"
+															  class="ecl-site-switcher__link ecl-link">Commission and
+						its
+						priorities</a></li>
+					<li class="ecl-site-switcher__option ecl-site-switcher__option--is-selected"><a
+							href="https://ec.europa.eu/info/index" class="ecl-site-switcher__link ecl-link">Policies,
+						information and services</a></li>
+				</ul>
+			</div>
+		</div>
+		<header data-ecl-auto-init="SiteHeaderHarmonised"
+				class="ecl-site-header-harmonised--group1 ecl-site-header-harmonised">
+			<div class="ecl-site-header-harmonised__container ecl-container">
+				<div class="ecl-site-header-harmonised__top"><a
+						class="ecl-link ecl-link--standalone ecl-site-header-harmonised__logo-link"
+						href="https://ec.europa.eu" aria-label="European Commission"><img alt="European Commission logo"
+																						  title="European Commission"
+																						  class="ecl-site-header-harmonised__logo-image"
+																						  src="https://ec.europa.eu/taxation_customs/dds2/taric/europa/ecl/images/logo/logo--de.svg"/></a>
+					<div class="ecl-site-header-harmonised__action">
+						<a onclick="showOverlay()"
+						   class="ecl-link ecl-link--standalone ecl-site-header-harmonised__language-selector"
+						   href="javascript:void(0)" data-ecl-language-selector="true"
+						   aria-controls="language-list-overlay"
+						   aria-expanded="false"><span class="ecl-site-header-harmonised__language-icon">
+                            <svg focusable="false" aria-hidden="true"
+								 class="ecl-site-header-harmonised__icon ecl-icon ecl-icon--s" width="24" height="24"
+								 xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                <path d="M18.191 1H5.81A4.812 4.812 0 001 5.818v8.338a4.812 4.812 0 004.809 4.818h.746V23l8.41-4.026h3.226c2.636 0 4.809-2.156 4.809-4.818V5.818C23 3.156 20.827 1 18.191 1z"/>
+                            </svg>
+                            <span class="ecl-site-header-harmonised__language-code">de</span></span>
+							Deutsch</a>
+						<div class="ecl-site-header-core__search-container">
+							<a class="ecl-link ecl-link--standalone ecl-site-header-core__search-toggle"
+							   data-ecl-search-toggle="true" aria-controls="search-form-id" aria-expanded="false">
+								<svg focusable="false" aria-hidden="true" class="ecl-icon ecl-icon--s" width="24"
+									 height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+									<path d="M22.457 20.018L17.67 15.46l-.065-.063a8.322 8.322 0 001.493-4.746C19.097 5.864 15.034 2 10.048 2 5.063 2 1 5.843 1 10.63c0 4.789 4.063 8.653 9.048 8.653a9.284 9.284 0 004.964-1.428l.065.063 4.766 4.578a1.946 1.946 0 002.613 0c.725-.672.725-1.785 0-2.478h.001zM10.05 16.28c-3.272 0-5.908-2.52-5.908-5.65 0-3.128 2.636-5.648 5.908-5.648 3.25 0 5.908 2.52 5.908 5.649S13.3 16.28 10.05 16.28z"/>
+								</svg>
+								Search</a>
+							<form action="https://ec.europa.eu/search" id="search-form-id" data-ecl-search-form="true"
+								  class="ecl-site-header-core__search ecl-search-form" role="search">
+								<input type="hidden" name="query_source" value="TAXUD">
+								<div class="ecl-form-group ecl-form-group--text-input"><label
+										class="ecl-search-form__label ecl-form-label"
+										for="search-input-id">Suche</label><input type="search" id="search-input-id"
+																															class="ecl-search-form__text-input ecl-text-input"
+																															name="QueryText"/></div>
+								<button aria-label="Search" type="submit" class="ecl-search-form__button ecl-button ecl-button--search">
+									<span class="ecl-button__container">
+										<span class="ecl-button__label" data-ecl-label="true">Suche</span>
+										<svg focusable="false" aria-hidden="true" data-ecl-icon="true"
+											 class="ecl-button__icon ecl-button__icon--after ecl-icon ecl-icon--s">
+											<path d="M22.457 20.018L17.67 15.46l-.065-.063a8.322 8.322 0 001.493-4.746C19.097 5.864 15.034 2 10.048 2 5.063 2 1 5.843 1 10.63c0 4.789 4.063 8.653 9.048 8.653a9.284 9.284 0 004.964-1.428l.065.063 4.766 4.578a1.946 1.946 0 002.613 0c.725-.672.725-1.785 0-2.478h.001zM10.05 16.28c-3.272 0-5.908-2.52-5.908-5.65 0-3.128 2.636-5.648 5.908-5.648 3.25 0 5.908 2.52 5.908 5.649S13.3 16.28 10.05 16.28z"/>
+										</svg>
+                                    </span>
+								</button>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div>
+				<nav data-ecl-auto-init="Menu" class="ecl-menu--group1 ecl-menu" aria-expanded="false" data-ecl-menu="true">
+					<div class="ecl-menu__overlay" data-ecl-menu-overlay="true"></div>
+					<div class="ecl-container ecl-menu__container">
+						<a class="ecl-link ecl-link--standalone ecl-menu__open" href="javascript:void(0)" data-ecl-menu-open="true">
+							<svg focusable="false" class="ecl-icon ecl-icon--s" fill="#fff" aria-hidden="true" width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+								<path d="M0 19.2h24v2.402H0zm0-8.4h24v2.4H0zm0-8.402h24v2.403H0zm0 0"/></svg>
+							Menu
+						</a>
+						<div class="ecl-menu__site-name">Steuern und Zollunion</div>
+						<section class="ecl-menu__inner" data-ecl-menu-inner="true">
+							<header class="ecl-menu__inner-header">
+								<button data-ecl-menu-close="true" type="submit"
+										class="ecl-menu__close ecl-button ecl-button--text">
+                                  <span class="ecl-menu__close-container ecl-button__container">
+                                      <svg focusable="false" aria-hidden="true" data-ecl-icon="true" class="ecl-button__icon ecl-button__icon--after ecl-icon ecl-icon--s" width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                            <path fill="#ffffff" d="M16.538 15.205L13.32 11.99l3.199-3.194-1.332-1.332-3.2 3.193L8.812 7.48 7.48 8.812l3.177 3.177-3.195 3.199 1.334 1.333 3.193-3.2 3.217 3.217 1.333-1.333zm5.594-7.49a10.886 10.886 0 00-2.355-3.492 10.882 10.882 0 00-3.492-2.355A10.906 10.906 0 0012 1c-1.488 0-2.93.293-4.286.868a10.958 10.958 0 00-3.492 2.355 10.888 10.888 0 00-2.355 3.492A10.925 10.925 0 001 12a10.958 10.958 0 003.222 7.778 10.9 10.9 0 003.492 2.355C9.07 22.707 10.512 23 12 23a10.964 10.964 0 007.777-3.222 10.912 10.912 0 002.355-3.492A10.94 10.94 0 0023 12c0-1.487-.294-2.93-.868-4.285zM21.702 12a9.642 9.642 0 01-2.844 6.858A9.619 9.619 0 0112 21.703a9.635 9.635 0 01-6.859-2.844A9.617 9.617 0 012.298 12a9.619 9.619 0 012.843-6.859A9.615 9.615 0 0112 2.298a9.619 9.619 0 016.858 2.843A9.623 9.623 0 0121.703 12z"/>
+                                      </svg>
+                                     <span class="ecl-button__label" data-ecl-label="true">Close</span>
+                                  </span>
+								</button>
+
+								<div class="ecl-menu__title">Steuern und Zollunion</div>
+								<button data-ecl-menu-back="true" type="submit" class="ecl-menu__back ecl-button ecl-button--text">
+                                    <span class="ecl-button__container">
+                                         <svg focusable="false" aria-hidden="true" data-ecl-icon="true" class="ecl-button__icon ecl-button__icon--before ecl-icon ecl-icon--s ecl-icon--rotate-270">
+                                            <use xlink:href="europa/ecl/images/icons/sprites/icons.svg#ui--corner-arrow"></use>
+                                         </svg>
+                                     <span class="ecl-button__label" data-ecl-label="true">Back</span>
+                                    </span>
+								</button>
+							</header>
+
+                            <ul class="ecl-menu__list" data-ecl-menu-list="true">
+                                <li class="ecl-menu__item--current" style="padding-right: 1rem; padding-left: 1rem; margin-right: 0px; margin-left: 0px;" data-ecl-menu-item="true"><a
+                                        href='http://ec.europa.eu/taxation_customs/dds2/taric/help/index.jsp?Lang=de'
+                                        class="ecl-menu__link" data-ecl-menu-link="true">Hilfe</a></li>
+                                <li class="ecl-menu__item--current" style="padding-right: 1rem; padding-left: 1rem; margin-right: 0px; margin-left: 0px;" data-ecl-menu-item="true"><a
+                                        href='http://ec.europa.eu/taxation_customs/dds2/taric/news/newstar.jsp?Lang=de'
+                                        class="ecl-menu__link" data-ecl-menu-link="true">Aktuell</a></li>
+                                <li class="ecl-menu__item--current" style="padding-right: 1rem; padding-left: 1rem; margin-right: 0px; margin-left: 0px;" data-ecl-menu-item="true"><a
+                                        href='http://ec.europa.eu/taxation_customs/business/calculation-customs-duties/what-is-common-customs-tariff/taric_de'
+                                        class="ecl-menu__link" data-ecl-menu-link="true">Information</a></li>
+                                <li class="ecl-menu__item--current" style="padding-right: 1rem; padding-left: 1rem; margin-right: 0px; margin-left: 0px;" data-ecl-menu-item="true"><a
+                                        href='http://ec.europa.eu/taxation_customs/dds2/taric/help/dds_tar_faq_de.pdf'
+                                        class="ecl-menu__link" data-ecl-menu-link="true">Häufige Fragen</a></li>
+                                <li class="ecl-menu__item--current" style="padding-right: 1rem; padding-left: 1rem; margin-right: 0px; margin-left: 0px;" data-ecl-menu-item="true"><a
+                                        href='mailto:TAXUD-DDS-TARIC@ec.europa.eu'
+                                        class="ecl-menu__link" data-ecl-menu-link="true">Briefkasten TARIC</a></li>
+    
+
+</ul>
+</section>
+</div>
+</nav>
+</div>
+
+<div id="language-list-overlay" hidden="" class="ecl-language-list ecl-language-list--overlay"
+aria-labelledby="ecl-language-list__title" role="dialog" data-ecl-language-list-overlay="true">
+<div class="ecl-language-list__container ecl-container">
+<div class="ecl-row">
+<div class="ecl-language-list__close ecl-col-12 ecl-col-lg-8 ecl-offset-lg-2">
+<button onclick="closeOverlay()" data-ecl-language-list-close="true" type="submit"
+        class="ecl-language-list__close-button ecl-button ecl-button--ghost">
+    <span
+            class="ecl-button__container"><span class="ecl-button__label" data-ecl-label="true">Close</span>
+    <svg focusable="false" aria-hidden="true" data-ecl-icon="true" class="ecl-button__icon ecl-button__icon--after ecl-icon ecl-icon--s" width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+        <path fill="#ffffff" d="M16.538 15.205L13.32 11.99l3.199-3.194-1.332-1.332-3.2 3.193L8.812 7.48 7.48 8.812l3.177 3.177-3.195 3.199 1.334 1.333 3.193-3.2 3.217 3.217 1.333-1.333zm5.594-7.49a10.886 10.886 0 00-2.355-3.492 10.882 10.882 0 00-3.492-2.355A10.906 10.906 0 0012 1c-1.488 0-2.93.293-4.286.868a10.958 10.958 0 00-3.492 2.355 10.888 10.888 0 00-2.355 3.492A10.925 10.925 0 001 12a10.958 10.958 0 003.222 7.778 10.9 10.9 0 003.492 2.355C9.07 22.707 10.512 23 12 23a10.964 10.964 0 007.777-3.222 10.912 10.912 0 002.355-3.492A10.94 10.94 0 0023 12c0-1.487-.294-2.93-.868-4.285zM21.702 12a9.642 9.642 0 01-2.844 6.858A9.619 9.619 0 0112 21.703a9.635 9.635 0 01-6.859-2.844A9.617 9.617 0 012.298 12a9.619 9.619 0 012.843-6.859A9.615 9.615 0 0112 2.298a9.619 9.619 0 016.858 2.843A9.623 9.623 0 0121.703 12z"/>
+    </svg>
+</span>
+</button>
+</div>
+<div class="ecl-language-list__title ecl-col-12 ecl-col-lg-8 ecl-offset-lg-2"
+ id="ecl-language-list__title">
+<svg focusable="false" aria-hidden="true"
+     class="ecl-language-list__title-icon ecl-icon ecl-icon--m" width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+    <path fill="#ffffff" d="M15.134 12.329h1.842c.303-.653.49-1.353.536-2.1h-2.076c-.023.77-.14 1.47-.303 2.1zm.326-2.938h2.076A5.82 5.82 0 0017 7.29h-1.865c.162.63.28 1.33.326 2.1zm-3.358 3.777v2.401c.373-.28 1.235-1.026 1.842-2.401h-1.842zm2.729 0a7.872 7.872 0 01-1.307 2.192c1.213-.42 2.239-1.166 2.962-2.192H14.83zm.046-6.716h1.632a5.881 5.881 0 00-2.915-2.215c.42.536.91 1.259 1.282 2.215h.001zm-.606.84H12.1V9.39h2.52c-.047-.793-.164-1.493-.35-2.1zm.326 2.938h-2.495v2.099h2.169a7.944 7.944 0 00.326-2.1zm-.653-3.8c-.186-.514-.466-.933-.7-1.283-.35-.466-.7-.793-.956-1.003-.047-.07-.116-.093-.186-.14V6.43h1.842zm-4.524 0h1.866V4.027c-.397.28-1.26 1.05-1.866 2.401zm-2.541 0h1.655A7.34 7.34 0 019.84 4.237 5.957 5.957 0 006.879 6.43zm1.026 3.777H5.829a5.7 5.7 0 00.536 2.098h1.842c-.163-.63-.256-1.306-.303-2.098zm.326-2.939H6.39a6.367 6.367 0 00-.56 2.1h2.099c.047-.77.14-1.47.303-2.1zM0 13.818c0 2.822 2.192 5.091 5.09 5.091h3.637L17.455 24v-5.09h1.454c2.875 0 5.091-1.87 5.091-4.693V5.091C24 2.269 21.784 0 18.91 0H5.09C2.193 0 0 2.27 0 5.09v8.728zm4.99-4.031c0-3.708 3.008-6.716 6.715-6.692a6.663 6.663 0 016.67 6.715c0 3.708-3.008 6.716-6.716 6.693a6.663 6.663 0 01-6.67-6.716zm3.521 3.358H6.856a6.044 6.044 0 002.938 2.215 7.476 7.476 0 01-1.282-2.215zm.606-.84h2.146v-2.098H8.767c.024.792.14 1.492.35 2.098zm-.349-2.938h2.495V7.268H9.095c-.187.607-.28 1.307-.327 2.1zm.63 3.801c.21.49.489.91.722 1.259.35.443.7.793.956 1.003a.45.45 0 00.163.14v-2.402H9.397z"/>
+</svg>
+Select your language
+</div>
+</div>
+<div class="ecl-row">
+<div class="ecl-language-list__column ecl-col-12 ecl-col-lg-4 ecl-offset-lg-2">
+<ul class="ecl-language-list__list">
+    
+    
+        
+        
+        
+        
+        
+        
+    
+    
+    
+        
+        
+        
+    
+    
+    <li class="ecl-language-list__item "><a lang="bg"
+                                            hrefLang="bg"
+                                            rel="alternate"
+                                            href="https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp?AdditionalCode=&MeasText=&logoPath=europa%2fecl%2fimages%2flogo&Lang=bg&StartPub=&Taric=8517&Area=&GoodsText=&LangDescr=&MinCharFts=3&OrderNum=&MeasType=&europaPath=europa&Expand=true&SimDate=20251201&EndPub=&Level=&Regulation=&LastSelectedCode="
+                                            class="ecl-language-list__link ecl-link ecl-link--standalone">Български
+    </a>
+    </li>
+    
+    
+        
+        
+        
+        
+        
+        
+    
+    
+    
+        
+        
+        
+    
+    
+    <li class="ecl-language-list__item "><a lang="cs"
+                                            hrefLang="cs"
+                                            rel="alternate"
+                                            href="https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp?AdditionalCode=&MeasText=&logoPath=europa%2fecl%2fimages%2flogo&Lang=cs&StartPub=&Taric=8517&Area=&GoodsText=&LangDescr=&MinCharFts=3&OrderNum=&MeasType=&europaPath=europa&Expand=true&SimDate=20251201&EndPub=&Level=&Regulation=&LastSelectedCode="
+                                            class="ecl-language-list__link ecl-link ecl-link--standalone">Čeština
+    </a>
+    </li>
+    
+    
+        
+        
+        
+        
+        
+        
+    
+    
+    
+        
+        
+        
+    
+    
+    <li class="ecl-language-list__item "><a lang="da"
+                                            hrefLang="da"
+                                            rel="alternate"
+                                            href="https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp?AdditionalCode=&MeasText=&logoPath=europa%2fecl%2fimages%2flogo&Lang=da&StartPub=&Taric=8517&Area=&GoodsText=&LangDescr=&MinCharFts=3&OrderNum=&MeasType=&europaPath=europa&Expand=true&SimDate=20251201&EndPub=&Level=&Regulation=&LastSelectedCode="
+                                            class="ecl-language-list__link ecl-link ecl-link--standalone">Dansk
+    </a>
+    </li>
+    
+    
+        
+        
+        
+        
+        
+        
+    
+    
+    
+        
+        
+        
+    
+    
+    <li class="ecl-language-list__item ecl-language-list__item--is-active"><a
+            lang="de"
+            hrefLang="de"
+            rel="alternate"
+            href="https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp?AdditionalCode=&MeasText=&logoPath=europa%2fecl%2fimages%2flogo&Lang=de&StartPub=&Taric=8517&Area=&GoodsText=&LangDescr=&MinCharFts=3&OrderNum=&MeasType=&europaPath=europa&Expand=true&SimDate=20251201&EndPub=&Level=&Regulation=&LastSelectedCode="
+            class="ecl-language-list__link ecl-link ecl-link--standalone ecl-link--icon ecl-link--icon-after"><span
+            class="ecl-link__label">Deutsch</span>
+        <svg focusable="false" aria-hidden="true" class="ecl-link__icon ecl-icon ecl-icon--xs" width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18.333 4L9 13.465 4.778 9.183l-3.111 3.155L9 20 21.667 7.155z"/></svg>
+    </a></li>
+    
+    
+        
+        
+        
+        
+        
+        
+    
+    
+    
+        
+        
+        
+    
+    
+    <li class="ecl-language-list__item "><a lang="et"
+                                            hrefLang="et"
+                                            rel="alternate"
+                                            href="https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp?AdditionalCode=&MeasText=&logoPath=europa%2fecl%2fimages%2flogo&Lang=et&StartPub=&Taric=8517&Area=&GoodsText=&LangDescr=&MinCharFts=3&OrderNum=&MeasType=&europaPath=europa&Expand=true&SimDate=20251201&EndPub=&Level=&Regulation=&LastSelectedCode="
+                                            class="ecl-language-list__link ecl-link ecl-link--standalone">Eesti keel
+    </a>
+    </li>
+    
+    
+        
+        
+        
+        
+        
+        
+    
+    
+    
+        
+        
+        
+    
+    
+    <li class="ecl-language-list__item "><a lang="el"
+                                            hrefLang="el"
+                                            rel="alternate"
+                                            href="https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp?AdditionalCode=&MeasText=&logoPath=europa%2fecl%2fimages%2flogo&Lang=el&StartPub=&Taric=8517&Area=&GoodsText=&LangDescr=&MinCharFts=3&OrderNum=&MeasType=&europaPath=europa&Expand=true&SimDate=20251201&EndPub=&Level=&Regulation=&LastSelectedCode="
+                                            class="ecl-language-list__link ecl-link ecl-link--standalone">Ελληνικα
+    </a>
+    </li>
+    
+    
+        
+        
+        
+        
+        
+        
+    
+    
+    
+        
+        
+        
+    
+    
+    <li class="ecl-language-list__item "><a lang="en"
+                                            hrefLang="en"
+                                            rel="alternate"
+                                            href="https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp?AdditionalCode=&MeasText=&logoPath=europa%2fecl%2fimages%2flogo&Lang=en&StartPub=&Taric=8517&Area=&GoodsText=&LangDescr=&MinCharFts=3&OrderNum=&MeasType=&europaPath=europa&Expand=true&SimDate=20251201&EndPub=&Level=&Regulation=&LastSelectedCode="
+                                            class="ecl-language-list__link ecl-link ecl-link--standalone">English
+    </a>
+    </li>
+    
+    
+        
+        
+        
+        
+        
+        
+    
+    
+    
+        
+        
+        
+    
+    
+    <li class="ecl-language-list__item "><a lang="es"
+                                            hrefLang="es"
+                                            rel="alternate"
+                                            href="https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp?AdditionalCode=&MeasText=&logoPath=europa%2fecl%2fimages%2flogo&Lang=es&StartPub=&Taric=8517&Area=&GoodsText=&LangDescr=&MinCharFts=3&OrderNum=&MeasType=&europaPath=europa&Expand=true&SimDate=20251201&EndPub=&Level=&Regulation=&LastSelectedCode="
+                                            class="ecl-language-list__link ecl-link ecl-link--standalone">Español
+    </a>
+    </li>
+    
+    
+        
+        
+        
+        
+        
+        
+    
+    
+    
+        
+        
+        
+    
+    
+    <li class="ecl-language-list__item "><a lang="fr"
+                                            hrefLang="fr"
+                                            rel="alternate"
+                                            href="https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp?AdditionalCode=&MeasText=&logoPath=europa%2fecl%2fimages%2flogo&Lang=fr&StartPub=&Taric=8517&Area=&GoodsText=&LangDescr=&MinCharFts=3&OrderNum=&MeasType=&europaPath=europa&Expand=true&SimDate=20251201&EndPub=&Level=&Regulation=&LastSelectedCode="
+                                            class="ecl-language-list__link ecl-link ecl-link--standalone">Français
+    </a>
+    </li>
+    
+    
+        
+        
+        
+        
+        
+        
+    
+    
+    
+        
+        
+        
+    
+    
+    <li class="ecl-language-list__item "><a lang="hr"
+                                            hrefLang="hr"
+                                            rel="alternate"
+                                            href="https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp?AdditionalCode=&MeasText=&logoPath=europa%2fecl%2fimages%2flogo&Lang=hr&StartPub=&Taric=8517&Area=&GoodsText=&LangDescr=&MinCharFts=3&OrderNum=&MeasType=&europaPath=europa&Expand=true&SimDate=20251201&EndPub=&Level=&Regulation=&LastSelectedCode="
+                                            class="ecl-language-list__link ecl-link ecl-link--standalone">Hrvatski
+    </a>
+    </li>
+    
+    
+        
+        
+        
+        
+        
+        
+    
+    
+    
+        
+        
+        
+    
+    
+    <li class="ecl-language-list__item "><a lang="it"
+                                            hrefLang="it"
+                                            rel="alternate"
+                                            href="https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp?AdditionalCode=&MeasText=&logoPath=europa%2fecl%2fimages%2flogo&Lang=it&StartPub=&Taric=8517&Area=&GoodsText=&LangDescr=&MinCharFts=3&OrderNum=&MeasType=&europaPath=europa&Expand=true&SimDate=20251201&EndPub=&Level=&Regulation=&LastSelectedCode="
+                                            class="ecl-language-list__link ecl-link ecl-link--standalone">Italiano
+    </a>
+    </li>
+    
+</ul>
+</div>
+<div class="ecl-language-list__column ecl-col-12 ecl-col-lg-4">
+<ul class="ecl-language-list__list">
+    
+    
+        
+        
+        
+        
+        
+        
+    
+    
+    
+        
+        
+        
+    
+    
+    <li class="ecl-language-list__item "><a lang="lv"
+                                            hrefLang="lv"
+                                            rel="alternate"
+                                            href="https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp?AdditionalCode=&MeasText=&logoPath=europa%2fecl%2fimages%2flogo&Lang=lv&StartPub=&Taric=8517&Area=&GoodsText=&LangDescr=&MinCharFts=3&OrderNum=&MeasType=&europaPath=europa&Expand=true&SimDate=20251201&EndPub=&Level=&Regulation=&LastSelectedCode="
+                                            class="ecl-language-list__link ecl-link ecl-link--standalone">Latviešu valoda
+    </a>
+    </li>
+    
+    
+        
+        
+        
+        
+        
+        
+    
+    
+    
+        
+        
+        
+    
+    
+    <li class="ecl-language-list__item "><a lang="lt"
+                                            hrefLang="lt"
+                                            rel="alternate"
+                                            href="https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp?AdditionalCode=&MeasText=&logoPath=europa%2fecl%2fimages%2flogo&Lang=lt&StartPub=&Taric=8517&Area=&GoodsText=&LangDescr=&MinCharFts=3&OrderNum=&MeasType=&europaPath=europa&Expand=true&SimDate=20251201&EndPub=&Level=&Regulation=&LastSelectedCode="
+                                            class="ecl-language-list__link ecl-link ecl-link--standalone">Lietuvu kalba
+    </a>
+    </li>
+    
+    
+        
+        
+        
+        
+        
+        
+    
+    
+    
+        
+        
+        
+    
+    
+    <li class="ecl-language-list__item "><a lang="hu"
+                                            hrefLang="hu"
+                                            rel="alternate"
+                                            href="https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp?AdditionalCode=&MeasText=&logoPath=europa%2fecl%2fimages%2flogo&Lang=hu&StartPub=&Taric=8517&Area=&GoodsText=&LangDescr=&MinCharFts=3&OrderNum=&MeasType=&europaPath=europa&Expand=true&SimDate=20251201&EndPub=&Level=&Regulation=&LastSelectedCode="
+                                            class="ecl-language-list__link ecl-link ecl-link--standalone">Magyar
+    </a>
+    </li>
+    
+    
+        
+        
+        
+        
+        
+        
+    
+    
+    
+        
+        
+        
+    
+    
+    <li class="ecl-language-list__item "><a lang="nl"
+                                            hrefLang="nl"
+                                            rel="alternate"
+                                            href="https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp?AdditionalCode=&MeasText=&logoPath=europa%2fecl%2fimages%2flogo&Lang=nl&StartPub=&Taric=8517&Area=&GoodsText=&LangDescr=&MinCharFts=3&OrderNum=&MeasType=&europaPath=europa&Expand=true&SimDate=20251201&EndPub=&Level=&Regulation=&LastSelectedCode="
+                                            class="ecl-language-list__link ecl-link ecl-link--standalone">Nederlands
+    </a>
+    </li>
+    
+    
+        
+        
+        
+        
+        
+        
+    
+    
+    
+        
+        
+        
+    
+    
+    <li class="ecl-language-list__item "><a lang="pl"
+                                            hrefLang="pl"
+                                            rel="alternate"
+                                            href="https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp?AdditionalCode=&MeasText=&logoPath=europa%2fecl%2fimages%2flogo&Lang=pl&StartPub=&Taric=8517&Area=&GoodsText=&LangDescr=&MinCharFts=3&OrderNum=&MeasType=&europaPath=europa&Expand=true&SimDate=20251201&EndPub=&Level=&Regulation=&LastSelectedCode="
+                                            class="ecl-language-list__link ecl-link ecl-link--standalone">Polski
+    </a>
+    </li>
+    
+    
+        
+        
+        
+        
+        
+        
+    
+    
+    
+        
+        
+        
+    
+    
+    <li class="ecl-language-list__item "><a lang="pt"
+                                            hrefLang="pt"
+                                            rel="alternate"
+                                            href="https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp?AdditionalCode=&MeasText=&logoPath=europa%2fecl%2fimages%2flogo&Lang=pt&StartPub=&Taric=8517&Area=&GoodsText=&LangDescr=&MinCharFts=3&OrderNum=&MeasType=&europaPath=europa&Expand=true&SimDate=20251201&EndPub=&Level=&Regulation=&LastSelectedCode="
+                                            class="ecl-language-list__link ecl-link ecl-link--standalone">Português
+    </a>
+    </li>
+    
+    
+        
+        
+        
+        
+        
+        
+    
+    
+    
+        
+        
+        
+    
+    
+    <li class="ecl-language-list__item "><a lang="ro"
+                                            hrefLang="ro"
+                                            rel="alternate"
+                                            href="https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp?AdditionalCode=&MeasText=&logoPath=europa%2fecl%2fimages%2flogo&Lang=ro&StartPub=&Taric=8517&Area=&GoodsText=&LangDescr=&MinCharFts=3&OrderNum=&MeasType=&europaPath=europa&Expand=true&SimDate=20251201&EndPub=&Level=&Regulation=&LastSelectedCode="
+                                            class="ecl-language-list__link ecl-link ecl-link--standalone">Română
+    </a>
+    </li>
+    
+    
+        
+        
+        
+        
+        
+        
+    
+    
+    
+        
+        
+        
+    
+    
+    <li class="ecl-language-list__item "><a lang="sk"
+                                            hrefLang="sk"
+                                            rel="alternate"
+                                            href="https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp?AdditionalCode=&MeasText=&logoPath=europa%2fecl%2fimages%2flogo&Lang=sk&StartPub=&Taric=8517&Area=&GoodsText=&LangDescr=&MinCharFts=3&OrderNum=&MeasType=&europaPath=europa&Expand=true&SimDate=20251201&EndPub=&Level=&Regulation=&LastSelectedCode="
+                                            class="ecl-language-list__link ecl-link ecl-link--standalone">Slovenčina
+    </a>
+    </li>
+    
+    
+        
+        
+        
+        
+        
+        
+    
+    
+    
+        
+        
+        
+    
+    
+    <li class="ecl-language-list__item "><a lang="sl"
+                                            hrefLang="sl"
+                                            rel="alternate"
+                                            href="https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp?AdditionalCode=&MeasText=&logoPath=europa%2fecl%2fimages%2flogo&Lang=sl&StartPub=&Taric=8517&Area=&GoodsText=&LangDescr=&MinCharFts=3&OrderNum=&MeasType=&europaPath=europa&Expand=true&SimDate=20251201&EndPub=&Level=&Regulation=&LastSelectedCode="
+                                            class="ecl-language-list__link ecl-link ecl-link--standalone">Slovenščina
+    </a>
+    </li>
+    
+    
+        
+        
+        
+        
+        
+        
+    
+    
+    
+        
+        
+        
+    
+    
+    <li class="ecl-language-list__item "><a lang="fi"
+                                            hrefLang="fi"
+                                            rel="alternate"
+                                            href="https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp?AdditionalCode=&MeasText=&logoPath=europa%2fecl%2fimages%2flogo&Lang=fi&StartPub=&Taric=8517&Area=&GoodsText=&LangDescr=&MinCharFts=3&OrderNum=&MeasType=&europaPath=europa&Expand=true&SimDate=20251201&EndPub=&Level=&Regulation=&LastSelectedCode="
+                                            class="ecl-language-list__link ecl-link ecl-link--standalone">Suomi
+    </a>
+    </li>
+    
+    
+        
+        
+        
+        
+        
+        
+    
+    
+    
+        
+        
+        
+    
+    
+    <li class="ecl-language-list__item "><a lang="sv"
+                                            hrefLang="sv"
+                                            rel="alternate"
+                                            href="https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp?AdditionalCode=&MeasText=&logoPath=europa%2fecl%2fimages%2flogo&Lang=sv&StartPub=&Taric=8517&Area=&GoodsText=&LangDescr=&MinCharFts=3&OrderNum=&MeasType=&europaPath=europa&Expand=true&SimDate=20251201&EndPub=&Level=&Regulation=&LastSelectedCode="
+                                            class="ecl-language-list__link ecl-link ecl-link--standalone">Svenska
+    </a>
+    </li>
+    
+</ul>
+</div>
+</div>
+</div>
+</div>
+
+</header>
+</div>
+
+
+</body>
+</html>
+            </div>
+        
+
+        <div id="country_panel"></div>
+
+        <script language="JavaScript" type="text/javascript">
+
+            function setVisible(el) {
+                if (el == null) return;
+                var style = el.style.cssText;
+                style = style.replace(/display:\s*none/i, "display: block");
+                el.style.cssText = style;
+            }
+
+            function setInvisible(el) {
+                if (el == null) return;
+                var style = el.style.cssText;
+                style = style.replace(/display:\s*block/i, "display: none");
+                el.style.cssText = style;
+            }
+
+            function isVisible(el) {
+                if (el == null) return false;
+                var style = el.style.cssText;
+                if (style == null) return false;
+                return !/display:\s*none/i.test(style);
+            }
+
+            function disableEnterSubmit(e) {
+                if (e == null)
+                    return true;
+                var keynum
+
+                if (window.event) <!--  IE -->
+                    keynum = e.keyCode
+                else if (e.which) <!--  Netscape/Firefox/Opera -->
+                    keynum = e.which
+
+                if (keynum == 13)
+                    return false;
+
+                return true;
+            }
+
+            function submitQuery(e) {
+                var keynum
+                var keychar
+                var numcheck
+
+                if (window.event) <!--  IE -->
+                {
+                    keynum = e.keyCode
+                } else if (e.which) <!--  Netscape/Firefox/Opera -->
+                {
+                    keynum = e.which
+                }
+
+                if (keynum == 13) {
+                    typeEnterKey(e);
+                    return;
+                }
+            }
+
+            function clearStartPub() {
+
+                var startEl = document.getElementById("measStartDat");
+                startEl.value = "";
+                document.taric_form.StartPub.value = "";
+            }
+
+            function clearEndPub() {
+
+                var endEl = document.getElementById("measEndDat");
+                endEl.value = "";
+                document.taric_form.EndPub.value = "";
+            }
+
+
+        </script>
+
+        <script language="JavaScript" type="text/javascript">
+            function setSimulationDate(date) {
+                var simDateEl = document.getElementById("simDate");
+                simDateEl.value = date;
+                document.getElementById("simulationdate1").innerHTML = date;
+                document.getElementById("simulationdate2").innerHTML = date;
+                document.getElementById("simulationdate3").innerHTML = date;
+            }
+
+            function selectCountry() {
+                var index = document.getElementById("taricArea").selectedIndex;
+                var option = document.getElementById("taricArea").options[index];
+                if (option != null) {
+                    if (option.value == "----------") {
+                        return ""; // Request valid for all countries and regions
+                    } else
+                        return option.value;
+                } else {
+                    return "";
+                }
+            }
+
+            function selectMeasType() {
+                return getSelectValues(document.getElementById("measureType"));
+            }
+
+            function getSelectValues(select) {
+                var result = [];
+                var options = select && select.options;
+                var opt;
+
+                for (var i = 0, iLen = options.length; i < iLen; i++) {
+                    opt = options[i];
+
+                    if (opt.selected) {
+                        result.push(opt.value);
+                    }
+                }
+                return result;
+            }
+
+            function setSelectValues(select, measTypes) {
+                var options = select && select.options;
+                var index;
+
+                if (measTypes != "") {
+                    selectedList = measTypes.split(',');
+                    for (var i = 0, iLen = selectedList.length; i < iLen; i++) {
+                        index = selectedList[i];
+                        for (var j = 0, jLen = options.length; j < jLen; j++) {
+                            opt = options[j];
+                            if (opt.value == index) {
+                                opt.setAttribute("selected", "selected");
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+
+
+        </script>
+
+        <script type="text/javascript">
+
+            function submitForm(flag) {
+                hideMessage();
+                if (flag == 'export') {
+                    var link = new url('daily_publications.jsp');
+                    link.setParameter('Lang', 'de');
+                    window.location.href = link.currentUrl;
+                } else
+                    return;
+            }
+
+            function hideErrorMessage(errDivName) {
+                var errDesc = document.getElementById(errDivName);
+                if (errDesc != null)
+                    errDesc.style.display = "none";
+            }
+
+            function showErrorMessage(errDivName) {
+                var errDesc = document.getElementById(errDivName);
+                if (errDesc != null)
+                    errDesc.style.display = "block";
+            }
+
+
+            function hideMessage() {
+                hideErrorMessage("statusmsg");
+                hideErrorMessage("errorDiv");
+                hideErrorMessage("error_wrong_file");
+                hideErrorMessage("error_empty");
+                hideErrorMessage("export_error");
+            }
+
+            function hideErrorMessage(errDivName) {
+                var errDesc = document.getElementById(errDivName);
+                if (errDesc != null)
+                    errDesc.style.display = "none";
+            }
+
+            function showErrorMessage(errDivName) {
+                var errDesc = document.getElementById(errDivName);
+                if (errDesc != null)
+                    errDesc.style.display = "block";
+            }
+
+            function endsWith(str, suffix) {
+                return str.indexOf(suffix, str.length - suffix.length) !== -1;
+            }
+        </script>
+
+        <SCRIPT src="https://ec.europa.eu/taxation_customs/dds2/taric/popup_files/yahoo-dom-event.js" type=text/javascript></SCRIPT>
+        <SCRIPT src="https://ec.europa.eu/taxation_customs/dds2/taric/popup_files/connection-min.js" type=text/javascript></SCRIPT>
+        <SCRIPT src="https://ec.europa.eu/taxation_customs/dds2/taric/popup_files/element-min.js" type=text/javascript></SCRIPT>
+        <SCRIPT src="https://ec.europa.eu/taxation_customs/dds2/taric/popup_files/button-min.js" type=text/javascript></SCRIPT>
+        <SCRIPT src="https://ec.europa.eu/taxation_customs/dds2/taric/popup_files/dragdrop-min.js" type=text/javascript></SCRIPT>
+        <SCRIPT src="https://ec.europa.eu/taxation_customs/dds2/taric/popup_files/container-min.js" type=text/javascript></SCRIPT>
+
+        <SCRIPT>
+            YAHOO.namespace("calandar.container");
+            YAHOO.namespace("country.container");
+
+            function init() {
+                calendarPanel = new YAHOO.widget.Panel("calendar_panel", {
+                    visible: false,
+                    constraintoviewport: true,
+                    modal: true,
+                    close: false,
+                    draggable: false,
+                    underlay: "none"
+                });
+                prepareCalendarPanel('20251201', 'de');
+            }
+
+            YAHOO.util.Event.onDOMReady(init);
+
+        </SCRIPT>
+
+        <main>
+            <div>
+                <div class="ecl-page-header-harmonised">
+                    <div class="ecl-container" id="meta-container">
+                            
+                            
+                        
+                        
+                        <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+
+
+
+
+
+    
+    
+    
+    
+
+
+
+
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link type="text/css" rel="stylesheet" href="https://ec.europa.eu/taxation_customs/dds2/taric/europa/ecl/css/ecl-ec-preset-website.css" media="screen">
+    <link type="text/css" rel="stylesheet" href="https://ec.europa.eu/taxation_customs/dds2/taric/europa/ecl/css/ecl-ec-preset-website-print.css" media="print">
+</head>
+
+
+<body>
+
+
+    
+    <nav data-ecl-auto-init="BreadcrumbHarmonised"
+         class="ecl-page-header-harmonised__breadcrumb ecl-breadcrumb-harmonised"
+         aria-label="You are here:" data-ecl-breadcrumb-harmonised="true">
+        <ol class="ecl-breadcrumb-harmonised__container">
+            <li class="ecl-breadcrumb-harmonised__segment"
+                data-ecl-breadcrumb-harmonised-item="static" aria-hidden="false"><a
+                    href='http://ec.europa.eu/index_de.htm'
+                    class="ecl-breadcrumb-harmonised__link ecl-link ecl-link--standalone">Europäische Kommission</a>
+                <svg focusable="false" aria-hidden="true" role="presentation"
+                     class="ecl-breadcrumb-harmonised__icon ecl-icon ecl-icon--2xs ecl-icon--rotate-90" width="24" height="24"
+                     xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <path d="M20.623 19.5L12 9.83 3.377 19.5 1 16.835 12 4.5l11 12.335z"/>
+                </svg>
+            </li>
+            <li class="ecl-breadcrumb-harmonised__segment"
+                data-ecl-breadcrumb-harmonised-item="static" aria-hidden="false"><a
+                    href='https://ec.europa.eu/taxation_customs/index_de'
+                    class="ecl-breadcrumb-harmonised__link ecl-link ecl-link--standalone">Steuern und Zollunion</a>
+                <svg focusable="false" aria-hidden="true" role="presentation"
+                     class="ecl-breadcrumb-harmonised__icon ecl-icon ecl-icon--2xs ecl-icon--rotate-90" width="24" height="24"
+                     xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <path d="M20.623 19.5L12 9.83 3.377 19.5 1 16.835 12 4.5l11 12.335z"/>
+                </svg>
+            </li>
+            <li class="ecl-breadcrumb-harmonised__segment"
+                data-ecl-breadcrumb-harmonised-item="static" aria-hidden="false"><a
+                    href='http://ec.europa.eu/taxation_customs/online-services_de'
+                    class="ecl-breadcrumb-harmonised__link ecl-link ecl-link--standalone">Datenbanken</a>
+                <svg focusable="false" aria-hidden="true" role="presentation"
+                     class="ecl-breadcrumb-harmonised__icon ecl-icon ecl-icon--2xs ecl-icon--rotate-90" width="24" height="24"
+                     xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <path d="M20.623 19.5L12 9.83 3.377 19.5 1 16.835 12 4.5l11 12.335z"/>
+                </svg>
+            </li>
+            </li>
+
+
+            
+            <li class="ecl-breadcrumb-harmonised__segment"
+                data-ecl-breadcrumb-harmonised-item="static" aria-hidden="false">
+
+                <a href="https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp?Lang=de"
+                   class="ecl-breadcrumb-harmonised__link ecl-link ecl-link--standalone">TARIC
+                </a>
+                <svg focusable="false" aria-hidden="true" role="presentation"
+                     class="ecl-breadcrumb-harmonised__icon ecl-icon ecl-icon--2xs ecl-icon--rotate-90" width="24" height="24"
+                     xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <path d="M20.623 19.5L12 9.83 3.377 19.5 1 16.835 12 4.5l11 12.335z"/>
+                </svg>
+                <span class="ecl-breadcrumb__current-page">Maßnahmen</span>
+            </li>
+            
+        </ol>
+    </nav>
+
+</body>
+</html>
+                            
+                        <div id="message-container"></div>
+                        <div class="welcome-area">
+                            <h1 class="ecl-page-header-harmonised__title">TARIC-Abfrage</h1>
+                            <span>
+                            	<span>Letzte Aktualisierung:&nbsp;</span>
+                            	<span>
+                                	
+                                    	01-12-2025
+                                	
+                        		</span><br/>
+                            	<a  href="#" 
+                            	    class="ecl-link ecl-link--standalone"
+                               		onClick="submitForm('export');">TARIC Daily updates&nbsp;
+                            	</a>
+                            	<br/>
+                            	<a 	href="https://circabc.europa.eu/ui/group/0e5f18c2-4b2f-42e9-aed4-dfe50ae1263b/library/64db9d0f-e7c9-4084-afe9-f47e70e53c10?p=1&n=-1&sort=name_ASC"
+                            		class="ecl-link ecl-link--standalone">
+                            		TARIC Full database&nbsp;
+                            	</a>
+                        </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ecl-container" id="outer-container">
+                <input type="hidden" id="simDate" value="20251201"/>
+                    
+                <div>
+                    <div id="tabs">
+                        <button style="background-color:#006fb4; border-radius: .28571429rem .28571429rem 0 0;"
+                                onclick="selectUrl(1,'de','20251201')"
+                                class="ecl-button ecl-button--primary">Maßnahmen</button>
+                        <button style="border: 2px solid #006fb4; border-radius: .28571429rem .28571429rem 0 0;"
+                                onclick="selectUrl(2,'de','20251201')"
+                                class="ecl-button ecl-button--secondary">Geographische Information</button>
+                        <button style="border: 2px solid #006fb4; border-radius: .28571429rem .28571429rem 0 0;"
+                                onclick="selectUrl(3,'de','20251201')"
+                                class="ecl-button ecl-button--secondary">Verordnungen</button>
+                    </div>
+                    <div class="form-container">
+                        <p class="form-title" style="border-radius: 0 .28571429rem 0 0;">
+                            Suche nach Warencode und geografischem Gebiet
+                        </p>
+                        <div class="form-content">
+                            <form name="taric_form" method="get"
+                                  enctype="multipart/form-data" style="text-align:left;">
+                                <input style="display: none;" type="text" name="Lang" value="de"/>
+                                <input style="display: none;" type="text" name="SimDate" value=""/>
+                                <input style="display: none;" type="text" name="Area" value=""/>
+                                <input style="display: none;" type="text" name="MeasType" value=""/>
+                                <input style="display: none;" type="text" name="StartPub" value=""/>
+                                <input style="display: none;" type="text" name="EndPub" value=""/>
+                                <input style="display: none;" type="text" name="MeasText" value=""/>
+                                <input style="display: none;" type="text" name="GoodsText" value=""/>
+                                <input type="hidden" name="op">
+
+                                <table class="ecl-table">
+                                    <tr>
+                                        <td>
+                                            <table>
+                                                <tr>
+                                                	  <td>
+	                                                      <div class="form-content-row">
+	                                                          <div>
+	                                                              <label class="ecl-form-label"
+	                                                                     title="Goods code">
+	                                                                  Warencode
+	                                                              </label>&nbsp;&nbsp;
+	                                                              <div style="display: inline;">
+	                                                                  <a href="#" class="ecl-link ecl-link--standalone" onclick="browseClick()">
+	                                                                      [Blättern]
+	                                                                  </a>
+	                                                              </div>
+	                                                              <input class="ecl-text-input ecl-text-input--m" type="text" size="12"
+	                                                                     maxlength="10"
+	                                                                     id="taricCode" name="Taric"
+	                                                                     onKeyPress="return disableEnterSubmit(event);"
+	                                                                     onkeyup="submitQuery(event);" value=8517>
+	                                                          </div>
+	                                                          <div style="width: 50px">
+	                                                              &nbsp;
+	                                                          </div>
+	                                                          <div>
+	                                                              <label class="ecl-form-label"
+	                                                                     title="Einfuhr in die EU: Ursprung der Waren. Ausfuhr aus der EU: Bestimmungsort der Waren">
+	                                                                  Ursprung/Bestimmung
+	                                                              </label><br>
+	                                                              <div class="ecl-select__container ecl-select__container--l">
+	                                                                  <script type="text/javascript">buildSelectArea("de", "20251201");</script>
+	                                                                  <div class="ecl-select__icon">
+	                                                                      <svg class="ecl-select__icon-shape ecl-icon ecl-icon--s ecl-icon--rotate-180"
+	                                                                           width="24" height="24" xmlns="http://www.w3.org/2000/svg"
+	                                                                           viewBox="0 0 24 24">
+	                                                                          <path d="M20.623 19.5L12 9.83 3.377 19.5 1 16.835 12 4.5l11 12.335z"/>
+	                                                                      </svg>
+	                                                                  </div>
+	                                                              </div>
+	                                                          </div>
+	                                                      </div>
+	                                                  </td>
+	                                              </tr>
+	                                              <tr>
+	                                                 	<td>
+	                                                      <div>
+	                                                          <label class="ecl-form-label"
+	                                                                 title="">
+	                                                              Additional code
+	                                                          </label>&nbsp;&nbsp;
+                                                            <input class="ecl-text-input ecl-text-input--m" type="text" size="12"
+	                                                                 maxlength="4"
+	                                                                 id="AdditionalCode" name="AdditionalCode"
+	                                                                 style="text-transform: uppercase;"
+	                                                                 onKeyPress="return disableEnterSubmit(event);"
+	                                                                 onkeyup="submitQuery(event);" value=>
+	                                                      </div>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="3">
+                                            <div id="error_taric_code_format" style="display: none;">
+                                        <span class="error_message">Ungültiges Format für den Warennomenklaturcode.</span>
+                                            </div>
+                                            <div id="error_taric_code_not_valid" style="display: none;">
+                                        <span class="error_message">Der Warencode ist nicht (länger) in der Europäischen Union gültig. 
+Bitte geben Sie die ersten sechs Ziffern ein und durchsuchen Sie die Nomenklatur, bis Sie eine Bezeichnung finden, die auf Ihre Ware zutrifft.
+</span>
+                                            </div>
+                                            <div id="error_country_not_valid" style="display: none;">
+                                        <span class="error_message">The destination/origin (geographical area) must be valid at the reference date.</span>
+                                            </div>
+                                            <div id="error_additional_code" style="display: none;">
+                                        <span class="error_message">Additional code should be 4 characters long.</span>
+	                                          </div>
+                                        </td>
+                                    </tr>
+                                        
+                                    <tr>
+                                        <td style="vertical-align: top; padding-bottom: 5px; padding-top:5px; padding-left: 12px;">
+                                            <div style="display: inline;">
+                                                <div id="hide_more_criteria" style="display: none;">
+                                                    <a href="#" class="ecl-link ecl-link--standalone" onclick='switchQueryVisibility()'>
+                                                        [Zusätzliche Kriterien unterdrücken]
+                                                    </a>
+                                                </div>
+                                                <div id="show_more_criteria"
+                                                     style="display: block<;">
+                                                    <a href="#" class="ecl-link ecl-link--standalone" onclick='switchQueryVisibility()'>
+                                                        [Zusätzliche Kriterien]
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="form-content-row" id="text_search" style="display: none;">
+                                                <table>
+                                                    <tr>
+                                                        <div>
+                                                            <label class="ecl-form-label"
+                                                                   title="Matching exact words only (AND and OR operators may be used and exact string can be searched)">
+                                                                Warenbeschreibung
+                                                            </label>
+                                                            <div class="simpletext" style="display: none;">&nbsp;in&nbsp;</div>
+                                                            <div style='align=left; display: none;' class="simpletext">
+                                                                &nbsp;<INPUT TYPE='radio' NAME="search_text" id="goods_radio"
+                                                                             value="goods"
+                                                                             checked>Goods nomenclature descriptions
+                                                            </div>
+                                                        </div>
+                                                        <div>
+                                                            <td>
+                                                                <input class="ecl-text-input ecl-text-input--l" type="text"
+                                                                       size="12" maxlength="100" id="textSearch"
+                                                                       name="textSearch"
+                                                                       onKeyPress="return disableEnterSubmit(event);"
+                                                                       onkeyup="submitQuery(event);"
+                                                                       value="">
+                                                            </td>
+                                                            <td>
+                                                                <div class="ecl-select__container">
+                                                                    <select id="LangDescr" name='LangDescr'
+                                                                            class="ecl-select  ">
+                                                                        
+                                                                        <option>bg
+                                                                        </option>
+                                                                        
+                                                                        <option>cs
+                                                                        </option>
+                                                                        
+                                                                        <option>da
+                                                                        </option>
+                                                                        
+                                                                        <option selected>de
+                                                                        </option>
+                                                                        
+                                                                        <option>el
+                                                                        </option>
+                                                                        
+                                                                        <option>en
+                                                                        </option>
+                                                                        
+                                                                        <option>es
+                                                                        </option>
+                                                                        
+                                                                        <option>et
+                                                                        </option>
+                                                                        
+                                                                        <option>fi
+                                                                        </option>
+                                                                        
+                                                                        <option>fr
+                                                                        </option>
+                                                                        
+                                                                        <option>hr
+                                                                        </option>
+                                                                        
+                                                                        <option>hu
+                                                                        </option>
+                                                                        
+                                                                        <option>it
+                                                                        </option>
+                                                                        
+                                                                        <option>lt
+                                                                        </option>
+                                                                        
+                                                                        <option>lv
+                                                                        </option>
+                                                                        
+                                                                        <option>nl
+                                                                        </option>
+                                                                        
+                                                                        <option>pl
+                                                                        </option>
+                                                                        
+                                                                        <option>pt
+                                                                        </option>
+                                                                        
+                                                                        <option>ro
+                                                                        </option>
+                                                                        
+                                                                        <option>sk
+                                                                        </option>
+                                                                        
+                                                                        <option>sl
+                                                                        </option>
+                                                                        
+                                                                        <option>sv
+                                                                        </option>
+                                                                        
+                                                                    </select>
+                                                                    <div class="ecl-select__icon">
+                                                                        <svg class="ecl-select__icon-shape ecl-icon ecl-icon--s ecl-icon--rotate-180"
+                                                                             width="24" height="24" xmlns="http://www.w3.org/2000/svg"
+                                                                             viewBox="0 0 24 24">
+                                                                            <path d="M20.623 19.5L12 9.83 3.377 19.5 1 16.835 12 4.5l11 12.335z"/>
+                                                                        </svg>
+                                                                    </div>
+                                                                </div>
+                                                            </td>
+                                                            <td class="simpletext" style="display: none;">&nbsp;<INPUT
+                                                                    TYPE='radio' NAME="search_text" id="measure_radio"
+                                                                    value="measure"
+                                                                    >Any measures textual fields
+                                                            </td>
+                                                        </div>
+                                                    <tr>
+                                                        <td colspan="2">
+                                                            <div id="error_search_text_empty" style="display: none;">
+                                                                    <span class="error_message">The characters sequence trimmed from heading and trailing blank characters of a full text search  must not be empty.</span>
+                                                            </div>
+                                                            <div id="error_search_text_operand" style="display: none;">
+                                                                    <span class="error_message">The characters sequence of the operands of a full text search criterion trimmed from heading and trailing blank characters must not be empty.</span>
+                                                            </div>
+                                                            <div id="error_search_text_quote" style="display: none;">
+                                                                    <span class="error_message">The characters sequence is not correctly formatted with regard to double quotes.</span>
+                                                            </div>
+                                                            <div id="error_search_text_fulltext" style="display: none;">
+                                                                    <span class="error_message">The text length is to small to launch full text search.</span>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    </tr>
+                                                </table>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="form-content-row" id="measure_type_order_number"
+                                                 style="display: none;">
+                                                <div class="form-content" id="measure_type_order_number_left" style="float:left">
+                                                    <table class="ecl-table">
+                                                        <tr>
+                                                            <div>
+                                                                <label class="ecl-form-label"
+                                                                       title="Measure type">Massnahmeart</label>
+                                                            </div>
+                                                            <div class="ecl-select__container ecl-select__container--l  " style="width: 700px" >
+                                                                <script type="text/javascript">buildSelectMeasType("de", "20251201");</script>
+                                                            </div>
+                                                            <div id="error_meas_type_not_valid" style="display: none;">
+                                                            <span class="error_message">If the measure type is specified, it must be valid at the reference date.</span>
+                                                            </div>
+                                                        </tr>
+                                                    </table>
+                                                </div>
+                                                <div class="form-content" id="measure_type_order_number_right" style="float:right">
+                                                    <table class="ecl-table">
+                                                        <div>
+                                                            <label class="ecl-form-label"
+                                                                   title="Order number"
+                                                                   style="display: inline;">Laufende Nummer</label>
+                                                            <br>
+                                                            <input class="ecl-text-input ecl-text-input--m" type="text" size="12"
+                                                                   maxlength="6"
+                                                                   id="OrderNum" name="OrderNum"
+                                                                   onKeyPress="return disableEnterSubmit(event);"
+                                                                   onkeyup="submitQuery(event);" value=><br>
+                                                                
+                                                            <div name="error_enter_data" role="alert" id="error_order_number_format"
+                                                                 class="ecl-message"
+                                                                 data-ecl-message="true" style="display: none;">
+                                                            <span id="message-icon_date3">
+                                                                <svg class="ecl-message__icon ecl-icon ecl-icon--s" width="20" height="20"
+                                                                     xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30"
+                                                                     style="fill: red;">
+                                                                    <path d="M13.576 12.206l2.466 2.467a.331.331 0 0 1 0 .48l-.89.89a.331.331 0 0 1-.48 0l-2.467-2.466a.331.331 0 0 0-.48 0L9.26 16.043a.331.331 0 0 1-.48 0l-.89-.89a.331.331 0 0 1 0-.48l2.466-2.467a.331.331 0 0 0 0-.48L7.888 9.26a.331.331 0 0 1 0-.48l.891-.89a.331.331 0 0 1 .48 0l2.466 2.466a.331.331 0 0 0 .48 0l2.467-2.467a.331.331 0 0 1 .48 0l.89.89a.331.331 0 0 1 0 .48l-2.466 2.467c-.138.206-.138.343 0 .48zM16.933.005h-9.94L0 7.067v9.94L7.062 24h9.94l6.993-7.062V7.067L16.933.005z"/>
+                                                                </svg>
+                                                            </span>
+                                                                <div class="ecl-message__content">
+                                                                    <p id="error-message3" class="ecl-message__description">
+                                                                        Invalid format for the order number.
+                                                                    </p>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div>
+                                                            <label class="ecl-form-label"
+                                                                   title="Regulation"
+                                                                   style="display: inline;">Rechtsgrundlage</label><br>
+                                                            <input class="ecl-text-input ecl-text-input--m" type="text" size="12"
+                                                                   maxlength="9"
+                                                                   id="regulation" name="Regulation"
+                                                                   onKeyPress="return disableEnterSubmit(event);"
+                                                                   onkeyup="submitQuery(event);" value=>
+                                                            <div class="ecl-u-type-paragraph">
+                                                                (z.B. R2842/72, D0456/75)
+                                                            </div>
+                                                        </div>
+                                                            
+                                                        <div name="error_enter_data" role="alert" id="error_regulation_format"
+                                                             class="ecl-message"
+                                                             data-ecl-message="true" style="display: none;">
+                                                        <span id="message-icon_date2">
+                                                                <svg class="ecl-message__icon ecl-icon ecl-icon--s" width="20" height="20"
+                                                                     xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30"
+                                                                     style="fill: red;">
+                                                                    <path d="M13.576 12.206l2.466 2.467a.331.331 0 0 1 0 .48l-.89.89a.331.331 0 0 1-.48 0l-2.467-2.466a.331.331 0 0 0-.48 0L9.26 16.043a.331.331 0 0 1-.48 0l-.89-.89a.331.331 0 0 1 0-.48l2.466-2.467a.331.331 0 0 0 0-.48L7.888 9.26a.331.331 0 0 1 0-.48l.891-.89a.331.331 0 0 1 .48 0l2.466 2.466a.331.331 0 0 0 .48 0l2.467-2.467a.331.331 0 0 1 .48 0l.89.89a.331.331 0 0 1 0 .48l-2.466 2.467c-.138.206-.138.343 0 .48zM16.933.005h-9.94L0 7.067v9.94L7.062 24h9.94l6.993-7.062V7.067L16.933.005z"/>
+                                                                </svg>
+                                                            </span>
+                                                            <div class="ecl-message__content">
+                                                                <p id="error-message2" class="ecl-message__description">
+                                                                    Ungültiges Format für die Verordnung.
+                                                                </p>
+                                                            </div>
+                                                        </div>
+
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="form-content-row" id="pub_start_date" style="display: none;">
+                                                
+                                                <table class="ecl-table">
+                                                    <tr>
+                                                        <label class="ecl-form-label"
+                                                               title="Measure start Date"
+                                                               style="display: inline;">Anfangsdatum</label>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            <div class="form-content-row">
+                                                                <div class="ecl-u-type-paragraph">Zwischen</div>
+                                                                <div style="width:30px;">&nbsp;</div>
+                                                                <div class="ecl-datepicker">
+                                                                    <input data-ecl-auto-init="Datepicker"
+                                                                           class="ecl-datepicker__field ecl-text-input ecl-text-input--m  "
+                                                                           data-ecl-datepicker-toggle="true"
+                                                                           type="text"
+                                                                           autocomplete="off"
+                                                                           size="20"
+                                                                           maxlength="10" datepicker-toggle="true"
+                                                                           onKeyPress="return disableEnterSubmit(event);"
+                                                                           onkeyup="submitQuery(event);"
+                                                                           id="measStartDat"
+                                                                           name="measStartDat"
+                                                                           value=""
+                                                                           onchange="showCalendarForGeo('20251201', 'de', event);"/>
+                                                                    <svg focusable="false" aria-hidden="true"
+                                                                         class="ecl-datepicker__icon ecl-icon ecl-icon--s">
+                                                                        <use xlink:href="europa/ecl/images/icons/sprites/icons.svg#general--calendar"></use>
+                                                                    </svg>
+                                                                </div>
+
+                                                                <div style="width:30px;">&nbsp;</div>
+
+                                                                <div sclass="ecl-u-type-paragraph">und</div>
+
+                                                                <div style="width:30px;">&nbsp;</div>
+
+                                                                <div class="ecl-datepicker">
+                                                                    <input data-ecl-auto-init="Datepicker"
+                                                                           class="ecl-datepicker__field ecl-text-input ecl-text-input--m  "
+                                                                           data-ecl-datepicker-toggle="true"
+                                                                           type="text"
+                                                                           autocomplete="off"
+                                                                           size="20"
+                                                                           maxlength="10"
+                                                                           onKeyPress="return disableEnterSubmit(event);"
+                                                                           onkeyup="submitQuery(event);"
+                                                                           id="measEndDat"
+                                                                           name="measEndDat"
+                                                                           value=""/>
+                                                                    <svg focusable="false" aria-hidden="true"
+                                                                         class="ecl-datepicker__icon ecl-icon ecl-icon--s">
+                                                                        <use xlink:href="europa/ecl/images/icons/sprites/icons.svg#general--calendar"></use>
+                                                                    </svg>
+                                                                </div>
+
+                                                                <div style="width:30px;">&nbsp;</div>
+
+                                                                <div class="ecl-u-type-paragraph">
+                                                                    &nbsp;<a href="#" class="ecl-link ecl-link--standalone"
+                                                                             onclick="lastWeek()">[Letzte Woche]</a>&nbsp;
+                                                                    <a href="#"
+                                                                       class="ecl-link ecl-link--standalone"
+                                                                       onclick="lastMonth()">[Letzten Monat]</a>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                        
+                                                    <tr>
+                                                        <td>
+                                                            <div name="error_enter_data" role="alert"
+                                                                 id="error_meas_date_range" class="ecl-message"
+                                                                 data-ecl-message="true" style="display: none;">
+                                                            <span id="message-icon_date">
+                                                                <svg class="ecl-message__icon ecl-icon ecl-icon--s" width="20" height="20"
+                                                                     xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30"
+                                                                     style="fill: red;">
+                                                                    <path d="M13.576 12.206l2.466 2.467a.331.331 0 0 1 0 .48l-.89.89a.331.331 0 0 1-.48 0l-2.467-2.466a.331.331 0 0 0-.48 0L9.26 16.043a.331.331 0 0 1-.48 0l-.89-.89a.331.331 0 0 1 0-.48l2.466-2.467a.331.331 0 0 0 0-.48L7.888 9.26a.331.331 0 0 1 0-.48l.891-.89a.331.331 0 0 1 .48 0l2.466 2.466a.331.331 0 0 0 .48 0l2.467-2.467a.331.331 0 0 1 .48 0l.89.89a.331.331 0 0 1 0 .48l-2.466 2.467c-.138.206-.138.343 0 .48zM16.933.005h-9.94L0 7.067v9.94L7.062 24h9.94l6.993-7.062V7.067L16.933.005z"/>
+                                                                </svg>
+                                                            </span>
+                                                                <div class="ecl-message__content">
+                                                                    <p id="error-message" class="ecl-message__description">
+                                                                        Die Auswahl des Datums ist ungültig.</p>
+                                                                </div>
+                                                            </div>
+
+
+                                                            <div name="error_enter_data" role="alert" id="error_meas_date"
+                                                                 class="ecl-message"
+                                                                 data-ecl-message="true" style="display: none;">
+                                                        <span id="message-icon_date1">
+                                                            <svg class="ecl-message__icon ecl-icon ecl-icon--s" width="20" height="20"
+                                                                 xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30" style="fill: red;">
+                                                                <path d="M13.576 12.206l2.466 2.467a.331.331 0 0 1 0 .48l-.89.89a.331.331 0 0 1-.48 0l-2.467-2.466a.331.331 0 0 0-.48 0L9.26 16.043a.331.331 0 0 1-.48 0l-.89-.89a.331.331 0 0 1 0-.48l2.466-2.467a.331.331 0 0 0 0-.48L7.888 9.26a.331.331 0 0 1 0-.48l.891-.89a.331.331 0 0 1 .48 0l2.466 2.466a.331.331 0 0 0 .48 0l2.467-2.467a.331.331 0 0 1 .48 0l.89.89a.331.331 0 0 1 0 .48l-2.466 2.467c-.138.206-.138.343 0 .48zM16.933.005h-9.94L0 7.067v9.94L7.062 24h9.94l6.993-7.062V7.067L16.933.005z"/>
+                                                            </svg>
+                                                        </span>
+                                                                <div class="ecl-message__content">
+                                                                    <p id="error-message1" class="ecl-message__description">
+                                                                        Das Datumsformat muss dd-MM-yyyy sein.
+                                                                    </p>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                        
+                                    <tr>
+                                        <td>
+                                            <div class="form-button-area">
+                                                <div>
+                                                    <button class="ecl-button ecl-button--primary"
+                                                            type="button"
+                                                            value="Suche nach Maßnahmen"
+                                                            onclick="searchButClick();">
+                                                        <span class="ecl-button__container"
+                                                              style="width: 100%;text-align: center;">
+                                                            <span class="ecl-button__label" data-ecl-label="true"
+                                                                  style="width: 100%;">
+                                                                  Suche nach Maßnahmen
+                                                            </span>
+                                                        </span>
+                                                    </button>
+                                                    <a style="display:none;">Suche nach Maßnahmen</a>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </table>
+
+                                <input type="submit" value="submit" id="hidden.retrieve.measures" style="display: none;"/>
+                                <input type="hidden" id="level" value="">
+                                    
+                                <div class="ecl-form-group">
+                                    <div class="form-content-row">
+                                        Das Referenzdatum für die Abfrage ist &nbsp;
+                                            
+                                        <div class="ecl-datepicker">
+                                            <div>
+                                                <input data-ecl-auto-init="Datepicker"
+                                                       class="ecl-datepicker__field ecl-text-input ecl-text-input--m  "
+                                                       data-ecl-datepicker-toggle="true"
+                                                       type="text"
+                                                       size="20"
+                                                       maxlength="10"
+                                                       value='01-12-2025'
+                                                       id="SimDatePic"
+                                                       name="DatePicker"
+                                                       onchange="setReferenceDate();"
+                                                />
+                                                <svg focusable="false" aria-hidden="true"
+                                                     class="ecl-datepicker__icon ecl-icon ecl-icon--m">
+                                                    <path d="M5.23 4.058V2.494C5.23 1.668 5.977 1 6.898 1c.92 0 1.666.668 1.666 1.494v1.564c0 .825-.746 1.494-1.666 1.494-.92 0-1.666-.67-1.666-1.494zm10.155 0V2.494c0-.826.745-1.494 1.666-1.494.92 0 1.666.668 1.666 1.494v1.564c0 .825-.746 1.494-1.666 1.494-.92 0-1.666-.67-1.666-1.494zm4.23 15.908h-2.538V17.69h2.538v2.276zm0-3.794h-2.538v-2.275h2.538v2.275zm0-3.793h-2.538v-2.276h2.538v2.276zm-4.23 7.587h-2.539V17.69h2.539v2.276zm0-3.794h-2.539v-2.275h2.539v2.275zm0-3.793h-2.539v-2.276h2.539v2.276zm-4.231 7.587H8.615V17.69h2.539v2.276zm0-3.794H8.615v-2.275h2.539v2.275zm0-3.793H8.615v-2.276h2.539v2.276zm-4.23 7.587h-2.54V17.69h2.54v2.276zm0-3.794h-2.54v-2.275h2.54v2.275zm0-3.793h-2.54v-2.276h2.54v2.276zm14.854-4.046H2.222v13.445h19.556V8.332zM2.692 23C1.758 23 1 22.32 1 21.483V4.793c0-.838.758-1.517 1.692-1.517h1.693v.758c0 1.258 1.136 2.276 2.538 2.276s2.539-1.018 2.539-2.276v-.758h5.076v.758c0 1.258 1.138 2.276 2.539 2.276 1.401 0 2.538-1.018 2.538-2.276v-.758h1.693c.934 0 1.692.679 1.692 1.517v16.69C23 22.32 22.242 23 21.308 23H2.692z"/>
+                                                </svg>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <div name="error_enter_data" role="alert" style="display: none" id="error_simulation_date"
+                                     class="ecl-message" data-ecl-message="true">
+                                <span id="message-icon_simdate">
+                                    <svg class="ecl-message__icon ecl-icon ecl-icon--s" width="20" height="20"
+                                         xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30" style="fill: red;">
+                                        <path d="M13.576 12.206l2.466 2.467a.331.331 0 0 1 0 .48l-.89.89a.331.331 0 0 1-.48 0l-2.467-2.466a.331.331 0 0 0-.48 0L9.26 16.043a.331.331 0 0 1-.48 0l-.89-.89a.331.331 0 0 1 0-.48l2.466-2.467a.331.331 0 0 0 0-.48L7.888 9.26a.331.331 0 0 1 0-.48l.891-.89a.331.331 0 0 1 .48 0l2.466 2.466a.331.331 0 0 0 .48 0l2.467-2.467a.331.331 0 0 1 .48 0l.89.89a.331.331 0 0 1 0 .48l-2.466 2.467c-.138.206-.138.343 0 .48zM16.933.005h-9.94L0 7.067v9.94L7.062 24h9.94l6.993-7.062V7.067L16.933.005z"/>
+                                    </svg>
+                                </span>
+                                    <span style="color:red;">Wenn das Referenzdatum in der Zukunft liegt, kann nicht garantiert werden, dass die angezeigten Daten vollständig sind.</span>
+
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+				<a name="afterForm"/>
+                <div id="overlayPanel" class="customized_information_details" style="display: none;"></div>
+            </div>
+        </main>
+
+        <br>
+        <div class="top-link">
+            <a class="ecl-link ecl-link--standalone" href="#top">Top</a>
+        </div>
+
+        
+            <div>
+                
+                <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+
+
+
+
+
+<html>
+<body>
+<footer class="ecl-footer-harmonised--group1 ecl-footer-harmonised">
+    <div class="ecl-container ecl-footer-harmonised__container">
+        <div class="ecl-footer-harmonised__section ecl-footer-harmonised__section1"><a href="https://ec.europa.eu/taxation_customs/home_en" class="ecl-footer-harmonised__title ecl-link ecl-link--standalone">Taxation and Custom Union</a>
+        </div>
+        <div class="ecl-footer-harmonised__section ecl-footer-harmonised__section2">
+            <div class="ecl-footer-harmonised__title ecl-footer-harmonised__title--separator">Contact us</div>
+            <ul class="ecl-footer-harmonised__list">
+                <li class="ecl-footer-harmonised__list-item"><a href="https://ec.europa.eu/taxation_customs/contacts_en" class="ecl-footer-harmonised__link ecl-link ecl-link--standalone">Contact information of the DG TAXUD</a></li>
+            </ul>
+        </div>
+        <div class="ecl-footer-harmonised__section ecl-footer-harmonised__section3">
+            <div class="ecl-footer-harmonised__title ecl-footer-harmonised__title--separator">About us</div>
+            <ul class="ecl-footer-harmonised__list">
+                <li class="ecl-footer-harmonised__list-item"><a href="https://ec.europa.eu/taxation_customs/newsletters_en" class="ecl-footer-harmonised__link ecl-link ecl-link--standalone">Newsletter</a></li>
+                <li class="ecl-footer-harmonised__list-item"><a href="https://ec.europa.eu/taxation_customs/dds2/taric/faq/20131127-Contact-List.pdf#zoom=125" class="ecl-footer-harmonised__link ecl-link ecl-link--standalone">Contact List</a></li>
+            </ul>
+        </div>
+        <div class="ecl-footer-harmonised__section ecl-footer-harmonised__section4">
+            <div class="ecl-footer-harmonised__title ecl-footer-harmonised__title--separator">Follow us on</div>
+            <ul class="ecl-footer-harmonised__list ecl-footer-harmonised__list--inline">
+                <li class="ecl-footer-harmonised__list-item"><a href="https://www.flickr.com/photos/146315122@N05" class="ecl-footer-harmonised__link ecl-link ecl-link--standalone ecl-link--icon ecl-link--icon-before">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="20 0 50 50" class="ecl-link__icon ecl-icon ecl-icon--xs">
+                        <path fill="#ffffff" d="M 20,0 V 40 H 60 V 0 Z m 14.4,24.5 c -2.5,0 -4.4,-2 -4.4,-4.4 0,-2.5 2,-4.4 4.4,-4.4 2.5,0 4.4,2 4.4,4.4 0,2.4 -2,4.4 -4.4,4.4 z m 11.2,0 c -2.5,0 -4.4,-2 -4.4,-4.4 0,-2.5 2,-4.4 4.4,-4.4 2.5,0 4.4,2 4.4,4.4 0,2.4 -2,4.4 -4.4,4.4 z"/>
+                    </svg><span class="ecl-link__label">Flickr</span></a></li>
+                <li class="ecl-footer-harmonised__list-item"><a href="https://twitter.com/EU_Taxud" class="ecl-footer-harmonised__link ecl-link ecl-link--standalone ecl-link--icon ecl-link--icon-before">
+                    <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="ecl-link__icon ecl-icon ecl-icon--xs">
+                        <path fill="#ffffff" d="M20.592 8.031C20.592 14.068 16.104 21 7.896 21 5.269 21 2.86 20.217 1 18.876h.985c2.08 0 3.94-.783 5.582-2.013a4.415 4.415 0 01-4.268-3.13c.437.112.656.112.875.112.438 0 .766 0 1.204-.112-2.08-.447-3.612-2.236-3.612-4.472.657.223 1.314.559 2.08.559-1.314-.783-2.08-2.236-2.08-3.801 0-.895.22-1.677.657-2.348 2.189 2.907 5.582 4.695 9.303 4.92-.11-.448-.11-.672-.11-1.007 0-2.46 2.08-4.584 4.488-4.584 1.423 0 2.627.559 3.394 1.453.985-.111 1.97-.559 2.845-1.006-.219 1.006-.985 2.013-1.97 2.46.876-.112 1.751-.447 2.627-.783-.766.783-1.532 1.565-2.408 2.236v.671z"/>
+                    </svg><span class="ecl-link__label">Twitter</span></a></li>
+                <li class="ecl-footer-harmonised__list-item"><a href="https://www.youtube.com/EUTaxud" class="ecl-footer-harmonised__link ecl-link ecl-link--standalone ecl-link--icon ecl-link--icon-before">
+                    <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="ecl-link__icon ecl-icon ecl-icon--xs">
+                        <path fill="#ffffff" d="M9.729 15.32l-.001-7.191 5.944 3.608-5.943 3.582zM22.78 6.882s-.215-1.763-.874-2.54c-.837-1.02-1.775-1.024-2.205-1.084C16.623 3 12.005 3 12.005 3h-.01S7.377 3 4.3 3.259c-.43.06-1.368.065-2.205 1.084-.66.777-.874 2.54-.874 2.54S1 8.954 1 11.025v1.942c0 2.07.22 4.142.22 4.142s.215 1.763.874 2.54c.837 1.02 1.936.987 2.426 1.094C6.28 20.939 12 21 12 21s4.623-.008 7.701-.267c.43-.06 1.368-.065 2.205-1.084.66-.777.874-2.54.874-2.54s.22-2.071.22-4.142v-1.942c0-2.07-.22-4.142-.22-4.142z"/></svg>
+                    <span class="ecl-link__label">YouTube</span></a></li>
+            </ul>
+        </div>
+        <div class="ecl-footer-harmonised__section ecl-footer-harmonised__section7"><a href="https://ec.europa.eu/info/index_en" class="ecl-footer-harmonised__title ecl-link ecl-link--standalone">European Commission</a></div>
+        <div class="ecl-footer-harmonised__section ecl-footer-harmonised__section8">
+            <ul class="ecl-footer-harmonised__list">
+                <li class="ecl-footer-harmonised__list-item"><a href="https://ec.europa.eu/info/about-european-commission/contact_en" class="ecl-footer-harmonised__link ecl-link ecl-link--standalone">Contact the European Commission</a></li>
+                <li class="ecl-footer-harmonised__list-item"><a href="https://europa.eu/european-union/contact/social-networks_en#n:+i:4+e:1+t:+s" class="ecl-footer-harmonised__link ecl-link ecl-link--standalone ecl-link--icon ecl-link--icon-after"><span class="ecl-link__label">Follow the European Commission on social media</span>
+                    <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="ecl-link__icon ecl-icon ecl-icon--xs">
+                        <path fill="#ffffff" d="M1 1l8.25.046v2.71H3.796V20.29H20.25v-5.465H23V23H1V1zm11.468 0H23v10.494l-3.944-3.93-5.892 5.87-2.599-2.588 5.847-5.824L12.468 1z"/>
+                    </svg>
+                </a></li>
+                <li class="ecl-footer-harmonised__list-item"><a href="https://ec.europa.eu/info/about-commissions-new-web-presence" class="ecl-footer-harmonised__link ecl-link ecl-link--standalone">About the Commission's new web presence</a></li>
+                <li class="ecl-footer-harmonised__list-item"><a href="https://ec.europa.eu/info/resources-partners" class="ecl-footer-harmonised__link ecl-link ecl-link--standalone">Resources for partners</a></li>
+            </ul>
+        </div>
+        <div class="ecl-footer-harmonised__section ecl-footer-harmonised__section9">
+            <ul class="ecl-footer-harmonised__list">
+                <li class="ecl-footer-harmonised__list-item"><a href="https://ec.europa.eu/info/language-policy_en" class="ecl-footer-harmonised__link ecl-link ecl-link--standalone">Language policy</a></li>
+                <li class="ecl-footer-harmonised__list-item"><a href="https://ec.europa.eu/info/cookies_en" class="ecl-footer-harmonised__link ecl-link ecl-link--standalone">Cookies</a></li>
+                <li class="ecl-footer-harmonised__list-item"><a href="https://ec.europa.eu/info/privacy-policy_en" class="ecl-footer-harmonised__link ecl-link ecl-link--standalone">Privacy policy</a></li>
+                <li class="ecl-footer-harmonised__list-item"><a href="https://ec.europa.eu/info/legal-notice_en" class="ecl-footer-harmonised__link ecl-link ecl-link--standalone">Legal notice</a></li>
+            </ul>
+        </div>
+    </div>
+</footer>
+<script>
+    ECL.autoInit();
+    document.querySelector(".ecl-site-header-harmonised__logo-link").style.flex="1 0 auto";
+</script>
+</body>
+</html>
+            </div>
+        
+    </div>
+    </body>
+
+    </html>
+    <!--form:dump_document/>-->
+
