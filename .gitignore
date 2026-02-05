@@ -132,3 +132,4 @@ frontend.log
 # { "backend_url": "https://api.trycloudflare.com" }
 # --------------------------------------------------------
 backend_url.json
+mac_backend.py
