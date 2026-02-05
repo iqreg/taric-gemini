@@ -12,6 +12,13 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
+#VERSION für codesandbox eingeführt Beschreibung 1-Port-Setup (empfohlen): Frontend + Bilder-Uploads über FastAPI ausliefern
+from fastapi.responses import JSONResponse, FileResponse
+from fastapi.staticfiles import StaticFiles
+
+#VERSION für codesandbox eingeführt Beschreibung 1-Port-Setup (empfohlen): Frontend + Bilder-Uploads über FastAPI ausliefern ende
+
+
 import httpx
 from bs4 import BeautifulSoup
 
@@ -521,6 +528,36 @@ class EvaluationIn(BaseModel):
     reviewer: Optional[str] = None
     comment: Optional[str] = None
     superviser_bewertung: Optional[int] = None
+
+#VERSION für codesandbox eingeführt Beschreibung 1-Port-Setup (empfohlen): Frontend + Bilder-Uploads über FastAPI ausliefern
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
+
+# ...
+
+app = FastAPI(title="TARIC-Gemini-Backend")
+
+# --- Frontend & Static Files (1-Port-Setup) ---
+# Alle Dateien im Repo-Root als /static verfügbar machen (index.html, evaluation.html, auswertung.html, ...)
+app.mount("/static", StaticFiles(directory=str(BASE_DIR)), name="static")
+
+# Upload-Bilder (für Evaluation UI) direkt ausliefern
+app.mount("/bilder_uploads", StaticFiles(directory=str(IMAGE_DIR)), name="bilder_uploads")
+
+# Root-Seite: Frontend
+@app.get("/")
+async def frontend_root():
+    return FileResponse(str(BASE_DIR / "index.html"))
+
+# Komfort-Routen (optional, aber praktisch)
+@app.get("/evaluation")
+async def frontend_evaluation():
+    return FileResponse(str(BASE_DIR / "evaluation.html"))
+
+@app.get("/auswertung")
+async def frontend_auswertung():
+    return FileResponse(str(BASE_DIR / "auswertung.html"))
+#VERSION für codesandbox eingeführt Beschreibung 1-Port-Setup (empfohlen): Frontend + Bilder-Uploads über FastAPI ausliefern ende
 
 
 @app.post("/classify")
