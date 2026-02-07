@@ -1,3 +1,4 @@
+
 # --------------------------------------------------------
 # Virtuelle Umgebungen
 # --------------------------------------------------------
@@ -133,3 +134,11 @@ frontend.log
 # --------------------------------------------------------
 backend_url.json
 mac_backend.py
+#--- personal files
+# --- allow personal docs ---
+!docs/
+!docs/**/*.md
+!docs/**/*
+
+# --- override ignore for filenames with spaces inside docs ---
+!docs/**/*
