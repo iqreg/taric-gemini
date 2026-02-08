@@ -15,6 +15,13 @@ from pydantic import BaseModel
 #VERSION für codesandbox eingeführt Beschreibung 1-Port-Setup (empfohlen): Frontend + Bilder-Uploads über FastAPI ausliefern
 from fastapi.responses import JSONResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
+from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
+
+app = FastAPI()
+
+app.mount("/", StaticFiles(directory="static", html=True), name="static")
+
 
 #VERSION für codesandbox eingeführt Beschreibung 1-Port-Setup (empfohlen): Frontend + Bilder-Uploads über FastAPI ausliefern ende
 
