@@ -533,13 +533,13 @@
             <option value="local">Backend: Local</option>
             <option value="cloudflare">Backend: Cloudflare</option>
           </select>
-          <a href="index.html" class="nav-link">
+          <a href="/" class="nav-link">
             <span class="icon">📷</span><span>Klassifikation</span>
           </a>
-          <a href="evaluation.html" class="nav-link active">
+          <a href="/evaluation" class="nav-link active">
             <span class="icon">🧪</span><span>Evaluation</span>
           </a>
-          <a href="auswertung.html" class="nav-link">
+          <a href="/auswertung" class="nav-link">
             <span class="icon">📊</span><span>DB-Auswertung</span>
           </a>
         </div>
@@ -690,35 +690,33 @@
     }
 
     function getLocalApiBase() {
-      const host = window.location.hostname || "localhost";
-      const protocol = window.location.protocol === "https:" ? "https:" : "http:";
-      // Lokaler Backend-Port 8000
-      return `${protocol}//${host}:8000`;
+      // 1-Port-Setup: gleiche Origin (funktioniert für CodeSandbox & lokal, wenn Frontend via Backend läuft)
+      return window.location.origin;
     }
 
     async function loadCloudflareBackendUrlFromJson() {
       if (cloudflareBackendUrlCache) {
         return cloudflareBackendUrlCache;
       }
-      try {
-        const res = await fetch("backend_url.json", { cache: "no-store" });
-        if (!res.ok) {
-          console.error("backend_url.json nicht erreichbar:", res.status);
-          return null;
+      const candidates = ["/static/backend_url.json", "backend_url.json"];
+      for (const candidate of candidates) {
+        try {
+          const res = await fetch(candidate, { cache: "no-store" });
+          if (!res.ok) {
+            continue;
+          }
+          const cfg = await res.json();
+          if (cfg.backend_url) {
+            const url = cfg.backend_url.replace(/\/+$/, "");
+            cloudflareBackendUrlCache = url;
+            return url;
+          }
+        } catch (err) {
+          console.warn("Fehler beim Laden von backend_url.json:", err);
         }
-        const cfg = await res.json();
-        if (cfg.backend_url) {
-          const url = cfg.backend_url.replace(/\/+$/, "");
-          cloudflareBackendUrlCache = url;
-          return url;
-        } else {
-          console.error("backend_url.json enthält kein 'backend_url'");
-          return null;
-        }
-      } catch (err) {
-        console.error("Fehler beim Laden von backend_url.json:", err);
-        return null;
       }
+      console.error("backend_url.json nicht erreichbar oder ohne 'backend_url'");
+      return null;
     }
 
     async function getBackendBaseUrl() {

@@ -743,7 +743,12 @@
             </p>
 
             <div class="file-row">
-              <input type="file" id="file-input" accept="image/*" />
+              <input
+                type="file"
+                id="file-input"
+                accept="image/*"
+                capture="environment"
+              />
               <div class="filename" id="file-name">Keine Datei ausgewählt</div>
             </div>
 
@@ -934,28 +939,25 @@
         if (cloudflareBackendUrlCache) {
           return cloudflareBackendUrlCache;
         }
-        try {
-          // Wenn du backend_url.json über /static auslieferst, bleibt dieser relative Pfad korrekt.
-          const res = await fetch("/static/backend_url.json", {
-            cache: "no-store",
-          });
-          if (!res.ok) {
-            console.error("backend_url.json nicht erreichbar:", res.status);
-            return null;
+        const candidates = ["/static/backend_url.json", "backend_url.json"];
+        for (const candidate of candidates) {
+          try {
+            const res = await fetch(candidate, { cache: "no-store" });
+            if (!res.ok) {
+              continue;
+            }
+            const cfg = await res.json();
+            if (cfg.backend_url) {
+              const url = cfg.backend_url.replace(/\/+$/, "");
+              cloudflareBackendUrlCache = url;
+              return url;
+            }
+          } catch (err) {
+            console.warn("Fehler beim Laden von backend_url.json:", err);
           }
-          const cfg = await res.json();
-          if (cfg.backend_url) {
-            const url = cfg.backend_url.replace(/\/+$/, "");
-            cloudflareBackendUrlCache = url;
-            return url;
-          } else {
-            console.error("backend_url.json enthält kein 'backend_url'");
-            return null;
-          }
-        } catch (err) {
-          console.error("Fehler beim Laden von backend_url.json:", err);
-          return null;
         }
+        console.error("backend_url.json nicht erreichbar oder ohne 'backend_url'");
+        return null;
       }
 
       async function getBackendBaseUrl() {
