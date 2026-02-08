@@ -4,25 +4,35 @@
 
 Das Projekt dient der automatisierten Bilderkennung und TARIC-Klassifizierung über ein eigenes Backend (Python/FastAPI + Uvicorn) und ein simples Frontend (lokaler HTTP-Server). Der aktuelle Stand umfasst eine funktionierende Bildübertragung an das Backend, eine stabile Kommunikation mit dem Klassifizierungsmodell sowie funktionierende Netzwerkzugriffe über die lokale IP.
 
+## CODESANDBOX UMGEBUNG VORBEREITEN
+
+## ▶ Verwendung Makefile um die Umgebung aufzusetzen
+
+```bash
+make deps
+make run-reload
+```
+
 ## Komponenten
 
 ### Backend
 
-* Framework: FastAPI
-* Startbefehl:
+- Framework: FastAPI
+- Startbefehl:
 
   ```bash
   uvicorn backend:app --reload --host 0.0.0.0 --port 8000
   ```
-* Funktionen:
 
-  * Entgegennahme von Bildern (POST /classify)
-  * Speichern der Bilddateien
-  * Weiterleitung an Klassifizierungsfunktion
+- Funktionen:
+
+  - Entgegennahme von Bildern (POST /classify)
+  - Speichern der Bilddateien
+  - Weiterleitung an Klassifizierungsfunktion
 
 ### Frontend
 
-* Lokaler Webserver mittels Python:
+- Lokaler Webserver mittels Python:
 
   ```bash
   python3 -m http.server 8080 --bind 0.0.0.0
@@ -33,6 +43,7 @@ Frontwnd sollte die ip dre Backendserver Maschine haben, daher automatisch korre
 [17:47:43] qb@mac ~/projects/taric-gemini % /usr/bin/python3 -m http.server 8080 --bind $(ipconfig getifaddr en0)
 
 Serving HTTP on 192.168.7.124 port 8080 (http://192.168.7.124:8080/) ...
+
 ```
 
 * Index-Datei wird korrekt von anderen Geräten im Netzwerk geladen
@@ -42,9 +53,11 @@ Serving HTTP on 192.168.7.124 port 8080 (http://192.168.7.124:8080/) ...
 * Lokale Mac-IP: Beispiel `192.168.7.124`
 * Adressschema für Frontend-Aufruf:
 
-  ```
-  http://192.168.7.124:8080/index.html
-  ```
+```
+
+http://192.168.7.124:8080/index.html
+
+````
 * Firewall-Thema gelöst: Ports korrekt freigegeben
 * Wichtig: Bei Änderungen der Firewall-Einträge werden Regeln teilweise automatisch gelöscht → erneute Prüfung notwendig
 
@@ -52,34 +65,34 @@ Serving HTTP on 192.168.7.124 port 8080 (http://192.168.7.124:8080/) ...
 
 * Bildempfang funktioniert:
 
-  * Logging zeigt volle Bildbytes
-  * Dateien werden unter `bilder_uploads/` gespeichert
+* Logging zeigt volle Bildbytes
+* Dateien werden unter `bilder_uploads/` gespeichert
 * Klassifizierungsmodell liefert JSON mit:
 
-  * taric_code
-  * cn_code
-  * hs_chapter
-  * confidence
-  * short_reason
-  * possible_alternatives
+* taric_code
+* cn_code
+* hs_chapter
+* confidence
+* short_reason
+* possible_alternatives
 
 ## Beispiel-Response
 
 ```json
 {
-  "taric_code": "8517620000",
-  "cn_code": "85176200",
-  "hs_chapter": "85",
-  "confidence": 0.9,
-  "short_reason": "Dockingstation mit Netzwerkschnittstellen.",
-  "possible_alternatives": [ ... ]
+"taric_code": "8517620000",
+"cn_code": "85176200",
+"hs_chapter": "85",
+"confidence": 0.9,
+"short_reason": "Dockingstation mit Netzwerkschnittstellen.",
+"possible_alternatives": [ ... ]
 }
-```
+````
 
 ## Branch & GitHub
 
-* Ziel: Aktuelle lokale Version (Backend + Frontend + Infrastruktur) in neuen Branch pushen
-* Standard-Vorgehen:
+- Ziel: Aktuelle lokale Version (Backend + Frontend + Infrastruktur) in neuen Branch pushen
+- Standard-Vorgehen:
 
   ```bash
   git add .
@@ -99,8 +112,6 @@ project-root/
 │ requirements.txt
 └─ README.md
 ```
-
-
 
 ---
 
@@ -127,11 +138,12 @@ taric-gemini/
 
 ## 🔧 Voraussetzungen
 
-* **Python 3.10+**
-* **Google Gemini API Key**
+- **Python 3.10+**
+- **Google Gemini API Key**
 
-  * erstellen unter [https://aistudio.google.com](https://aistudio.google.com)
-* **Virtuelle Umgebung** (empfohlen)
+  - erstellen unter [https://aistudio.google.com](https://aistudio.google.com)
+
+- **Virtuelle Umgebung** (empfohlen)
 
 Abhängigkeiten:
 
@@ -194,8 +206,8 @@ http://localhost:8000/health
 
 Die Datei `index.html` kann direkt geöffnet werden:
 
-* auf Desktop → Doppelklick
-* auf Mobile → lokal hochladen oder via `python -m http.server` hosten
+- auf Desktop → Doppelklick
+- auf Mobile → lokal hochladen oder via `python -m http.server` hosten
 
 Workflow:
 
@@ -242,10 +254,10 @@ werden alle Bilder in `bilder/` klassifiziert und in einer separaten DB gespeich
 
 ## 🔒 Sicherheit
 
-* API-Keys werden **nicht** in Git gespeichert
-* `.venv/`, `*.db` und `bilder/` sind **.gitignore**-geschützt
-* Frontend hat **keinen Zugriff** auf den API-Key
-* Backend verwaltet den Key über Umgebungsvariablen
+- API-Keys werden **nicht** in Git gespeichert
+- `.venv/`, `*.db` und `bilder/` sind **.gitignore**-geschützt
+- Frontend hat **keinen Zugriff** auf den API-Key
+- Backend verwaltet den Key über Umgebungsvariablen
 
 ---
 
@@ -255,7 +267,4 @@ Interne Verwendung – nicht für produktive Zollprozesse vorgesehen.
 
 ---
 
-
-
-
-* 
+-
