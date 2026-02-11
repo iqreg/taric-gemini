@@ -6,7 +6,9 @@ import traceback
 from datetime import date
 from pathlib import Path
 from typing import Optional, List, Dict, Any
+from io import BytesIO
 
+from PIL import Image
 from fastapi import FastAPI, File, UploadFile, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -20,7 +22,8 @@ from fastapi.staticfiles import StaticFiles
 
 app = FastAPI()
 
-app.mount("/", StaticFiles(directory="static", html=True), name="static")
+# Mount static files from the root directory for HTML pages
+app.mount("/", StaticFiles(directory=".", html=True), name="static")
 
 
 #VERSION für codesandbox eingeführt Beschreibung 1-Port-Setup (empfohlen): Frontend + Bilder-Uploads über FastAPI ausliefern ende
@@ -601,12 +604,29 @@ async def classify(file: UploadFile = File(...)):
                 },
             )
 
-        # Bild speichern (für Evaluation)
+        # Bild in WebP konvertieren und speichern (zur Speicherersparnis)
         ts = time.strftime("%Y%m%d_%H%M%S")
-        filename = f"{ts}_{int(time.time() * 1000)}{suffix}"
+        filename = f"{ts}_{int(time.time() * 1000)}.webp"
         img_path = IMAGE_DIR / filename
-        with img_path.open("wb") as f:
-            f.write(data)
+        
+        try:
+            # Konvertiere zu WebP
+            img = Image.open(BytesIO(data))
+            # Auto-Rotation basierend auf EXIF-Daten
+            try:
+                from PIL import ImageOps
+                img = ImageOps.exif_transpose(img)
+            except:
+                pass
+            img.save(img_path, 'WEBP', quality=85, method=6)
+            print(f"✅ Bild gespeichert als WebP: {filename}")
+        except Exception as e:
+            # Fallback: Speichere Original (falls WebP-Konvertierung fehlschlägt)
+            print(f"⚠️  WebP-Konvertierung fehlgeschlagen: {e}. Speichere Original...")
+            filename = f"{ts}_{int(time.time() * 1000)}{Path(original_name).suffix}"
+            img_path = IMAGE_DIR / filename
+            with img_path.open("wb") as f:
+                f.write(data)
 
         # Modell aufrufen
         try:

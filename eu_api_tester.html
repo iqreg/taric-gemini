@@ -355,7 +355,7 @@
             <option value="cloudflare">Backend: Cloudflare</option>
           </select>
           <a href="index.html" class="nav-link">
-            <span class="icon">📷</span><span>Klassifikation</span>
+            <span class="icon">📷</span><span>Einreihung</span>
           </a>
           <a href="evaluation.html" class="nav-link">
             <span class="icon">🧪</span><span>Evaluation</span>
@@ -405,9 +405,9 @@
         if (stored === "local" || stored === "cloudflare") {
           return stored;
         }
-        return "cloudflare";
+        return "local";
       } catch {
-        return "cloudflare";
+        return "local";
       }
     }
 
@@ -541,7 +541,7 @@
 
       const item = items[currentIndex];
       const filename = item.filename || "";
-      const imgSrc = `bilder_uploads/${filename}`;
+      const imgSrc = `/bilder_uploads/${filename}`;
       console.log("Bild-URL:", imgSrc, "Filename:", filename);
 
       const confRaw = typeof item.confidence === "number"
@@ -554,7 +554,7 @@
         <img src="${imgSrc}" alt="${filename}" />
         <div class="meta">
           <div><strong>taric_live.id:</strong> ${item.taric_live_id ?? item.id ?? "–"}</div>
-          <div><strong>Datei:</strong> ${filename}</div>
+          <div><strong>Zollgut:</strong> ${filename}</div>
           <div><strong>Erfasst:</strong> ${item.created_at || ""}</div>
         </div>
         <div class="codes">
@@ -648,6 +648,18 @@
       backendModeSelect.value = mode;
       backendModeSelect.addEventListener("change", () => {
         const newMode = setBackendModeStored(backendModeSelect.value);
+        
+        // Warnung wenn zu Cloudflare gewechselt wird
+        if (newMode === "cloudflare") {
+          alert(
+            "⚠️ WICHTIG: Cloudflare-Backend\n\n" +
+            "Der Client ist nur erreichbar wenn:\n" +
+            "- Cloudflare Quick Tunnel aktiv ist\n" +
+            "- VPN konfiguriert und verbunden ist\n\n" +
+            "Falls nicht konfiguriert: Nutze lokales Backend (Port 8000) auf der gleichen Maschine."
+          );
+        }
+        
         cloudflareBackendUrlCache = null;
         setStatus(
           newMode === "cloudflare"

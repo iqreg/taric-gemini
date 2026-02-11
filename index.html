@@ -2,7 +2,7 @@
 <html lang="de">
   <head>
     <meta charset="UTF-8" />
-    <title>TARIC Bildklassifikation (Gemini)</title>
+    <title>TARIC Bildeinreihung (Gemini)</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <style>
       :root {
@@ -689,7 +689,7 @@
     <div class="app">
       <header>
         <div class="title-block">
-          <h1><span class="icon">📷</span>TARIC Klassifikation per Foto</h1>
+          <h1><span class="icon">📷</span>TARIC Einreihung per Foto</h1>
           <p class="subtitle">
             Foto hochladen → Modell ermittelt den wahrscheinlichsten TARIC-Code
             inkl. Begründung.
@@ -704,7 +704,7 @@
           <!-- 1-Port-Setup: Links als FastAPI-Routen (passen zu /evaluation & /auswertung im Backend) -->
           <div class="nav-links">
             <a href="/" class="nav-link active">
-              <span class="icon">📷</span><span>Klassifikation</span>
+              <span class="icon">📷</span><span>Einreihung</span>
             </a>
             <a href="/evaluation" class="nav-link">
               <span class="icon">🧪</span><span>Evaluation</span>
@@ -726,20 +726,19 @@
       </header>
 
       <main>
-        <!-- Bild-Upload -->
+        <!-- Zollgut-Upload -->
         <section class="card">
           <div class="card-inner">
             <div class="card-header">
               <div class="card-title">
                 <span class="icon">🖼️</span>
-                <span>Bild-Upload</span>
+                <span>Zollgut-Upload</span>
               </div>
               <div class="card-step">Schritt 1</div>
             </div>
 
             <p class="hint">
-              Foto aufnehmen oder ein Bild aus der Galerie wählen. Das Bild wird
-              an dein Backend gesendet (Standard: same origin).
+              Warenbild aufnehmen oder aus der Sammlung auswählen. Das Zollgut wird zur Tarifeinreihung an das Zollsystem übermittelt (Standard: same origin).
             </p>
 
             <div class="file-row">
@@ -749,7 +748,7 @@
                 accept="image/*"
                 capture="environment"
               />
-              <div class="filename" id="file-name">Keine Datei ausgewählt</div>
+              <div class="filename" id="file-name">Kein Zollgut ausgewählt</div>
             </div>
 
             <div class="preview-frame">
@@ -781,13 +780,13 @@
           </div>
         </section>
 
-        <!-- Klassifikation & Feedback -->
+        <!-- Einreihung & Feedback -->
         <section class="card">
           <div class="card-inner">
             <div class="card-header">
               <div class="card-title">
                 <span class="icon">📊</span>
-                <span>Klassifikation &amp; Feedback</span>
+                <span>Einreihung &amp; Feedback</span>
               </div>
               <div class="card-step">Schritt 2</div>
             </div>
@@ -867,7 +866,7 @@
                 </ul>
               </div>
 
-              <div class="meta-result" id="meta-result">ID: – · Datei: –</div>
+              <div class="meta-result" id="meta-result">ID: – · Zollgut: –</div>
             </div>
 
             <div class="feedback-block">
@@ -978,7 +977,7 @@
       }
 
       // -----------------------------------
-      // UI-Elemente & Klassifikation
+      // UI-Elemente & Einreihung
       // -----------------------------------
       const fileInput = document.getElementById("file-input");
       const fileNameEl = document.getElementById("file-name");
@@ -1027,7 +1026,7 @@
       fileInput.addEventListener("change", () => {
         const file = fileInput.files && fileInput.files[0];
         if (!file) {
-          fileNameEl.textContent = "Keine Datei ausgewählt";
+          fileNameEl.textContent = "Kein Zollgut ausgewählt";
           previewImg.style.display = "none";
           classifyBtn.disabled = true;
           return;
@@ -1197,7 +1196,7 @@
 
         const id = data.id ?? "–";
         const fn = data.filename ?? "–";
-        metaResultEl.textContent = `ID: ${id} · Datei: ${fn}`;
+        metaResultEl.textContent = `ID: ${id} · Zollgut: ${fn}`;
 
         btnOk.classList.remove("saved");
         btnNo.classList.remove("saved");
@@ -1248,6 +1247,18 @@
           backendModeSelect.value = mode;
           backendModeSelect.addEventListener("change", () => {
             const newMode = setBackendModeStored(backendModeSelect.value);
+            
+            // Warnung wenn zu Cloudflare gewechselt wird
+            if (newMode === "cloudflare") {
+              alert(
+                "⚠️ WICHTIG: Cloudflare-Backend\n\n" +
+                "Der Client ist nur erreichbar wenn:\n" +
+                "- Cloudflare Quick Tunnel aktiv ist\n" +
+                "- VPN konfiguriert und verbunden ist\n\n" +
+                "Falls nicht konfiguriert: Nutze lokales Backend (Port 8000) auf der gleichen Maschine."
+              );
+            }
+            
             cloudflareBackendUrlCache = null;
             setStatus(
               "info",

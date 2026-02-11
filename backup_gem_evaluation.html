@@ -288,7 +288,7 @@
 
         <div class="meta-box">
           <div class="meta-item">
-            <span class="meta-label">ID / Dateiname:</span>
+            <span class="meta-label">ID / Zollgut:</span>
             <span class="meta-value" id="meta-id">N/A</span>
           </div>
           <div class="meta-item">
@@ -317,7 +317,7 @@
 
       <div class="right-panel">
         <div class="form-section">
-          <h2>1. KI-Klassifikation</h2>
+          <h2>1. KI-Einreihung</h2>
           <label>Vorgeschlagener TARIC-Code:</label>
           <p>
             <span id="ki-taric-code" class="taric-code-pill"></span>
@@ -701,6 +701,18 @@
       backendModeSelect.value = mode;
       backendModeSelect.addEventListener("change", () => {
         const newMode = setBackendModeStored(backendModeSelect.value);
+        
+        // Warnung wenn zu Cloudflare gewechselt wird
+        if (newMode === "cloudflare") {
+          alert(
+            "⚠️ WICHTIG: Cloudflare-Backend\n\n" +
+            "Der Client ist nur erreichbar wenn:\n" +
+            "- Cloudflare Quick Tunnel aktiv ist\n" +
+            "- VPN konfiguriert und verbunden ist\n\n" +
+            "Falls nicht konfiguriert: Nutze lokales Backend (Port 8000) auf der gleichen Maschine."
+          );
+        }
+        
         cloudflareBackendUrlCache = null; 
         setStatus(
           newMode === "cloudflare"

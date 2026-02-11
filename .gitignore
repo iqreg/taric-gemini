@@ -17,9 +17,23 @@ __pycache__/
 .DS_Store
 
 # --------------------------------------------------------
-# API-Key / Secrets
+# API-Key / Secrets / Umgebungsdateien
 # --------------------------------------------------------
 API_GEMINI.txt
+.env
+.env.local
+.env.*.local
+email_config.env
+backend_url.json
+
+# --------------------------------------------------------
+# Konfigurationsdateien (können URLs/Pfade enthalten)
+# --------------------------------------------------------
+projectfiles.txt
+start_all.command
+start_all.sh
+mac_backend.py
+recipients.txt
 
 # --------------------------------------------------------
 # Lokale SQLite / Testdatenbanken
@@ -112,28 +126,14 @@ backup_files/
 # Logs
 *.log
 
-# lokale Umgebungsdateien
-*.env
-recipients.txt
-backend_url.json
-projectfiles.txt
-start_all.command
-start_all.sh
 # --------------------------------------------------------
 # Logfiles (Backend/Cloudflare)
 # --------------------------------------------------------
-
 *.log
 backend.log
 cf_backend.log
 cf_frontend.log
 frontend.log
-# --------------------------------------------------------
-# start_all.sh erzeugt bei jedem Start eine neue Cloudflare-URL 
-# { "backend_url": "https://api.trycloudflare.com" }
-# --------------------------------------------------------
-backend_url.json
-mac_backend.py
 #--- personal files
 # --- allow personal docs ---
 !docs/

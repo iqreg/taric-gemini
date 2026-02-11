@@ -293,7 +293,7 @@
       <div class="actions">
         <a class="btn btn-primary" href="/">
           <span class="icon">↩︎</span>
-          <span>TARIC Klassifikation</span>
+          <span>TARIC Einreihung</span>
         </a>
         <a class="btn btn-secondary" href="/evaluation">
           <span class="icon">🧪</span>
@@ -368,9 +368,9 @@
           return stored;
         }
         // Standardmodus, falls noch nichts gespeichert wurde:
-        return "cloudflare";
+        return "local";
       } catch {
-        return "cloudflare";
+        return "local";
       }
     }
 
@@ -525,6 +525,18 @@
       backendModeSelect.value = mode;
       backendModeSelect.addEventListener("change", () => {
         const newMode = setBackendModeStored(backendModeSelect.value);
+        
+        // Warnung wenn zu Cloudflare gewechselt wird
+        if (newMode === "cloudflare") {
+          alert(
+            "⚠️ WICHTIG: Cloudflare-Backend\n\n" +
+            "Der Client ist nur erreichbar wenn:\n" +
+            "- Cloudflare Quick Tunnel aktiv ist\n" +
+            "- VPN konfiguriert und verbunden ist\n\n" +
+            "Falls nicht konfiguriert: Nutze lokales Backend (Port 8000) auf der gleichen Maschine."
+          );
+        }
+        
         cloudflareBackendUrlCache = null; // bei Mode-Wechsel neu laden
         statusText.textContent =
           newMode === "cloudflare"
