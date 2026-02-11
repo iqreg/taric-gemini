@@ -23,7 +23,7 @@ from fastapi.staticfiles import StaticFiles
 app = FastAPI()
 
 # Mount static files from the root directory for HTML pages
-app.mount("/", StaticFiles(directory=".", html=True), name="static")
+app.mount("/", StaticFiles(directory=str(BASE_DIR), html=True), name="static")
 
 
 #VERSION für codesandbox eingeführt Beschreibung 1-Port-Setup (empfohlen): Frontend + Bilder-Uploads über FastAPI ausliefern ende
