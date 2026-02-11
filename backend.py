@@ -22,12 +22,7 @@ from fastapi.staticfiles import StaticFiles
 
 app = FastAPI()
 
-# Mount static files from the root directory for HTML pages
-app.mount("/", StaticFiles(directory=str(BASE_DIR), html=True), name="static")
-
-
-#VERSION für codesandbox eingeführt Beschreibung 1-Port-Setup (empfohlen): Frontend + Bilder-Uploads über FastAPI ausliefern ende
-
+#VERSION für codesandbox eingeführt Beschreibung 1-Port-Setup (empfohlen): Frontend + Bilder-Uploads über FastAPI ausliefern
 
 import httpx
 from bs4 import BeautifulSoup
@@ -45,6 +40,9 @@ DB_PATH = BASE_DIR / "taric_live.db"
 # damit sie später im Evaluationsmodul genutzt werden können.
 IMAGE_DIR = BASE_DIR / "bilder_uploads"
 IMAGE_DIR.mkdir(parents=True, exist_ok=True)
+
+# Mount static files from the root directory for HTML pages
+app.mount("/", StaticFiles(directory=str(BASE_DIR), html=True), name="static")
 
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 # GEMINI_MODEL_NAME = os.getenv("GEMINI_MODEL_NAME", "gemini-2.5-flash")
