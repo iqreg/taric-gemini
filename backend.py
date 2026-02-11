@@ -44,6 +44,10 @@ IMAGE_DIR.mkdir(parents=True, exist_ok=True)
 # Mount static files from the root directory for HTML pages
 app.mount("/", StaticFiles(directory=str(BASE_DIR), html=True), name="static")
 
+@app.get("/health")
+def health():
+    return JSONResponse(content={"status": "ok"}, status_code=200)
+
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 # GEMINI_MODEL_NAME = os.getenv("GEMINI_MODEL_NAME", "gemini-2.5-flash")
 GEMINI_MODEL_NAME = os.getenv("GEMINI_MODEL_NAME", "gemini-2.5-flash-lite")
