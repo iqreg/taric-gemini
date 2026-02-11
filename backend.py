@@ -41,8 +41,17 @@ DB_PATH = BASE_DIR / "taric_live.db"
 IMAGE_DIR = BASE_DIR / "bilder_uploads"
 IMAGE_DIR.mkdir(parents=True, exist_ok=True)
 
-# Mount static files from the root directory for HTML pages
-app.mount("/", StaticFiles(directory=str(BASE_DIR), html=True), name="static")
+# Mount static files under /static to avoid shadowing API routes
+app.mount("/static", StaticFiles(directory=str(BASE_DIR), html=True), name="static")
+
+
+@app.get("/")
+def serve_index():
+    index_file = BASE_DIR / "index.html"
+    if index_file.exists():
+        return FileResponse(path=str(index_file), media_type="text/html")
+    return JSONResponse(content={"message": "index not found"}, status_code=404)
+
 
 @app.get("/health")
 def health():
