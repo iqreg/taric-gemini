@@ -66,17 +66,29 @@ http://192.168.7.124:8080/index.html
 * Bildempfang funktioniert:
 
 * Logging zeigt volle Bildbytes
-* Dateien werden unter `bilder_uploads/` gespeichert (nun immer im **AVIF**-Format konvertiert)
-* Bilder werden automatisch dem Git-Repository hinzugefügt und bei jedem Upload gepusht,
-  so dass sie auch nach einem Neustart oder einer neuen Session verfügbar bleiben.
+* **Persistente Speicherung der Uploads**
+  - Alle Bilder landen unter `bilder_uploads/` (ebenfalls statisch über
+    FastAPI erreichbar).
+  - Beim Einlesen werden sie automatisch nach AVIF konvertiert, wodurch
+der Speicherplatzbedarf deutlich sinkt.  Fotodateien aller Formate
+werden akzeptiert und intern konvertiert.
+  - Nach dem Speichern wird die Datei per `git add`/`commit`/`push`
+in das Repository übertragen (funktioniert, sofern `git` im Container
+konfiguriert ist und ein Remote hinterlegt wurde).  Ein fehlender Push
+löst lediglich eine Warnung aus; der Upload selbst schlägt nie fehl.
+  - Beim Serverstart bemüht sich ein `git pull`, so dass auf einer
+    neuen Instanz bereits vorhandene Bilder geladen werden.
+  - **.gitignore wurde angepasst**; `bilder_uploads/` ist jetzt im Repo,
+wird also von Gitversionierung erfasst.
+
 * Klassifizierungsmodell liefert JSON mit:
 
-* taric_code
-* cn_code
-* hs_chapter
-* confidence
-* short_reason
-* possible_alternatives
+  * taric_code
+  * cn_code
+  * hs_chapter
+  * confidence
+  * short_reason
+  * possible_alternatives
 
 ## Beispiel-Response
 
@@ -101,6 +113,24 @@ http://192.168.7.124:8080/index.html
   git commit -m "Projektstatus aktualisiert, Backend/Frontend stabil"
   git push -u origin <branch-name>
   ```
+
+### Git-Konfiguration für Bilder-Persistenz
+
+Damit die Uploads wirklich automatisch versioniert werden, muss der
+Server-/Entwicklungscontainer ein funktionierendes Git haben und auf ein
+Remote zeigen.  Beispiel:
+
+```bash
+cd /workspaces/taric-gemini
+git remote add origin https://github.com/iqreg/taric-gemini.git
+# (oder SSH-URL, je nach Setup)
+git fetch origin && git checkout -b my-branch origin/main
+```
+
+Bei jedem neuen Bild versucht das Backend, es sofort zu committen und
+zu pushen.  Falls das nicht möglich ist (z.B. fehlende Schreibrechte),
+wird nur eine Warnung in der Server-Konsole ausgegeben und der Upload
+bleibt lokal erhalten.
 
 ## Projektordner-Struktur
 
