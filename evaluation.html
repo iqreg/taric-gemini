@@ -698,7 +698,10 @@
       if (cloudflareBackendUrlCache) {
         return cloudflareBackendUrlCache;
       }
-      const candidates = ["/static/backend_url.json", "backend_url.json"];
+      // `backend_url.json` is served under /static, so use the
+      // absolute path only.  Removing the relative fallback prevents
+      // wrong requests when navigating to another route.
+      const candidates = ["/static/backend_url.json"];
       for (const candidate of candidates) {
         try {
           const res = await fetch(candidate, { cache: "no-store" });

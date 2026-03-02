@@ -391,7 +391,9 @@
       if (cloudflareBackendUrlCache) {
         return cloudflareBackendUrlCache;
       }
-      const candidates = ["/static/backend_url.json", "backend_url.json"];
+      // fetch configuration from the single static mount – no
+      // relative candidate needed any more
+      const candidates = ["/static/backend_url.json"];
       for (const candidate of candidates) {
         try {
           const res = await fetch(candidate, { cache: "no-store" });

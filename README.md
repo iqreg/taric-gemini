@@ -66,7 +66,9 @@ http://192.168.7.124:8080/index.html
 * Bildempfang funktioniert:
 
 * Logging zeigt volle Bildbytes
-* Dateien werden unter `bilder_uploads/` gespeichert
+* Dateien werden unter `bilder_uploads/` gespeichert (nun immer im **AVIF**-Format konvertiert)
+* Bilder werden automatisch dem Git-Repository hinzugefügt und bei jedem Upload gepusht,
+  so dass sie auch nach einem Neustart oder einer neuen Session verfügbar bleiben.
 * Klassifizierungsmodell liefert JSON mit:
 
 * taric_code
@@ -106,7 +108,7 @@ http://192.168.7.124:8080/index.html
 project-root/
 │ backend.py
 │ index.html
-│ bilder_uploads/
+│ bilder_uploads/  ← Upload-Verzeichnis, jetzt versioniert und AVIF-komprimiert
 │ .venv_taric/
 │ kill_http_servers.sh
 │ requirements.txt

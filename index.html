@@ -939,7 +939,10 @@
         if (cloudflareBackendUrlCache) {
           return cloudflareBackendUrlCache;
         }
-        const candidates = ["/static/backend_url.json", "backend_url.json"];
+        // always load config from the mounted static directory –
+      // the earlier relative fallback caused 404s when the page was
+      // served from a sub‑path (e.g. /evaluation or /auswertung).
+      const candidates = ["/static/backend_url.json"];
         for (const candidate of candidates) {
           try {
             const res = await fetch(candidate, { cache: "no-store" });

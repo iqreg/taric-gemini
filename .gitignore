@@ -29,8 +29,8 @@ API_GEMINI.txt
 # --------------------------------------------------------
 # Lokale Bilddaten
 # --------------------------------------------------------
-bilder/
-bilder_uploads/
+# bilder/  (historisch)
+# bilder_uploads/  # now tracked in git; do not ignore
 
 # --------------------------------------------------------
 # VS Code Workspace (optional)
@@ -103,7 +103,10 @@ data/taric_bulk_originals/
 data/taric_bulk_log.csv
 
 # Uploads
-bilder_uploads/
+# images are now persisted in git so that they survive restarts and can be
+# pushed to GitHub.  Remove the ignore rule below if you want new uploads to
+# be tracked automatically.
+
 # Backup-Dateien
 bck*
 backup_files/

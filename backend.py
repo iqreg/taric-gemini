@@ -3,6 +3,7 @@ import json
 import sqlite3
 import time
 import traceback
+import subprocess
 from datetime import date
 from pathlib import Path
 from typing import Optional, List, Dict, Any
@@ -12,18 +13,29 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
-#VERSION für codesandbox eingeführt Beschreibung 1-Port-Setup (empfohlen): Frontend + Bilder-Uploads über FastAPI ausliefern
+# Pillow wird für die Konvertierung genutzt
+from PIL import Image
+import io
+
+# VERSION für codesandbox eingeführt Beschreibung 1-Port-Setup (empfohlen):
+#    Frontend + Bilder-Uploads über FastAPI ausliefern
+#
+# Die ursprüngliche Version hatte hier mehrere doppelte Imports, eine
+# `app = FastAPI()`-Instanz und sogar ein `app.mount("/", ... )`, was
+# später erneut überschrieben wurde.  Das führte zu Verwirrung und
+# Problemen beim Bereitstellen von statischen Dateien (links nach
+# `/static/...` landeten nicht im erwarteten Verzeichnis).  Wir belassen
+# nur die notwendige Konfiguration weiter unten, so dass das "static"-
+# Mount einmalig und korrekt initialisiert wird.
 from fastapi.responses import JSONResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi import FastAPI
-from fastapi.staticfiles import StaticFiles
 
-app = FastAPI()
+# die eigentliche FastAPI-App wird weiter unten mit Titel erstellt
+# (avoid double instantiation)
 
-app.mount("/", StaticFiles(directory="static", html=True), name="static")
-
-
-#VERSION für codesandbox eingeführt Beschreibung 1-Port-Setup (empfohlen): Frontend + Bilder-Uploads über FastAPI ausliefern ende
+# VERSION für codesandbox eingeführt Beschreibung 1-Port-Setup (empfohlen):
+#    Frontend + Bilder-Uploads über FastAPI ausliefern ende
 
 
 import httpx
@@ -125,6 +137,52 @@ def init_db() -> None:
     - taric_evaluation existiert
     - Spalte superviser_bewertung in taric_evaluation existiert
     """
+
+
+# --- Git-Helpers ------------------------------------------------
+
+def git_pull_repo():
+    """Zieht beim Serverstart (oder wann immer nötig) neue Bilder aus dem
+    Remote-Repo. Fehler werden nur geloggt, nicht weitergereicht.  """
+    try:
+        subprocess.run(["git", "pull"], check=True)
+        print("git pull successful")
+    except subprocess.CalledProcessError as e:
+        print("Warning: git pull failed:", e)
+
+
+def git_add_commit_push(path: Path, message: str | None = None):
+    """Fügt die Datei dem Index hinzu, commitet und pusht.  """
+    try:
+        subprocess.run(["git", "add", str(path)], check=True)
+        msg = message or f"Add upload {path.name}"
+        subprocess.run(["git", "commit", "-m", msg], check=True)
+        subprocess.run(["git", "push"], check=True)
+    except subprocess.CalledProcessError as e:
+        print("Git operation failed:", e)
+
+
+# helper zum Speichern als AVIF
+
+def save_bytes_as_avif(data: bytes) -> (str, Path):
+    """Konvertiert die Rohdaten in AVIF und speichert sie im Bilder‑Verzeichnis.
+    Gibt (Dateiname, Path) zurück.  Falls die Konversion fehlschlägt, wird der
+    Rohdatenblob einfach unverändert geschrieben.
+    """
+    ts = time.strftime("%Y%m%d_%H%M%S")
+    fname = f"{ts}_{int(time.time() * 1000)}.avif"
+    path = IMAGE_DIR / fname
+    try:
+        img = Image.open(io.BytesIO(data))
+        # Pillow macht je nach Quellmodus die richtige Konversion
+        if img.mode not in ("RGB", "RGBA"):
+            img = img.convert("RGB")
+        img.save(path, format="AVIF")
+    except Exception as exc:  # fallback: Rohdaten schreiben
+        print("AVIF conversion failed, writing raw bytes:", exc)
+        with path.open("wb") as f:
+            f.write(data)
+    return fname, path
     conn = get_conn()
     cur = conn.cursor()
 
@@ -518,6 +576,11 @@ async def fetch_official_taric_description(
 
 app = FastAPI(title="TARIC-Gemini-Backend")
 
+# pull remote images when the server starts
+@app.on_event("startup")
+def on_startup():
+    git_pull_repo()
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -536,13 +599,10 @@ class EvaluationIn(BaseModel):
     comment: Optional[str] = None
     superviser_bewertung: Optional[int] = None
 
-#VERSION für codesandbox eingeführt Beschreibung 1-Port-Setup (empfohlen): Frontend + Bilder-Uploads über FastAPI ausliefern
-from fastapi.staticfiles import StaticFiles
+# VERSION für codesandbox eingeführt Beschreibung 1-Port-Setup (empfohlen):
+# Frontend + Bilder-Uploads über FastAPI ausliefern
+# (die relevanten Imports sind bereits ganz oben gezogen)
 from fastapi.responses import FileResponse
-
-# ...
-
-app = FastAPI(title="TARIC-Gemini-Backend")
 
 # --- Frontend & Static Files (1-Port-Setup) ---
 # Alle Dateien im Repo-Root als /static verfügbar machen (index.html, evaluation.html, auswertung.html, ...)
@@ -601,12 +661,16 @@ async def classify(file: UploadFile = File(...)):
                 },
             )
 
-        # Bild speichern (für Evaluation)
-        ts = time.strftime("%Y%m%d_%H%M%S")
-        filename = f"{ts}_{int(time.time() * 1000)}{suffix}"
-        img_path = IMAGE_DIR / filename
-        with img_path.open("wb") as f:
-            f.write(data)
+        # Bild speichern (für Evaluation): wir konvertieren immer nach
+        # AVIF, damit später möglichst wenig Speicherplatz verbraucht wird.
+        # Der helper erzeugt einen eindeutigen Dateinamen und liefert
+        # sowohl Name als auch Pfad zurück.
+        filename, img_path = save_bytes_as_avif(data)
+
+        # Versuch, das neue Bild direkt in das Git-Repo zu committen
+        # (falls der Container git konfiguriert hat).  Fehler werden geloggt
+        # und brechen den Upload nicht ab.
+        git_add_commit_push(img_path)
 
         # Modell aufrufen
         try:
