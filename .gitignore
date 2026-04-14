@@ -38,9 +38,7 @@ recipients.txt
 # --------------------------------------------------------
 # Lokale SQLite / Testdatenbanken
 # --------------------------------------------------------
-db/*.db
-db/*.sqlite
-db/*.sqlite3
+*.db
 
 # --------------------------------------------------------
 # Lokale Bilddaten
@@ -144,8 +142,3 @@ frontend.log
 
 # --- override ignore for filenames with spaces inside docs ---
 !docs/**/*
-
-# CodeSandbox persistent artifacts
-
-# extra env pattern
-.env.*
