@@ -63,3 +63,5 @@ python-multipart==0.0.22
 # Falls du später Google Gemini (google-generativeai) brauchst:
 #   google-generativeai==0.8.5
 # dann ebenfalls KEINE grpcio/grpcio-status Pins hinzufügen.
+
+# Batch scripts use sqlite3/hashlib/csv from stdlib (no extra package needed).
