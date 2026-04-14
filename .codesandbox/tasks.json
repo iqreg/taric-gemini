@@ -2,8 +2,8 @@
   // These tasks will run in order when initializing your CodeSandbox project.
   "setupTasks": [
     {
-      "command": "python3 -m pip install --upgrade pip && pip3 install -r requirements.txt",
-      "name": "python3 -m pip install --upgrade pip && pip3 install -r requirements.txt"
+      "name": "python3 -m pip install --upgrade pip && pip3 install -r requirements.txt",
+      "command": "python3 -m pip install --upgrade pip && pip3 install -r requirements.txt"
     }
   ],
 
@@ -12,7 +12,10 @@
     "uvicorn backend:app --host 0.0.0.0 --port 8000": {
       "name": "uvicorn backend:app --host 0.0.0.0 --port 8000",
       "command": "uvicorn backend:app --host 0.0.0.0 --port 8000",
-      "runAtStart": true
+      "runAtStart": true,
+      "preview": {
+        "port": 8000
+      }
     }
   }
 }

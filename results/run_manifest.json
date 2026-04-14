@@ -1,0 +1,15 @@
+{
+  "run_at": "2026-04-14T16:38:01+00:00",
+  "image_dir": "/project/workspace/data/raw/taric_bulk_avif_backup",
+  "db_path": "/project/workspace/db/taric_dataset.db",
+  "results_dir": "/project/workspace/results",
+  "skip_existing": true,
+  "force": true,
+  "counts": {
+    "total": 0,
+    "processed": 0,
+    "skipped": 0,
+    "ok": 0,
+    "failed": 0
+  }
+}
