@@ -190,6 +190,32 @@ def init_db() -> None:
                 "ALTER TABLE taric_evaluation ADD COLUMN superviser_bewertung INTEGER;"
             )
 
+    # taric_official_cache (für /api/taric_official_compare)
+    cur.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='taric_official_cache';")
+    if not cur.fetchone():
+        cur.execute(
+            """
+            CREATE TABLE taric_official_cache (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                taric_prefix TEXT NOT NULL,
+                digits INTEGER NOT NULL,
+                sim_date TEXT NOT NULL,
+                lang TEXT NOT NULL,
+                official_html TEXT,
+                official_description TEXT,
+                source_url TEXT,
+                created_at TEXT,
+                last_used_at TEXT
+            );
+            """
+        )
+        cur.execute(
+            """
+            CREATE UNIQUE INDEX IF NOT EXISTS idx_taric_official_cache_unique
+            ON taric_official_cache (taric_prefix, digits, sim_date, lang);
+            """
+        )
+
     conn.commit()
     conn.close()
     print("DB initialisiert / geprüft.")
@@ -494,7 +520,17 @@ async def fetch_official_taric_description(
     }
 
     requested_url = None
-    async with httpx.AsyncClient(timeout=20.0) as client:
+    request_headers = {
+        "User-Agent": (
+            "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
+            "(KHTML, like Gecko) Chrome/124.0 Safari/537.36"
+        ),
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        "Accept-Language": f"{lang}-DE,{lang};q=0.9,en;q=0.7",
+        "Cache-Control": "no-cache",
+    }
+
+    async with httpx.AsyncClient(timeout=20.0, follow_redirects=True) as client:
         resp = await client.get(base_url, params=params)
         requested_url = str(resp.request.url)
         resp.raise_for_status()
@@ -988,6 +1024,16 @@ async def taric_official_compare(
     die offizielle EU-Beschreibung plus Metadaten zurückgibt.
     """
 
+    if digits not in (4, 6, 8, 10):
+        digits = 4
+    used_prefix = code[:digits] if code and code.isdigit() and len(code) >= digits else None
+    effective_sim_date = sim_date or date.today().strftime("%Y%m%d")
+    eu_taric_url = (
+        "https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp"
+        f"?Lang={lang}&Taric={used_prefix or ''}&Expand=true&SimDate={effective_sim_date}"
+    )
+    bti_url = "https://ec.europa.eu/taxation_customs/dds2/eos/ebti_search.jsp?Lang=de"
+
     try:
         result = await fetch_official_taric_description(
             full_code=code,
@@ -1007,7 +1053,12 @@ async def taric_official_compare(
             content={
                 "error": f"HTTP-Fehler beim Abruf der EU-TARIC-Seite: {e.response.status_code} {e.response.reason_phrase}",
                 "input_code": code,
-                "requested_url": requested_url,
+                "used_prefix": used_prefix,
+                "digits": digits,
+                "sim_date": effective_sim_date,
+                "requested_url": requested_url or eu_taric_url,
+                "source_url": requested_url or eu_taric_url,
+                "bti_info_url": bti_url,
             },
             status_code=502,
         )
@@ -1017,7 +1068,12 @@ async def taric_official_compare(
             content={
                 "error": f"Netzwerkfehler beim Abruf der EU-TARIC-Seite: {str(e)}",
                 "input_code": code,
-                "requested_url": requested_url,
+                "used_prefix": used_prefix,
+                "digits": digits,
+                "sim_date": effective_sim_date,
+                "requested_url": requested_url or eu_taric_url,
+                "source_url": requested_url or eu_taric_url,
+                "bti_info_url": bti_url,
             },
             status_code=502,
         )
@@ -1026,6 +1082,11 @@ async def taric_official_compare(
             content={
                 "error": f"Interner Fehler beim TARIC-Vergleich: {str(e)}",
                 "input_code": code,
+                "used_prefix": used_prefix,
+                "digits": digits,
+                "sim_date": effective_sim_date,
+                "source_url": eu_taric_url,
+                "bti_info_url": bti_url,
             },
             status_code=500,
         )

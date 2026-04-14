@@ -978,12 +978,22 @@
 
         if (!resp.ok) {
           const msg = data.error || "Unbekannter Fehler beim EU-Abruf.";
-          officialTaricDescriptionEl.innerHTML =
-            `<p style="color:var(--error);">${msg}</p>`;
+          officialTaricPrefixEl.textContent = data.used_prefix || code.substring(0, currentTaricDigits);
+          officialTaricDigitsEl.textContent = data.digits ?? currentTaricDigits;
+          officialTaricSimDateEl.textContent = data.sim_date || simDate;
 
-          if (data.requested_url) {
+          const extraLinks = [];
+          if (data.bti_info_url) {
+            extraLinks.push(
+              `<a href="${data.bti_info_url}" target="_blank" rel="noopener noreferrer">BTI/VZTA-Auskunft öffnen</a>`
+            );
+          }
+          officialTaricDescriptionEl.innerHTML =
+            `<p style="color:var(--error);">${msg}</p>${extraLinks.length ? `<p>${extraLinks.join(" | ")}</p>` : ""}`;
+
+          if (data.source_url || data.requested_url) {
             officialTaricSourceUrlEl.textContent = "EU-TARIC im Browser öffnen";
-            officialTaricSourceUrlEl.href = data.requested_url;
+            officialTaricSourceUrlEl.href = data.source_url || data.requested_url;
           } else {
             officialTaricSourceUrlEl.textContent = "Keine URL";
             officialTaricSourceUrlEl.removeAttribute("href");
