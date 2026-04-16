@@ -146,6 +146,10 @@ frontend.log
 !docs/**/*
 
 # CodeSandbox persistent artifacts
+taric_live.db
+*.db
+*.sqlite
+*.sqlite3
 
 # extra env pattern
 .env.*

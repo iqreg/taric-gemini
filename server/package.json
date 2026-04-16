@@ -1,0 +1,19 @@
+{
+  "name": "taric-node-storage",
+  "version": "1.0.0",
+  "private": true,
+  "type": "commonjs",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "export:data": "node src/scripts/exportData.js",
+    "import:data": "node src/scripts/importData.js",
+    "migrate:legacy": "node src/scripts/migrateLegacyData.js"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.10.0",
+    "express": "^4.21.2",
+    "multer": "^1.4.5-lts.1",
+    "uuid": "^11.1.0"
+  }
+}
