@@ -8,7 +8,6 @@
 
 set -euo pipefail
 
-# Projekt-Root relativ zur Skriptposition bestimmen
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 cd "$SCRIPT_DIR"
 
@@ -16,7 +15,6 @@ DB_FILE="taric_live.db"
 IMG_DIR="bilder_uploads"
 EXPORT_BASE_DIR="$SCRIPT_DIR/export"
 
-# 1) Vorprüfungen
 echo "== TARIC Export-Skript =="
 
 if ! command -v python3 >/dev/null 2>&1; then
@@ -36,10 +34,9 @@ if [ ! -d "$IMG_DIR" ]; then
   exit 1
 fi
 
-# 2) Metadaten auslesen
 echo "Lese Metadaten aus Datenbank..."
 
-read -r LIVE_COUNT EVAL_COUNT IMG_COUNT <<EOF
+read -r LIVE_COUNT EVAL_COUNT IMG_COUNT <<EOF_COUNTS
 $(python3 - <<'PY'
 import os
 import sqlite3
@@ -68,32 +65,28 @@ for _root, _dirs, files in os.walk(img_dir):
 print(live_count, eval_count, img_count)
 PY
 )
-EOF
+EOF_COUNTS
 
 TS="$(date +'%Y%m%d_%H%M%S')"
 EXPORT_DIR="$EXPORT_BASE_DIR/taric_export_$TS"
 README_FILE="$EXPORT_DIR/README_taric_export_$TS.txt"
 ARCHIVE_FILE="$EXPORT_BASE_DIR/taric_export_$TS.zip"
 
-# 3) Export-Verzeichnis vorbereiten
 echo "Erzeuge Export-Verzeichnis: $EXPORT_DIR"
 mkdir -p "$EXPORT_DIR"
 
-# 4) Dateien hinein kopieren
 echo "Kopiere Datenbank..."
 cp "$DB_FILE" "$EXPORT_DIR/"
 
 echo "Kopiere Bilder (dies kann je nach Anzahl einen Moment dauern)..."
 mkdir -p "$EXPORT_DIR/$IMG_DIR"
-# rsync ist effizienter, falls vorhanden, sonst fallback auf cp
 if command -v rsync >/dev/null 2>&1; then
   rsync -a "$IMG_DIR"/ "$EXPORT_DIR/$IMG_DIR"/
 else
   cp -R "$IMG_DIR"/ "$EXPORT_DIR/$IMG_DIR"/
 fi
 
-# 5) README mit Metadaten erzeugen
-cat > "$README_FILE" <<EOF
+cat > "$README_FILE" <<EOF_README
 TARIC-Live Export
 =================
 
@@ -119,9 +112,8 @@ Hinweise
   auf Dateien im Verzeichnis 'bilder_uploads/'.
 - Evaluationsdaten sind über 'taric_evaluation.taric_live_id'
   mit 'taric_live.id' verknüpft.
-EOF
+EOF_README
 
-# 6) ZIP-Archiv erzeugen
 echo "Erzeuge ZIP-Archiv: $ARCHIVE_FILE"
 mkdir -p "$EXPORT_BASE_DIR"
 python3 - <<PY

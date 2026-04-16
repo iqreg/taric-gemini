@@ -153,3 +153,9 @@ taric_live.db
 
 # extra env pattern
 .env.*
+
+# local sqlite
+ taric_live.db
+*.db
+*.sqlite
+*.sqlite3
